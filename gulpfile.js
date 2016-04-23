@@ -104,20 +104,27 @@ function build() {
     logBuildMode();
 
     return browserify({
-        paths: [ path.join(__dirname, 'src') ],
-        entries: ENTRY_FILE,
-        debug: true
-    })
-    .transform(babelify)
-    .bundle().on('error', function(error){
-          gutil.log(gutil.colors.red('[Build Error]', error.message));
-          this.emit('end');
-    })
-    .pipe(gulpif(!isProduction(), exorcist(sourcemapPath)))
-    .pipe(source(OUTPUT_FILE))
-    .pipe(buffer())
-    .pipe(gulpif(isProduction(), uglify()))
-    .pipe(gulp.dest(SCRIPTS_PATH));
+            paths: [path.join(__dirname, 'src')],
+            entries: ENTRY_FILE,
+            debug: true,
+            transform: [
+                [
+                    babelify, {
+                        presets: ["es2015"]
+                    }
+                ]
+            ]
+        })
+        .transform(babelify)
+        .bundle().on('error', function(error) {
+            gutil.log(gutil.colors.red('[Build Error]', error.message));
+            this.emit('end');
+        })
+        .pipe(gulpif(!isProduction(), exorcist(sourcemapPath)))
+        .pipe(source(OUTPUT_FILE))
+        .pipe(buffer())
+        .pipe(gulpif(isProduction(), uglify()))
+        .pipe(gulp.dest(SCRIPTS_PATH));
 
 }
 
