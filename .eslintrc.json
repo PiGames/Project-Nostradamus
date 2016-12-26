@@ -1,0 +1,12 @@
+{
+  "extends": "idiomatic",
+  "globals": {
+    "Phaser": true
+  },
+  "parserOptions": {
+		"sourceType": "module",
+		"ecmaFeatures": {
+			"impliedStrict": true
+		}
+	}
+}
