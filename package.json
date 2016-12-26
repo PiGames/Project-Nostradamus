@@ -1,5 +1,5 @@
 {
-  "name": "Project-Nostradamus",
+  "name": "project-nostradamus",
   "version": "0.0.0",
   "description": "2D stealth game with zombies as opponents, based on space station.",
   "main": "src/index.js",
