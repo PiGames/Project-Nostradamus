@@ -1,0 +1,68 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "browser-sync-client-transition@gist:e6ad215ccff2c6788c584770df9f0f09",
+        "scope": null,
+        "escapedName": "browser-sync-client-transition",
+        "name": "browser-sync-client-transition",
+        "rawSpec": "gist:e6ad215ccff2c6788c584770df9f0f09",
+        "spec": "gist:e6ad215ccff2c6788c584770df9f0f09",
+        "type": "hosted",
+        "hosted": {
+          "type": "gist",
+          "ssh": "git@gist.github.com:/e6ad215ccff2c6788c584770df9f0f09.git",
+          "sshUrl": "git+ssh://git@gist.github.com/e6ad215ccff2c6788c584770df9f0f09.git",
+          "httpsUrl": "git+https://gist.github.com/e6ad215ccff2c6788c584770df9f0f09.git",
+          "gitUrl": "git://gist.github.com/e6ad215ccff2c6788c584770df9f0f09.git",
+          "shortcut": "gist:e6ad215ccff2c6788c584770df9f0f09",
+          "directUrl": "https://gist.githubusercontent.com//e6ad215ccff2c6788c584770df9f0f09/raw/package.json"
+        }
+      },
+      "C:\\Users\\Bartek\\Documents\\Projekty\\Project-Nostradamus"
+    ]
+  ],
+  "_from": "gist:e6ad215ccff2c6788c584770df9f0f09",
+  "_id": "browser-sync-client-transition@1.0.0",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/browser-sync-client-transition",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "browser-sync-client-transition@gist:e6ad215ccff2c6788c584770df9f0f09",
+    "scope": null,
+    "escapedName": "browser-sync-client-transition",
+    "name": "browser-sync-client-transition",
+    "rawSpec": "gist:e6ad215ccff2c6788c584770df9f0f09",
+    "spec": "gist:e6ad215ccff2c6788c584770df9f0f09",
+    "type": "hosted",
+    "hosted": {
+      "type": "gist",
+      "ssh": "git@gist.github.com:/e6ad215ccff2c6788c584770df9f0f09.git",
+      "sshUrl": "git+ssh://git@gist.github.com/e6ad215ccff2c6788c584770df9f0f09.git",
+      "httpsUrl": "git+https://gist.github.com/e6ad215ccff2c6788c584770df9f0f09.git",
+      "gitUrl": "git://gist.github.com/e6ad215ccff2c6788c584770df9f0f09.git",
+      "shortcut": "gist:e6ad215ccff2c6788c584770df9f0f09",
+      "directUrl": "https://gist.githubusercontent.com//e6ad215ccff2c6788c584770df9f0f09/raw/package.json"
+    }
+  },
+  "_requiredBy": [
+    "#DEV:/"
+  ],
+  "_resolved": "git://gist.github.com/e6ad215ccff2c6788c584770df9f0f09.git#6ad19f34510c79f5d9fddb3fe8c8287ef7a88f9a",
+  "_shasum": "cf2005407f997f1cd78c1f9c7e6511b304f069ab",
+  "_shrinkwrap": null,
+  "_spec": "browser-sync-client-transition@gist:e6ad215ccff2c6788c584770df9f0f09",
+  "_where": "C:\\Users\\Bartek\\Documents\\Projekty\\Project-Nostradamus",
+  "author": {
+    "name": "bibixx"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "gitHead": "6ad19f34510c79f5d9fddb3fe8c8287ef7a88f9a",
+  "license": "MIT",
+  "name": "browser-sync-client-transition",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "version": "1.0.0"
+}
