@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "gulp",
-    "production": "gulp --production"
+    "production": "gulp --production",
+    "document": "jsdoc -d docs src/ src/**"
   },
   "repository": {
     "type": "git",

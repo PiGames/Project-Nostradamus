@@ -1,7 +1,9 @@
+/** Class responsible for displaying loading screen and loading resources for game.  */
 class Preload extends Phaser.State {
+  /**
+  * Display loading screen. Load resources for game.
+  */
   preload() {
-    // show loading screen
-    // load resources needed for game
   }
   create() {
     this.state.start( 'Menu' );

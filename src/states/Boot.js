@@ -1,6 +1,9 @@
+/** Class responsible for loading resources to show on loading screen in Preload state. */
 class Boot extends Phaser.State {
+  /**
+  * Load resources for loading screen
+  */
   preload() {
-    // load resources for loading screen
   }
   create() {
     this.state.start( 'Preload' );
