@@ -1,5 +1,8 @@
 {
   "extends": "idiomatic",
+  "env": {
+    "browser": true
+  },
   "globals": {
     "Phaser": true
   },
