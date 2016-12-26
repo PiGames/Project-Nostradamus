@@ -1,5 +1,5 @@
 # Project Nostradamus
-======
+
 Project Nostradamus - HTML5, 2D stealth game with zombies as opponents, based on space station, made with Phaser.
 
 ## License
