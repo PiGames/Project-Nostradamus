@@ -16,5 +16,9 @@ class Game extends Phaser.State {
     this.map.createCollision( this.map.player );
     this.map.handleMove();
   }
+
+  resize() {
+    console.log( 1 );
+  }
 }
 export default Game;

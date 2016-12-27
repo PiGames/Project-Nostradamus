@@ -12,11 +12,12 @@ export default class TileMap {
   */
 
   createMap() {
-    this.map = this.game.add.tilemap( 'map', 32, 32 ),
+    this.game.stage.backgroundColor = '#2d2d2d';
+    this.map = this.game.add.tilemap( 'map', 64, 64 ),
     this.map.addTilesetImage( 'tilemap', 'tilemap' );
 
     this.ground = this.map.createLayer( 'background' );
-    this.walls = this.map.createLayer( 'Walls' );
+    this.walls = this.map.createLayer( 'walls' );
 
     this.map.setCollisionByExclusion( [], true, this.walls );
 
@@ -47,8 +48,7 @@ export default class TileMap {
       sprint: this.game.input.keyboard.addKey( Phaser.Keyboard.SHIFT ),
     };
 
-    this.player = this.game.add.sprite( 32, 32, 'player' );
-    this.player.scale.setTo( 0.5, 0.5 );
+    this.player = this.game.add.sprite( 64, 64, 'player' );
     this.game.physics.arcade.enable( this.player );
     this.player.body.collideWorldBounds = true;
 
@@ -63,7 +63,7 @@ export default class TileMap {
     this.player.body.velocity.x = 0;
     this.player.body.velocity.y = 0;
 
-    let velocity = 300;
+    let velocity = 500;
 
     if ( this.cursors.sneak.isDown ) {
       velocity *= 0.25;

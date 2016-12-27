@@ -14,7 +14,6 @@ class ProjectNostradamus extends Phaser.Game {
   */
   constructor( width, height, renderer, parent ) {
     super( width, height, renderer, parent );
-
     this.state.add( 'Preload', Preload );
     this.state.add( 'Boot', Boot );
     this.state.add( 'Preload', Preload );
@@ -22,6 +21,10 @@ class ProjectNostradamus extends Phaser.Game {
     this.state.add( 'Game', Game );
 
     this.state.start( 'Boot' );
+  }
+
+  resize() {
+    console.log( 1 );
   }
 }
 export default ProjectNostradamus;
