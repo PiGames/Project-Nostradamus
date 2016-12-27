@@ -1,4 +1,5 @@
 import Entity from './Entity';
+import { PLAYER_SPEED, PLAYER_SNEAK_MULTIPLIER, PLAYER_SPRINT_MULTIPLIER, PLAYER_WALK_ANIMATION_FRAMERATE } from '../constants/PlayerConstants';
 
 /** Class representing player in game world. It derives after Entity class. It is responsible for player movement, animations, attacks etc.  */
 class Player extends Entity {
@@ -12,12 +13,69 @@ class Player extends Entity {
   */
   constructor( game, x, y, imageKey, frame ) {
     super( game, x, y, imageKey, frame );
+
+    this.cursors = {
+      up: this.game.input.keyboard.addKey( Phaser.Keyboard.W ),
+      down: this.game.input.keyboard.addKey( Phaser.Keyboard.S ),
+      left: this.game.input.keyboard.addKey( Phaser.Keyboard.A ),
+      right: this.game.input.keyboard.addKey( Phaser.Keyboard.D ),
+      sneak: this.game.input.keyboard.addKey( Phaser.Keyboard.ALT ),
+      sprint: this.game.input.keyboard.addKey( Phaser.Keyboard.SHIFT ),
+    };
+
+    this.animations.add( 'walk' );
   }
   /**
   * Update Player's properties, called every frame, such as: rotation angle.
   */
   update() {
+    this.handleMovement();
+    this.handleAnimation();
     this.lookAtMouse();
+  }
+  /**
+  * Handle player's movement. Handle movement special modes and normalize movement vector.
+  */
+  handleMovement() {
+    this.resetVelocity();
+
+    if ( this.cursors.up.isDown ) {
+      this.body.velocity.y = -PLAYER_SPEED;
+    } else if ( this.cursors.down.isDown ) {
+      this.body.velocity.y = PLAYER_SPEED;
+    }
+
+    if ( this.cursors.left.isDown ) {
+      this.body.velocity.x = -PLAYER_SPEED;
+    } else if ( this.cursors.right.isDown ) {
+      this.body.velocity.x = PLAYER_SPEED;
+    }
+
+    this.handleMovementSpecialModes();
+
+    this.normalizeVelocity();
+  }
+  /**
+  * Check for special keys pressed, if so make player move slower or faster.
+  */
+  handleMovementSpecialModes() {
+    let specialEffectMultiplier = 1;
+
+    if ( this.cursors.sneak.isDown ) {
+      specialEffectMultiplier = PLAYER_SNEAK_MULTIPLIER;
+    } else if ( this.cursors.sprint.isDown ) {
+      specialEffectMultiplier = PLAYER_SPRINT_MULTIPLIER;
+    }
+
+    this.body.velocity.x *= specialEffectMultiplier;
+    this.body.velocity.y *= specialEffectMultiplier;
+  }
+  handleAnimation() {
+    if ( this.body.velocity.x !== 0 || this.body.velocity.y !== 0 ) {
+      this.animations.play( 'walk', PLAYER_WALK_ANIMATION_FRAMERATE, true );
+    } else {
+      this.animations.stop( 1 );
+    }
   }
   lookAtMouse() {
     const mouseX = this.game.input.mousePointer.worldX,

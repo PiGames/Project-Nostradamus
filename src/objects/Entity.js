@@ -14,6 +14,8 @@ class Entity extends Phaser.Sprite {
     this.anchor.setTo( 0.5, 0.5 );
 
     this.game.physics.enable( this, Phaser.Physics.ARCADE );
+    this.body.collideWorldBounds = true;
+
     this.game.world.add( this );
   }
   /**
@@ -30,6 +32,19 @@ class Entity extends Phaser.Sprite {
       targetAngle += 360;
     }
     this.angle = targetAngle;
+  }
+  /**
+  * Check if entity is moving in both dimensions, if so lower vector values to move with normal speed.
+  */
+  normalizeVelocity() {
+    if ( this.body.velocity.x !== 0 && this.body.velocity.y !== 0 ) {
+      this.body.velocity.x = this.body.velocity.x * Math.sqrt( 2 ) * 1 / 2;
+      this.body.velocity.y = this.body.velocity.y * Math.sqrt( 2 ) * 1 / 2;
+    }
+  }
+  resetVelocity() {
+    this.body.velocity.x = 0;
+    this.body.velocity.y = 0;
   }
 }
 
