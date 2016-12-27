@@ -1,5 +1,5 @@
 import Entity from './Entity';
-import { PLAYER_SPEED, PLAYER_SNEAK_MULTIPLIER, PLAYER_SPRINT_MULTIPLIER, PLAYER_WALK_ANIMATION_FRAMERATE } from '../constants/PlayerConstants';
+import { PLAYER_SPEED, PLAYER_SNEAK_MULTIPLIER, PLAYER_SPRINT_MULTIPLIER, PLAYER_WALK_ANIMATION_FRAMERATE, PLAYER_FIGHT_ANIMATION_FRAMERATE } from '../constants/PlayerConstants';
 
 /** Class representing player in game world. It derives after Entity class. It is responsible for player movement, animations, attacks etc.  */
 class Player extends Entity {
@@ -22,8 +22,10 @@ class Player extends Entity {
       sneak: this.game.input.keyboard.addKey( Phaser.Keyboard.ALT ),
       sprint: this.game.input.keyboard.addKey( Phaser.Keyboard.SHIFT ),
     };
+    this.cursors
 
-    this.animations.add( 'walk' );
+    this.animations.add( 'walk', [ 1, 2, 1, 0 ], 1 );
+    this.animations.add( 'fight', [ 3, 5, 4 ], 3 );
   }
   /**
   * Update Player's properties, called every frame, such as: rotation angle.
@@ -74,7 +76,10 @@ class Player extends Entity {
     if ( this.body.velocity.x !== 0 || this.body.velocity.y !== 0 ) {
       this.animations.play( 'walk', PLAYER_WALK_ANIMATION_FRAMERATE, true );
     } else {
-      this.animations.stop( 1 );
+      this.animations.stop( 'walk', true );
+    }
+    if ( this.game.input.activePointer.isDown ) {
+      this.animations.play( 'fight', PLAYER_FIGHT_ANIMATION_FRAMERATE, false );
     }
   }
   lookAtMouse() {
