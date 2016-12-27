@@ -1,6 +1,11 @@
+import Player from '../objects/Player';
+import { PLAYER_INITIAL_FRAME } from '../constants/PlayerConstants';
+
 class Game extends Phaser.State {
   create() {
-    console.log( 'Starting Game state...' ); // eslint-disable-line no-console
+    this.player = new Player( this.game, 100, 100, 'player', PLAYER_INITIAL_FRAME );
+  }
+  update() {
   }
 }
 export default Game;

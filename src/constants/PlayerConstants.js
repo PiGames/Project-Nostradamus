@@ -1,0 +1,4 @@
+export const
+  PLAYER_WIDTH = 45,
+  PLAYER_HEIGHT = 36,
+  PLAYER_INITIAL_FRAME = 1;
