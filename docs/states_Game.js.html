@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Home</title>
+    <title>JSDoc: Source: states/Game.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,32 +17,35 @@
 
 <div id="main">
 
-    <h1 class="page-title">Home</h1>
+    <h1 class="page-title">Source: states/Game.js</h1>
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import Player from '../objects/Player';
+import { PLAYER_INITIAL_FRAME } from '../constants/PlayerConstants';
+import TileMap from '../objects/TileMap.js';
 
+/**Class representing Game state */
+export default class Game extends Phaser.State {
+  create() {
+    this.map = new TileMap( this.game );
 
-    <h3> </h3>
+    this.player = new Player( this.game, 100, 100, 'player', PLAYER_INITIAL_FRAME );
+    this.game.camera.follow( this.player );
+  }
 
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
+  update() {
+    this.map.collide( this.player );
+  }
+}
+</code></pre>
+        </article>
+    </section>
 
 
 

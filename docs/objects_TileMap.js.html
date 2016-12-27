@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Home</title>
+    <title>JSDoc: Source: objects/TileMap.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,32 +17,48 @@
 
 <div id="main">
 
-    <h1 class="page-title">Home</h1>
+    <h1 class="page-title">Source: objects/TileMap.js</h1>
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>export default class TileMap {
+  /**
+  * Create the Map. Draw map and set tiles that are supposed to collide with player.
+  * @param {object} game - A reference to the currently running game.
+  */
+  constructor( game ) {
+    this.game = game;
 
+    this.game.stage.backgroundColor = '#2d2d2d';
+    this.map = this.game.add.tilemap( 'map', 64, 64 ),
 
-    <h3> </h3>
+    this.map.addTilesetImage( 'tilemap', 'tilemap' );
 
+    this.ground = this.map.createLayer( 'background' );
+    this.walls = this.map.createLayer( 'walls' );
 
+    this.map.setCollisionByExclusion( [], true, this.walls );
 
+    this.game.world.setBounds( 0, 0, 100, 100 );
+    this.ground.resizeWorld();
+  }
 
-
-
-
-
-
-
-    
-
-
-
-
-
+  /**
+  * Add collision between entity and map.
+  * @param {object} entity - A reference to entity.
+  */
+  collide( entity ) {
+    this.game.physics.arcade.collide( entity, this.walls );
+  }
+}
+</code></pre>
+        </article>
+    </section>
 
 
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: ProjectNostradamus</title>
+    <title>JSDoc: Class: Entity</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: ProjectNostradamus</h1>
+    <h1 class="page-title">Class: Entity</h1>
 
     
 
@@ -28,9 +28,9 @@
 
 <header>
     
-        <h2>ProjectNostradamus</h2>
+        <h2>Entity</h2>
         
-            <div class="class-description">Class representing whole game. Once created it displays game in defined container.</div>
+            <div class="class-description">Class representing any entity in game world. It derives after Phaser.Sprite.</div>
         
     
 </header>
@@ -44,14 +44,14 @@
     <h2>Constructor</h2>
     
 
-    <h4 class="name" id="ProjectNostradamus"><span class="type-signature"></span>new ProjectNostradamus<span class="signature">(width, height, renderer, parent)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Entity"><span class="type-signature"></span>new Entity<span class="signature">(game, x, x, imageKey, frame)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Create a game.
+    Create a Entity. Set its anchor to center, enable arcade physics on it add entity to existing game world.
 </div>
 
 
@@ -87,16 +87,13 @@
 
         <tr>
             
-                <td class="name"><code>width</code></td>
+                <td class="name"><code>game</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
-|
-
-<span class="param-type">string</span>
+<span class="param-type">object</span>
 
 
             
@@ -106,40 +103,14 @@
 
             
 
-            <td class="description last">The width of game in pixels. If given as a string the value must be between - and 100 and will be used as percentage width.</td>
+            <td class="description last">A reference to the currently running game.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>height</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-|
-
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The height of game in pixels. If given as a string the value must be between - and 100 and will be used as percentage height.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>renderer</code></td>
+                <td class="name"><code>x</code></td>
             
 
             <td class="type">
@@ -155,23 +126,20 @@
 
             
 
-            <td class="description last">Which renderer to use: Phaser.AUTO will auto-detect, Phaser.WEBGL, Phaser.CANVAS or Phaser.HEADLESS (no rendering at all).</td>
+            <td class="description last">The x coordinate (in world space) to position the Sprite at.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>parent</code></td>
+                <td class="name"><code>x</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
-|
-
-<span class="param-type">HTMLElement</span>
+<span class="param-type">number</span>
 
 
             
@@ -181,7 +149,53 @@
 
             
 
-            <td class="description last">The DOM element into which this games canvas will be injected. Either a DOM ID (string) or the element itself.</td>
+            <td class="description last">The y coordinate (in world space) to position the Sprite at.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>imageKey</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">This is the key to image used by the Sprite during rendering.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>frame</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">If this Sprite is using part of a sprite sheet or texture atlas you can specify the exact frame to use by giving a numeric index.</td>
         </tr>
 
     
@@ -222,7 +236,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ProjectNostradamus.js.html">ProjectNostradamus.js</a>, <a href="ProjectNostradamus.js.html#line7">line 7</a>
+        <a href="objects_Entity.js.html">objects/Entity.js</a>, <a href="objects_Entity.js.html#line2">line 2</a>
     </li></ul></dd>
     
 
@@ -264,48 +278,21 @@
     
 
     
+        <h3 class="subsection-title">Methods</h3>
 
-    
-
-    
-</article>
-
-</section>
-
-
-
-
-
-
-
-<section>
-
-<header>
-    
-        <h2>ProjectNostradamus</h2>
         
-            <div class="class-description">Class representing whole game. Once created it displays game in defined container.</div>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
+            
 
     
-    <h2>Constructor</h2>
-    
 
-    <h4 class="name" id="ProjectNostradamus"><span class="type-signature"></span>new ProjectNostradamus<span class="signature">(width, height, renderer, parent)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="lookAt"><span class="type-signature"></span>lookAt<span class="signature">(targetX, targetY)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Create a game.
+    Rotate a Entity to look at given target.
 </div>
 
 
@@ -341,59 +328,7 @@
 
         <tr>
             
-                <td class="name"><code>width</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-|
-
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The width of game in pixels. If given as a string the value must be between - and 100 and will be used as percentage width.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>height</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-|
-
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The height of game in pixels. If given as a string the value must be between - and 100 and will be used as percentage height.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>renderer</code></td>
+                <td class="name"><code>targetX</code></td>
             
 
             <td class="type">
@@ -409,23 +344,20 @@
 
             
 
-            <td class="description last">Which renderer to use: Phaser.AUTO will auto-detect, Phaser.WEBGL, Phaser.CANVAS or Phaser.HEADLESS (no rendering at all).</td>
+            <td class="description last">The target x coordintate.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>parent</code></td>
+                <td class="name"><code>targetY</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
-|
-
-<span class="param-type">HTMLElement</span>
+<span class="param-type">number</span>
 
 
             
@@ -435,7 +367,7 @@
 
             
 
-            <td class="description last">The DOM element into which this games canvas will be injected. Either a DOM ID (string) or the element itself.</td>
+            <td class="description last">The target y coordintate.</td>
         </tr>
 
     
@@ -476,7 +408,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ProjectNostradamus.js.html">ProjectNostradamus.js</a>, <a href="ProjectNostradamus.js.html#line7">line 7</a>
+        <a href="objects_Entity.js.html">objects/Entity.js</a>, <a href="objects_Entity.js.html#line26">line 26</a>
     </li></ul></dd>
     
 
@@ -502,21 +434,89 @@
 
 
 
-    
-    </div>
+        
+            
 
     
 
+    <h4 class="name" id="normalizeVelocity"><span class="type-signature"></span>normalizeVelocity<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Check if entity is moving in both dimensions, if so lower vector values to move with normal speed.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
     
 
     
 
-     
+    
+
+    
 
     
 
     
 
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="objects_Entity.js.html">objects/Entity.js</a>, <a href="objects_Entity.js.html#line39">line 39</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
     
 
     
