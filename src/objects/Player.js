@@ -59,13 +59,16 @@ class Player extends Entity {
   * Check for special keys pressed, if so make player move slower or faster.
   */
   handleMovementSpecialModes() {
+    let specialEffectMultiplier = 1;
+
     if ( this.cursors.sneak.isDown ) {
-      this.body.velocity *= PLAYER_SNEAK_MULTIPLIER;
+      specialEffectMultiplier = PLAYER_SNEAK_MULTIPLIER;
+    } else if ( this.cursors.sprint.isDown ) {
+      specialEffectMultiplier = PLAYER_SPRINT_MULTIPLIER;
     }
 
-    if ( this.cursors.sprint.isDown ) {
-      this.body.velocity *= PLAYER_SPRINT_MULTIPLIER;
-    }
+    this.body.velocity.x *= specialEffectMultiplier;
+    this.body.velocity.y *= specialEffectMultiplier;
   }
   handleAnimation() {
     if ( this.body.velocity.x !== 0 || this.body.velocity.y !== 0 ) {
