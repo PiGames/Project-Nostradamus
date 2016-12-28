@@ -1,20 +1,20 @@
-export default class TileMap {
+export default class TileMap extends Phaser.Tilemap {
   /**
   * Create the Map. Draw map and set tiles that are supposed to collide with player.
   * @param {object} game - A reference to the currently running game.
+  * @param {string} key - A key to tilemap data.
+  * @param {number} tileWidth - Width of single tile.
+  * @param {number} tileHeight - Height of single tile.
   */
-  constructor( game ) {
-    this.game = game;
+  constructor( game, key, tileWidth, tileHeight ) {
+    super( game, key, tileWidth, tileHeight );
 
-    this.game.stage.backgroundColor = '#2d2d2d';
-    this.map = this.game.add.tilemap( 'map', 64, 64 ),
+    this.addTilesetImage( 'tilemap', 'tilemap' );
 
-    this.map.addTilesetImage( 'tilemap', 'tilemap' );
+    this.ground = this.createLayer( 'background' );
+    this.walls = this.createLayer( 'walls' );
 
-    this.ground = this.map.createLayer( 'background' );
-    this.walls = this.map.createLayer( 'walls' );
-
-    this.map.setCollisionByExclusion( [], true, this.walls );
+    this.setCollisionByExclusion( [], true, this.walls );
 
     this.game.world.setBounds( 0, 0, 100, 100 );
     this.ground.resizeWorld();
