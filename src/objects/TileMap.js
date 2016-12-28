@@ -1,6 +1,6 @@
 export default class TileMap extends Phaser.Tilemap {
   /**
-  * Create the Map. Draw map and set tiles that are supposed to collide with player.
+  * Create the Map. Draw map and set tiles that are supposed to collide with player. Also sets world size to match map size.
   * @param {object} game - A reference to the currently running game.
   * @param {string} key - A key to tilemap data.
   * @param {number} tileWidth - Width of single tile.
@@ -16,7 +16,6 @@ export default class TileMap extends Phaser.Tilemap {
 
     this.setCollisionByExclusion( [], true, this.walls );
 
-    this.game.world.setBounds( 0, 0, 100, 100 );
     this.ground.resizeWorld();
   }
 
