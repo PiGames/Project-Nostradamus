@@ -32,6 +32,7 @@
     "yargs": "^4.6.0"
   },
   "dependencies": {
+    "easystarjs": "^0.3.1",
     "phaser": "^2.4.7"
   }
 }
