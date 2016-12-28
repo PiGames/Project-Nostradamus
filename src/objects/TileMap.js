@@ -9,7 +9,7 @@ export default class TileMap extends Phaser.Tilemap {
   constructor( game, key, tileWidth, tileHeight ) {
     super( game, key, tileWidth, tileHeight );
 
-    this.addTilesetImage( 'tilemap', 'tilemap' );
+    this.addTilesetImage( 'tilemap' );
 
     this.ground = this.createLayer( 'background' );
     this.walls = this.createLayer( 'walls' );
