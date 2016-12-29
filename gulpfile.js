@@ -137,7 +137,10 @@ function serve() {
 
     var options = {
         server: {
-            baseDir: BUILD_PATH
+            baseDir: BUILD_PATH,
+            routes:  {
+              '/browser-sync-client-transition': './node_modules/browser-sync-client-transition/'
+            }
         },
         snippetOptions: {
           rule: {
@@ -149,7 +152,7 @@ function serve() {
     };
 
     options.snippetOptions.rule.fn = function() {
-      return `<link rel='stylesheet' href='./browser-sync-client-transition/browser-sync-client.min.css' /><script async src='./browser-sync-client-transition/browser-sync-client.min.js'></script>`;
+      return `<link rel='stylesheet' href='./browser-sync-client-transitio/browser-sync-client.min.css' /><script async src='./browser-sync-client-transitio/browser-sync-client.min.js'></script>`;
     };
 
     browserSync(options);
