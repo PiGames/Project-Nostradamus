@@ -80,13 +80,13 @@ export default class Player extends Entity {
     } else {
       this.animations.stop( 'walk', true );
     }
-    if ( this.game.input.activePointer.isDown ) {
+    if ( this.game.input.activePointer.leftButton.isDown ) {
       this.animations.play( 'fight', PLAYER_FIGHT_ANIMATION_FRAMERATE, false );
     }
   }
   lookAtMouse() {
-    const mouseX = this.game.input.mousePointer.worldX,
-      mouseY = this.game.input.mousePointer.worldY;
+    const mouseX = this.game.input.mousePointer.worldX;
+    const mouseY = this.game.input.mousePointer.worldY;
 
     this.lookAt( mouseX, mouseY );
   }
