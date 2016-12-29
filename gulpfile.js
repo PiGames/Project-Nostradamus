@@ -6,6 +6,7 @@ var gutil = require('gulp-util');
 var source = require('vinyl-source-stream');
 var buffer = require('gulp-buffer');
 var uglify = require('gulp-uglify');
+var stripDebug = require('gulp-strip-debug');
 var gulpif = require('gulp-if');
 var exorcist = require('exorcist');
 var babelify = require('babelify');
@@ -124,6 +125,7 @@ function build() {
         .pipe(gulpif(!isProduction(), exorcist(sourcemapPath)))
         .pipe(source(OUTPUT_FILE))
         .pipe(buffer())
+        .pipe(gulpif(isProduction(), stripDebug()))
         .pipe(gulpif(isProduction(), uglify()))
         .pipe(gulp.dest(SCRIPTS_PATH));
 
@@ -152,7 +154,7 @@ function serve() {
     };
 
     options.snippetOptions.rule.fn = function() {
-      return `<link rel='stylesheet' href='./browser-sync-client-transitio/browser-sync-client.min.css' /><script async src='./browser-sync-client-transitio/browser-sync-client.min.js'></script>`;
+      return `<link rel='stylesheet' href='./browser-sync-client-transition/browser-sync-client.min.css' /><script async src='./browser-sync-client-transition/browser-sync-client.min.js'></script>`;
     };
 
     browserSync(options);
