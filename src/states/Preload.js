@@ -1,5 +1,5 @@
 import { PLAYER_WIDTH, PLAYER_HEIGHT } from '../constants/PlayerConstants.js';
-import { ZOMBIE_WIDTH, ZOMBIE_HEIGHT } from '../constants/ZOMBIEConstants.js';
+import { ZOMBIE_WIDTH, ZOMBIE_HEIGHT } from '../constants/ZombieConstants.js';
 
 /** Class responsible for displaying loading screen and loading resources for game.  */
 class Preload extends Phaser.State {

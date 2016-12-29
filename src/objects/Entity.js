@@ -9,7 +9,7 @@ class Entity extends Phaser.Sprite {
   * @param {number} frame - If this Sprite is using part of a sprite sheet or texture atlas you can specify the exact frame to use by giving a numeric index.
   */
   constructor( game, x, y, imageKey, frame ) {
-    super( game, x, y, imageKey, frame )
+    super( game, x, y, imageKey, frame );
 
     this.anchor.setTo( 0.5, 0.5 );
 
@@ -24,8 +24,8 @@ class Entity extends Phaser.Sprite {
   * @param {number} targetY - The target y coordintate.
   */
   lookAt( targetX, targetY ) {
-    const targetPoint = new Phaser.Point( targetX, targetY ),
-      entityCenter = new Phaser.Point( this.body.x + this.width / 2, this.body.y + this.height / 2 );
+    const targetPoint = new Phaser.Point( targetX, targetY );
+    const entityCenter = new Phaser.Point( this.body.x + this.width / 2, this.body.y + this.height / 2 );
 
     let targetAngle = Phaser.Math.radToDeg( Phaser.Math.angleBetweenPoints( targetPoint, entityCenter ) ) - 90;
 

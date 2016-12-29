@@ -1,3 +1,5 @@
+import { MAP_WIDTH } from '../constants/TileMapConstants';
+
 export default class TileMap extends Phaser.Tilemap {
   /**
   * Create the Map. Draw map and set tiles that are supposed to collide with player. Also sets world size to match map size.
@@ -25,5 +27,27 @@ export default class TileMap extends Phaser.Tilemap {
   */
   collide( entity ) {
     this.game.physics.arcade.collide( entity, this.walls );
+  }
+
+  getWallsPostions() {
+    const walls = this.walls.getTiles( 0, 0, 2048, 2048 );
+    const wallsArr = [];
+
+    let currentY = [];
+
+    walls.forEach( ( v, i ) => {
+      if ( v.index !== -1 ) {
+        currentY.push( 1 );
+      } else {
+        currentY.push( 0 );
+      }
+
+      if ( i % MAP_WIDTH === ( MAP_WIDTH - 1 ) ) {
+        wallsArr.push( currentY );
+        currentY = [];
+      }
+    } );
+
+    return wallsArr;
   }
 }
