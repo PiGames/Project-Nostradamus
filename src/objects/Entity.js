@@ -25,12 +25,14 @@ class Entity extends Phaser.Sprite {
   */
   lookAt( targetX, targetY ) {
     const targetPoint = new Phaser.Point( targetX, targetY ),
-      entityCenter = new Phaser.Point( this.body.x, this.body.y );
-    let targetAngle = ( 360 / ( 2 * Math.PI ) ) * this.game.math.angleBetweenPoints( targetPoint, entityCenter ) - 90;
+      entityCenter = new Phaser.Point( this.body.x + this.width / 2, this.body.y + this.height / 2 );
+
+    let targetAngle = Phaser.Math.radToDeg( Phaser.Math.angleBetweenPoints( targetPoint, entityCenter ) ) - 90;
 
     if ( targetAngle < 0 ) {
       targetAngle += 360;
     }
+
     this.angle = targetAngle;
   }
   /**

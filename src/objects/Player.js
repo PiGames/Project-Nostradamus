@@ -1,8 +1,8 @@
 import Entity from './Entity';
-import { PLAYER_SPEED, PLAYER_SNEAK_MULTIPLIER, PLAYER_SPRINT_MULTIPLIER, PLAYER_WALK_ANIMATION_FRAMERATE, PLAYER_FIGHT_ANIMATION_FRAMERATE } from '../constants/PlayerConstants';
+import { PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, PLAYER_SNEAK_MULTIPLIER, PLAYER_SPRINT_MULTIPLIER, PLAYER_WALK_ANIMATION_FRAMERATE, PLAYER_FIGHT_ANIMATION_FRAMERATE } from '../constants/PlayerConstants';
 
 /** Class representing player in game world. It derives after Entity class. It is responsible for player movement, animations, attacks etc.  */
-class Player extends Entity {
+export default class Player extends Entity {
   /**
   * Create the Player Entity.
   * @param {object} game - A reference to the currently running game.
@@ -14,6 +14,9 @@ class Player extends Entity {
   constructor( game, x, y, imageKey, frame ) {
     super( game, x, y, imageKey, frame );
 
+    this.width = PLAYER_WIDTH;
+    this.height = PLAYER_HEIGHT;
+
     this.cursors = {
       up: this.game.input.keyboard.addKey( Phaser.Keyboard.W ),
       down: this.game.input.keyboard.addKey( Phaser.Keyboard.S ),
@@ -22,7 +25,6 @@ class Player extends Entity {
       sneak: this.game.input.keyboard.addKey( Phaser.Keyboard.ALT ),
       sprint: this.game.input.keyboard.addKey( Phaser.Keyboard.SHIFT ),
     };
-    this.cursors
 
     this.animations.add( 'walk', [ 1, 2, 1, 0 ], 1 );
     this.animations.add( 'fight', [ 3, 5, 4 ], 3 );
@@ -90,4 +92,3 @@ class Player extends Entity {
   }
 
 }
-export default Player;
