@@ -36,7 +36,7 @@ class Entity extends Phaser.Sprite {
     this.angle = targetAngle;
   }
   /**
-  * Check if entity is moving in both dimensions, if so lower vector values to move with normal speed.
+  * Check if entity is moving in both dimensions, if so, lower vector values to move with normal speed.
   */
   normalizeVelocity() {
     if ( this.body.velocity.x !== 0 && this.body.velocity.y !== 0 ) {
