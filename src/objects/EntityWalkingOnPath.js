@@ -11,14 +11,35 @@ export default class EntityWalkingOnPath extends Entity {
     this.pathfinder = new PathFinder();
     this.pathfinder.setGrid( walls );
 
-    this.path = path;
+    this.pathTargets = path;
 
-    this.currentTarget = this.path[ 0 ];
+    this.pathsBetweenPathTargets = [];
+
+    this.currentTarget = this.pathTargets[ 0 ];
 
     /* disable update until path is calculated */
     this.isMoving = false;
 
+    //this.calculateStandardPaths();
+
     this.startMovement();
+  }
+  /**Recursive function that calculates standard paths and save them into pathsBetweenPathTargets container.  Recurse approach is used to handle asynchronous nature of findPath method */
+  calculateStandardPaths( index = 0 ) {
+    if ( this.pathsBetweenPathTargets.length === this.pathTargets.length ) {
+      return;
+    }
+
+    const start = this.pathTargets[ index ];
+    const target = ( index === this.pathTargets.length - 1 ) ? this.pathTargets[ 0 ] : this.pathTargets[ index + 1 ];
+
+    this.pathfinder.findPath( start.x, start.y, target.x, target.y, ( path ) => {
+      this.savePath( path, start, target );
+      this.calculateStandardPaths( index + 1 );
+    } );
+  }
+  savePath( path, start, target ) {
+    this.pathsBetweenPathTargets.push( { path, start, target } );
   }
   startMovement() {
     this.calculatePath( path => this.onPathCalculatingFinish( path ) );
@@ -74,8 +95,8 @@ export default class EntityWalkingOnPath extends Entity {
     this.startMovement();
   }
   getNextCurrentTarget() {
-    const currentTargetIndex = this.path.indexOf( this.currentTarget );
-    return currentTargetIndex >= this.path.length - 1 ? this.path[ 0 ] : this.path[ currentTargetIndex + 1 ];
+    const currentTargetIndex = this.pathTargets.indexOf( this.currentTarget );
+    return currentTargetIndex >= this.pathTargets.length - 1 ? this.pathTargets[ 0 ] : this.pathTargets[ currentTargetIndex + 1 ];
   }
   updateLookDirection() {
     const lookTarget = tileToPixels( this.stepTarget );
