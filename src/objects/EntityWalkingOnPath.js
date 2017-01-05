@@ -56,7 +56,6 @@ export default class EntityWalkingOnPath extends Entity {
     }
   }
   onStepTargetReach() {
-    this.resetVelocity();
     this.currentStepIndex++;
     if ( this.currentStepIndex === this.pathsBetweenPathTargets[ this.currentPathIndex ].path.length ) {
       this.currentPathIndex = ( this.currentPathIndex + 1 === this.pathsBetweenPathTargets.length ) ? 0 : this.currentPathIndex + 1;
