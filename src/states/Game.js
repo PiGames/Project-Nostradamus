@@ -14,8 +14,7 @@ export default class Game extends Phaser.State {
     this.game.camera.follow( this.player );
 
     this.zombies = this.game.add.group();
-    this.zombies.add( new Zombie( this.game, TILE_WIDTH * 1 + TILE_WIDTH / 2, TILE_HEIGHT + TILE_HEIGHT / 2, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 1, y: 4 }, { x: 10, y: 10 } ], this.map.getWallsPostions() ) );
-    //this.zombies.add( new Zombie( this.game, TILE_WIDTH * 3 + TILE_WIDTH / 2, TILE_HEIGHT + TILE_HEIGHT / 2, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 2, y: 2 }, { x: 10, y: 10 } ], this.map.getWallsPostions() ) );
+    this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 1, y: 4 }, { x: 10, y: 10 } ], this.map.getWallsPostions() ) );
   }
 
   update() {
