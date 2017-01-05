@@ -48,7 +48,6 @@ export default class EntityWalkingOnPath extends Entity {
     if ( this.enableMovement ) {
       if ( this.isReached( this.stepTarget ) ) {
         this.onStepTargetReach();
-        return;
       }
       this.game.physics.arcade.moveToObject( this, tileToPixels( this.stepTarget ), ZOMBIE_SPEED );
 
