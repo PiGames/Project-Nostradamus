@@ -17,19 +17,19 @@ export default class EntityWalkingOnPath extends Entity {
 
     this.pathsBetweenPathTargets = [];
 
-    /* disable update until path is calculated */
-    this.isMoving = false;
-
     this.currentPathIndex = 0;
     this.currentStepIndex = 0;
 
-    this.calculateStandardPaths( () => {
+    /* disable update until paths are calculated */
+    this.enableMovement = false;
+
+    this.calculatePathsBetweenTargets( () => {
       this.stepTarget = this.pathsBetweenPathTargets[ this.currentPathIndex ].path[ this.currentStepIndex ];
       this.enableMovement = true;
     } );
   }
   /**Recursive function that calculates standard paths and save them into pathsBetweenPathTargets container.  Recurse approach is used to handle asynchronous nature of findPath method */
-  calculateStandardPaths( doneCallback, index = 0 ) {
+  calculatePathsBetweenTargets( doneCallback, index = 0 ) {
     if ( this.pathsBetweenPathTargets.length === this.targets.length ) {
       doneCallback();
       return;
@@ -40,7 +40,7 @@ export default class EntityWalkingOnPath extends Entity {
 
     this.pathfinder.findPath( start.x, start.y, target.x, target.y, ( path ) => {
       this.pathsBetweenPathTargets.push( { path, start, target } );
-      this.calculateStandardPaths( doneCallback, index + 1 );
+      this.calculatePathsBetweenTargets( doneCallback, index + 1 );
     } );
   }
   /** Check if current target or step target is reached. Move body in stepTarget direction. */
