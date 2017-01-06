@@ -1,7 +1,7 @@
 import Entity from './Entity';
 import PathFinder from '../objects/PathFinder.js';
 import { ZOMBIE_SPEED, ZOMBIE_LOOKING_OFFSET, MIN_DISTANCE_TO_TARGET } from '../constants/ZombieConstants';
-import { pixelsToTileX, pixelsToTileY, tileToPixels } from '../utils/MapUtils.js';
+import { tileToPixels } from '../utils/MapUtils.js';
 
 /** Create Entity that is supposed to walk on given path. Set position of entity on first given target*/
 export default class EntityWalkingOnPath extends Entity {
@@ -21,11 +21,13 @@ export default class EntityWalkingOnPath extends Entity {
     this.currentStepIndex = 0;
 
     /* disable update until paths are calculated */
-    this.enableMovement = false;
+    this.isInitialized = false;
+    this.canMove = false;
 
     this.calculatePathsBetweenTargets( () => {
       this.stepTarget = this.pathsBetweenPathTargets[ this.currentPathIndex ].path[ this.currentStepIndex ];
-      this.enableMovement = true;
+      this.isInitialized = true;
+      this.canMove = true;
     } );
   }
   /**Recursive function that calculates standard paths and save them into pathsBetweenPathTargets container.  Recurse approach is used to handle asynchronous nature of findPath method */
@@ -45,7 +47,7 @@ export default class EntityWalkingOnPath extends Entity {
   }
   /** Check if current target or step target is reached. Move body in stepTarget direction. */
   update() {
-    if ( this.enableMovement ) {
+    if ( this.canMove ) {
       if ( this.isReached( this.stepTarget ) ) {
         this.onStepTargetReach();
       }
@@ -55,10 +57,11 @@ export default class EntityWalkingOnPath extends Entity {
     }
   }
   onStepTargetReach() {
-    this.currentStepIndex++;
-    if ( this.currentStepIndex === this.pathsBetweenPathTargets[ this.currentPathIndex ].path.length ) {
+    if ( this.currentStepIndex + 1 === this.pathsBetweenPathTargets[ this.currentPathIndex ].path.length ) {
       this.currentPathIndex = ( this.currentPathIndex + 1 === this.pathsBetweenPathTargets.length ) ? 0 : this.currentPathIndex + 1;
       this.currentStepIndex = 0;
+    } else {
+      this.currentStepIndex++;
     }
     this.stepTarget = this.pathsBetweenPathTargets[ this.currentPathIndex ].path[ this.currentStepIndex ];
   }
@@ -74,5 +77,12 @@ export default class EntityWalkingOnPath extends Entity {
   isReached( target ) {
     const distanceToTarget = this.game.physics.arcade.distanceBetween( this, tileToPixels( target ) );
     return distanceToTarget <= MIN_DISTANCE_TO_TARGET;
+  }
+  disableMovement() {
+    this.canMove = false;
+    this.resetVelocity();
+  }
+  enableMovement() {
+    this.canMove = true;
   }
 }

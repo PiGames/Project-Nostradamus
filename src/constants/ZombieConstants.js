@@ -5,4 +5,4 @@ export const ZOMBIE_SPEED = 175;
 export const ZOMBIE_LOOKING_OFFSET = 10;
 export const ZOMBIE_WALK_ANIMATION_FRAMERATE = 5;
 export const ZOMBIE_FIGHT_ANIMATION_FRAMERATE = 10;
-export const MIN_DISTANCE_TO_TARGET = 1;
+export const MIN_DISTANCE_TO_TARGET = 5;
