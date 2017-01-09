@@ -20,6 +20,10 @@ export default class EntityWalkingOnPath extends Entity {
     this.currentPathIndex = 0;
     this.currentStepIndex = 0;
 
+    this.isOnStandardPath = true;
+    this.temporaryPath = [];
+    this.temporaryStepIndex = 0;
+
     /* disable update until paths are calculated */
     this.isInitialized = false;
     this.canMove = false;
@@ -56,15 +60,27 @@ export default class EntityWalkingOnPath extends Entity {
       this.updateLookDirection();
     }
   }
+  /** When current step target or temporary step target is reached, set step target to the next one.*/
+  /** If current target is reached or temporary target is reached set path to the next one, or get back to standard path*/
   onStepTargetReach() {
-    if ( this.currentStepIndex + 1 === this.pathsBetweenPathTargets[ this.currentPathIndex ].path.length ) {
-      this.currentPathIndex = ( this.currentPathIndex + 1 === this.pathsBetweenPathTargets.length ) ? 0 : this.currentPathIndex + 1;
-      this.currentStepIndex = 0;
+    if ( this.isOnStandardPath ) {
+      if ( this.currentStepIndex + 1 === this.pathsBetweenPathTargets[ this.currentPathIndex ].path.length ) {
+        this.currentPathIndex = ( this.currentPathIndex + 1 === this.pathsBetweenPathTargets.length ) ? 0 : this.currentPathIndex + 1;
+        this.currentStepIndex = 0;
+      } else {
+        this.currentStepIndex++;
+      }
+      this.stepTarget = this.pathsBetweenPathTargets[ this.currentPathIndex ].path[ this.currentStepIndex ];
     } else {
-      this.currentStepIndex++;
+      if ( this.temporaryStepIndex + 1 === this.temporaryPath.length ) {
+        this.changePathToStandard();
+      } else {
+        this.temporaryStepIndex++;
+        this.stepTarget = this.temporaryPath[ this.temporaryStepIndex ];
+      }
     }
-    this.stepTarget = this.pathsBetweenPathTargets[ this.currentPathIndex ].path[ this.currentStepIndex ];
   }
+
   updateLookDirection() {
     const lookTarget = tileToPixels( this.stepTarget );
 
@@ -77,6 +93,26 @@ export default class EntityWalkingOnPath extends Entity {
   isReached( target ) {
     const distanceToTarget = this.game.physics.arcade.distanceBetween( this, tileToPixels( target ) );
     return distanceToTarget <= MIN_DISTANCE_TO_TARGET;
+  }
+  calculateTemporaryPath( start, target, callback ) {
+    this.pathfinder.findPath( start.x, start.y, target.x, target.y, callback );
+  }
+  /**Change path to temporary and automatically get back to standard path, after reaching temporary target ( it is recommended to set the target as current path target) */
+  changePathToTemporary( start, target ) {
+    this.canMove = false;
+    this.calculateTemporaryPath( start, target, ( path ) => {
+      this.temporaryPath = path;
+      this.temporaryStepIndex = 0;
+      this.stepTarget = path[ this.temporaryStepIndex ];
+      this.isOnStandardPath = false;
+      this.canMove = true;
+    } );
+  }
+  changePathToStandard() {
+    this.currentPathIndex = ( this.currentPathIndex + 1 === this.pathsBetweenPathTargets.length ) ? 0 : this.currentPathIndex + 1;
+    this.currentStepIndex = 0;
+    this.stepTarget = this.pathsBetweenPathTargets[ this.currentPathIndex ].path[ this.currentStepIndex ];
+    this.isOnStandardPath = true;
   }
   disableMovement() {
     this.canMove = false;
