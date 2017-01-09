@@ -14,14 +14,16 @@ export default class Game extends Phaser.State {
     this.player = new Player( this.game, TILE_WIDTH + TILE_WIDTH / 2, TILE_HEIGHT + TILE_HEIGHT / 2, 'player', PLAYER_INITIAL_FRAME );
     this.game.camera.follow( this.player );
 
-    this.zombies = new WalkingEntitiesManager( this.game );
-    this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 4, y: 2 }, { x: 4, y: 5 } ], this.map.getWallsPostions() ) );
-    this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 2, y: 4 }, { x: 5, y: 4 } ], this.map.getWallsPostions() ) );
+    this.zombies = new WalkingEntitiesManager( this.game, this.map.getWallsPostions() );
+    this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 2, y: 4 }, { x: 6, y: 4 } ], this.map.getWallsPostions() ) );
+    this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 4, y: 2 }, { x: 4, y: 6 } ], this.map.getWallsPostions() ) );
+    this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 2, y: 2 }, { x: 7, y: 7 } ], this.map.getWallsPostions() ) );
   }
 
   update() {
     this.map.collide( this.player );
-    this.map.collide( this.zombies );
-    this.game.physics.arcade.collide( this.zombies );
+    this.map.collide( this.zombies, ( ...args ) => this.zombies.onCollisionWithWalls( ...args ) );
+    this.game.physics.arcade.collide( this.zombies, this.zombies, ( ...args ) => this.zombies.onCollisionWihOtherEntity( ...args ) );
+    this.game.physics.arcade.collide( this.zombies, this.player );
   }
 }

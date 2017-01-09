@@ -1,55 +1,66 @@
-import { willEntitiesBeOnTheSameTile, isEntityTouchingTile, getEntityNextTile, areEntitiesTouchingTheSameTile } from '../utils/EntityManagerUtils';
+import { willEntitiesBeOnTheSameTile, getFreeTileAroundEntityExcludingOtherEntity, getEntityNextTile } from '../utils/EntityManagerUtils';
+import { pixelsToTile } from '../utils/MapUtils';
 
 export default class WalkingEntitiesManager extends Phaser.Group {
-  constructor( game ) {
+  constructor( game, grid ) {
     super( game );
+    this.mapGrid = grid;
     this.allEntitiesInitialized = false;
-    this.frozenEntities = [];
   }
 
   update() {
     if ( this.allEntitiesInitialized || this.areAllEntitiesInitialized() ) {
-      this.manageFrozenEntities();
       this.manageMovingEntities();
     }
 
     Phaser.Group.prototype.update.call( this );
   }
-
-
-  manageFrozenEntities() {
-    for ( const frozenEntity of this.frozenEntities ) {
-      let willCollide = false;
-
-      for ( const entity of this.children ) {
-        if ( entity === frozenEntity ) {
+  manageMovingEntities() {
+    for ( const entityIndex1 in this.children ) {
+      for ( const entityIndex2 in this.children ) {
+        if ( entityIndex1 === entityIndex2 ) {
           continue;
         }
-        if ( willEntitiesBeOnTheSameTile( frozenEntity, entity ) || isEntityTouchingTile( entity, getEntityNextTile( frozenEntity ) ) ) {
-          willCollide = true;
-        }
-      }
+        const currentHandledEntity = this.children[ Math.min( entityIndex1, entityIndex2 ) ];
+        const otherEntity = this.children[ Math.max( entityIndex1, entityIndex2 ) ];
 
-      if ( !willCollide ) {
-        frozenEntity.canMove = true;
-        const frozenEntityIndex = this.frozenEntities.indexOf( frozenEntity );
-        this.frozenEntities.splice( frozenEntityIndex, 1 );
+        if ( currentHandledEntity.canMove && otherEntity.canMove && willEntitiesBeOnTheSameTile( currentHandledEntity, otherEntity ) ) {
+          const freeTile = getFreeTileAroundEntityExcludingOtherEntity( currentHandledEntity, otherEntity, this.mapGrid );
+          const currentTarget = currentHandledEntity.pathsBetweenPathTargets[ currentHandledEntity.currentPathIndex ].target;
+
+          currentHandledEntity.changePathToTemporary( freeTile, currentTarget );
+        }
       }
     }
   }
+  onCollisionWihOtherEntity( entity1, entity2 ) {
+    const freeTile1 = getFreeTileAroundEntityExcludingOtherEntity( entity1, entity2, this.mapGrid );
+    const freeTile2 = getFreeTileAroundEntityExcludingOtherEntity( entity2, entity1, this.mapGrid );
 
-  manageMovingEntities() {
-    // this is done for down for specific numver of zombies (2)
+    const currentTarget1 = entity1.pathsBetweenPathTargets[ entity1.currentPathIndex ].target;
+    const currentTarget2 = entity2.pathsBetweenPathTargets[ entity2.currentPathIndex ].target;
 
-    if ( this.children[ 0 ].canMove && willEntitiesBeOnTheSameTile( this.children[ 0 ], this.children[ 1 ] ) ) {
-      this.children[ 0 ].disableMovement();
-      this.frozenEntities.push( this.children[ 0 ] );
-      //console.log( 'willBeOnTheSameTile' );
+    entity1.changePathToTemporary( freeTile1, currentTarget1 );
+    entity1.changePathToTemporary( freeTile2, currentTarget2 );
+  }
+
+  onCollisionWithWalls( entity, tile ) {
+    const entityTile = pixelsToTile( entity );
+    let freeTile;
+
+    if ( entityTile.x > tile.x ) {
+      freeTile = { x: entityTile.x + 1, y: entityTile.y };
+    } else if ( entityTile.x < tile.x ) {
+      freeTile = { x: entityTile.x - 1, y: entityTile.y };
+    } else if ( entityTile.y < tile.y ) {
+      freeTile = { x: entityTile.x, y: entityTile.y - 1 };
+    } else if ( entityTile.y > tile.y ) {
+      freeTile = { x: entityTile.x, y: entityTile.y + 1 };
     }
-    if ( this.children[ 0 ].canMove && this.children[ 0 ].canMove && areEntitiesTouchingTheSameTile( this.children[ 0 ], this.children[ 1 ] ) ) {
-      // you should disable the entity that is not passing through ( has center on it ) the shared tile
-      //console.log( 'areTouchingTheSameTile' );
-    }
+
+    const currentTarget = entity.pathsBetweenPathTargets[ entity.currentPathIndex ].target;
+
+    entity.changePathToTemporary( freeTile, currentTarget );
   }
 
   areAllEntitiesInitialized() {

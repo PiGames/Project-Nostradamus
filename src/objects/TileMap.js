@@ -25,8 +25,8 @@ export default class TileMap extends Phaser.Tilemap {
   * Add collision between entity and map.
   * @param {object} entity - A reference to entity.
   */
-  collide( entity ) {
-    this.game.physics.arcade.collide( entity, this.walls );
+  collide( entity, callback ) {
+    this.game.physics.arcade.collide( entity, this.walls, callback );
   }
 
   getWallsPostions() {

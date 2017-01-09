@@ -101,6 +101,10 @@ export default class EntityWalkingOnPath extends Entity {
   changePathToTemporary( start, target ) {
     this.canMove = false;
     this.calculateTemporaryPath( start, target, ( path ) => {
+      if ( path.length === 0 ) {
+        this.changePathToStandard();
+        return;
+      }
       this.temporaryPath = path;
       this.temporaryStepIndex = 0;
       this.stepTarget = path[ this.temporaryStepIndex ];
