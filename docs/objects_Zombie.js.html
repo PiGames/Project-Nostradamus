@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: states/Boot.js</title>
+    <title>JSDoc: Source: objects/Zombie.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: states/Boot.js</h1>
+    <h1 class="page-title">Source: objects/Zombie.js</h1>
 
     
 
@@ -26,26 +26,22 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/** Class responsible for loading resources to show on loading screen in Preload state. */
-class Boot extends Phaser.State {
+            <pre class="prettyprint source linenums"><code>import EntityWalkingOnPath from './EntityWalkingOnPath';
+
+/** Class representing zombie in game world. It derives after Entity class. It is responsible for zombie movement, animations, attacks etc.  */
+export default class Zombie extends EntityWalkingOnPath {
   /**
-  * Load resources for loading screen
+  * Create the Zombie Entity.
+  * @param {object} game - A reference to the currently running game.
+  * @param {number} x - The x coordinate to position the Sprite at.
+  * @param {number} x - The y coordinate to position the Sprite at.
+  * @param {string} imageKey - This is the key to image used by the Sprite during rendering.
+  * @param {number} frame - If this Sprite is using part of a sprite sheet or texture atlas you can specify the exact frame to use by giving a numeric index.
   */
-  preload() {
-  }
-  create() {
-    // this.game.stage.disableVisibilityChange = true;
-
-    // this.game.scale.maxWidth = 800;
-    // this.game.scale.maxHeight = 600;
-    this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-    this.game.scale.updateLayout();
-
-    this.state.start( 'Preload' );
+  constructor( game, x, y, imageKey, frame, path, walls ) {
+    super( game, x, y, imageKey, frame, path, walls );
   }
 }
-
-export default Boot;
 </code></pre>
         </article>
     </section>
