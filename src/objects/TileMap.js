@@ -19,6 +19,8 @@ export default class TileMap extends Phaser.Tilemap {
     this.setCollisionByExclusion( [], true, this.walls );
 
     this.ground.resizeWorld();
+
+    this.wallsPositions = this.getWallsPostions();
   }
 
   /**

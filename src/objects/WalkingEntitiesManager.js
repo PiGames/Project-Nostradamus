@@ -1,4 +1,4 @@
-import { willEntitiesBeOnTheSameTile, getFreeTileAroundEntityExcludingOtherEntity, getEntityNextTile } from '../utils/EntityManagerUtils';
+import { willEntitiesBeOnTheSameTile, getFreeTileAroundEntityExcludingOtherEntity } from '../utils/EntityManagerUtils';
 import { pixelsToTile } from '../utils/MapUtils';
 
 export default class WalkingEntitiesManager extends Phaser.Group {

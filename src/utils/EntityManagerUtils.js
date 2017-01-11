@@ -110,60 +110,69 @@ export const getFreeTileAroundEntityExcludingOtherEntity = ( entity, entityToExc
     directionToExclude = getDirectionBetweenTiles( entityTile, tileToExclude );
   }
 
-  let freeTile = { x: -1, y: -1 };
-
   switch ( directionToExclude ) {
   case 'NORTH':
-    freeTile.y = entityTile.y;
-    if ( mapGrid[ entityTile.x - 1 ][ entityTile.y ] === 0 && mapGrid[ entityTile.x + 1 ][ entityTile.y ] === 0 ) {
-      freeTile.x = ( Math.random() > 0.5 ) ? entityTile.x - 1 : entityTile.x + 1;
-    } else if ( mapGrid[ entityTile.x - 1 ][ entityTile.y ] === 0 ) {
-      freeTile.x = entityTile.x - 1;
-    } else if ( mapGrid[ entityTile.x + 1 ][ entityTile.y ] === 0 ) {
-      freeTile.x = entityTile.x + 1;
-    } else if ( mapGrid[ entityTile.x ][ entityTile.y + 1 ] === 0 ) {
-      freeTile = { x: entityTile.x, y: entityTile.y + 1 };
-    }
-    break;
+    return getFreeTileExcludingNorth( entityTile, mapGrid );
   case 'SOUTH':
-    freeTile.y = entityTile.y;
-    if ( mapGrid[ entityTile.x - 1 ][ entityTile.y ] === 0 && mapGrid[ entityTile.x + 1 ][ entityTile.y ] === 0 ) {
-      freeTile.x = ( Math.random() > 0.5 ) ? entityTile.x - 1 : entityTile.x + 1;
-    } else if ( mapGrid[ entityTile.x - 1 ][ entityTile.y ] === 0 ) {
-      freeTile.x = entityTile.x - 1;
-    } else if ( mapGrid[ entityTile.x + 1 ][ entityTile.y ] === 0 ) {
-      freeTile.x = entityTile.x + 1;
-    } else if ( mapGrid[ entityTile.x ][ entityTile.y - 1 ] === 0 ) {
-      freeTile = { x: entityTile.x, y: entityTile.y - 1 };
-    }
-    break;
+    return getFreeTileExcludingSouth( entityTile, mapGrid );
   case 'WEST':
-    freeTile.x = entityTile.x;
-    if ( mapGrid[ entityTile.x ][ entityTile.y - 1 ] === 0 && mapGrid[ entityTile.x ][ entityTile.y + 1 ] === 0 ) {
-      freeTile.y = ( Math.random() > 0.5 ) ? entityTile.y - 1 : entityTile.y + 1;
-    } else if ( mapGrid[ entityTile.x ][ entityTile.y - 1 ] === 0 ) {
-      freeTile.y = entityTile.y - 1;
-    } else if ( mapGrid[ entityTile.x ][ entityTile.y + 1 ] === 0 ) {
-      freeTile.y = entityTile.y + 1;
-    } else if ( mapGrid[ entityTile.x + 1 ][ entityTile.y ] === 0 ) {
-      freeTile = { x: entityTile.x + 1, y: entityTile.y };
-    }
-    break;
+    return getFreeTileExcludingWest( entityTile, mapGrid );
   case 'EAST':
-    freeTile.x = entityTile.x;
-    if ( mapGrid[ entityTile.x ][ entityTile.y - 1 ] === 0 && mapGrid[ entityTile.x ][ entityTile.y + 1 ] === 0 ) {
-      freeTile.y = ( Math.random() > 0.5 ) ? entityTile.y - 1 : entityTile.y + 1;
-    } else if ( mapGrid[ entityTile.x ][ entityTile.y - 1 ] === 0 ) {
-      freeTile.y = entityTile.y - 1;
-    } else if ( mapGrid[ entityTile.x ][ entityTile.y + 1 ] === 0 ) {
-      freeTile.y = entityTile.y + 1;
-    } else if ( mapGrid[ entityTile.x - 1 ][ entityTile.y ] === 0 ) {
-      freeTile = { x: entityTile.x - 1, y: entityTile.y };
-    }
+    return getFreeTileExcludingEast( entityTile, mapGrid );
   }
-  if ( freeTile.x !== -1 && freeTile.y !== -1 ) {
-    return freeTile;
-  } else {
-    throw new Error( `Couldn't find free tile entityTile: ${entityTile}, directionToExclude: ${directionToExclude}` );
-  }
+
+  throw new Error( `Couldn't find free tile entityTile: ${entityTile}, directionToExclude: ${directionToExclude}` );
 };
+
+function getFreeTileExcludingNorth( entityTile, mapGrid ) {
+  let freeTile = { x: -1, y: entityTile.y };
+  if ( mapGrid[ entityTile.x - 1 ][ entityTile.y ] === 0 && mapGrid[ entityTile.x + 1 ][ entityTile.y ] === 0 ) {
+    freeTile.x = ( Math.random() > 0.5 ) ? entityTile.x - 1 : entityTile.x + 1;
+  } else if ( mapGrid[ entityTile.x - 1 ][ entityTile.y ] === 0 ) {
+    freeTile.x = entityTile.x - 1;
+  } else if ( mapGrid[ entityTile.x + 1 ][ entityTile.y ] === 0 ) {
+    freeTile.x = entityTile.x + 1;
+  } else if ( mapGrid[ entityTile.x ][ entityTile.y + 1 ] === 0 ) {
+    freeTile = { x: entityTile.x, y: entityTile.y + 1 };
+  }
+  return freeTile;
+}
+function getFreeTileExcludingSouth( entityTile, mapGrid ) {
+  let freeTile = { x: -1, y: entityTile.y };
+  if ( mapGrid[ entityTile.x - 1 ][ entityTile.y ] === 0 && mapGrid[ entityTile.x + 1 ][ entityTile.y ] === 0 ) {
+    freeTile.x = ( Math.random() > 0.5 ) ? entityTile.x - 1 : entityTile.x + 1;
+  } else if ( mapGrid[ entityTile.x - 1 ][ entityTile.y ] === 0 ) {
+    freeTile.x = entityTile.x - 1;
+  } else if ( mapGrid[ entityTile.x + 1 ][ entityTile.y ] === 0 ) {
+    freeTile.x = entityTile.x + 1;
+  } else if ( mapGrid[ entityTile.x ][ entityTile.y - 1 ] === 0 ) {
+    freeTile = { x: entityTile.x, y: entityTile.y - 1 };
+  }
+  return freeTile;
+}
+function getFreeTileExcludingWest( entityTile, mapGrid ) {
+  let freeTile = { x: entityTile.x, y: -1 };
+  if ( mapGrid[ entityTile.x ][ entityTile.y - 1 ] === 0 && mapGrid[ entityTile.x ][ entityTile.y + 1 ] === 0 ) {
+    freeTile.y = ( Math.random() > 0.5 ) ? entityTile.y - 1 : entityTile.y + 1;
+  } else if ( mapGrid[ entityTile.x ][ entityTile.y - 1 ] === 0 ) {
+    freeTile.y = entityTile.y - 1;
+  } else if ( mapGrid[ entityTile.x ][ entityTile.y + 1 ] === 0 ) {
+    freeTile.y = entityTile.y + 1;
+  } else if ( mapGrid[ entityTile.x + 1 ][ entityTile.y ] === 0 ) {
+    freeTile = { x: entityTile.x + 1, y: entityTile.y };
+  }
+  return freeTile;
+}
+function getFreeTileExcludingEast( entityTile, mapGrid ) {
+  let freeTile = { x: entityTile.x, y: -1 };
+  if ( mapGrid[ entityTile.x ][ entityTile.y - 1 ] === 0 && mapGrid[ entityTile.x ][ entityTile.y + 1 ] === 0 ) {
+    freeTile.y = ( Math.random() > 0.5 ) ? entityTile.y - 1 : entityTile.y + 1;
+  } else if ( mapGrid[ entityTile.x ][ entityTile.y - 1 ] === 0 ) {
+    freeTile.y = entityTile.y - 1;
+  } else if ( mapGrid[ entityTile.x ][ entityTile.y + 1 ] === 0 ) {
+    freeTile.y = entityTile.y + 1;
+  } else if ( mapGrid[ entityTile.x - 1 ][ entityTile.y ] === 0 ) {
+    freeTile = { x: entityTile.x - 1, y: entityTile.y };
+  }
+  return freeTile;
+}
