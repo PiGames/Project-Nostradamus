@@ -1315,7 +1315,7 @@ var EntityWalkingOnPath = function (_Entity) {
     _this.line = new Phaser.Line();
     _this.tileHits = [];
     _this.isChasing = false;
-    _this.lastKnownPlayerPoistion = { x: 1, y: 1 };
+    _this.lastKnownPlayerPosition = { x: 1, y: 1 };
     _this.angle = 90;
 
     /* disable update until paths are calculated */
@@ -1825,7 +1825,7 @@ var _createClass = function () {
 
 var _EntityManagerUtils = require('../utils/EntityManagerUtils');
 
-var _MapUtils = require('../utils/MapUtils');
+var _MapUtils = require('../utils/MapUtils.js');
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -1853,7 +1853,7 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
 
     var _this = _possibleConstructorReturn(this, (WalkingEntitiesManager.__proto__ || Object.getPrototypeOf(WalkingEntitiesManager)).call(this, game));
 
-    _this.mapGrid = grid;
+    _this.mapGrid = (0, _MapUtils.getWallsPostions)(grid);
     _this.allEntitiesInitialized = false;
     return _this;
   }
@@ -1959,7 +1959,7 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
 
 exports.default = WalkingEntitiesManager;
 
-},{"../utils/EntityManagerUtils":22,"../utils/MapUtils":23}],17:[function(require,module,exports){
+},{"../utils/EntityManagerUtils":22,"../utils/MapUtils.js":23}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2163,11 +2163,11 @@ var Game = function (_Phaser$State) {
       this.player = new _Player2.default(this.game, _TileMapConstants.TILE_WIDTH + _TileMapConstants.TILE_WIDTH / 2, _TileMapConstants.TILE_HEIGHT + _TileMapConstants.TILE_HEIGHT / 2, 'player', _PlayerConstants.PLAYER_INITIAL_FRAME);
       this.game.camera.follow(this.player);
 
-      this.zombies = new _WalkingEntitiesManager2.default(this.game, this.map.wallsPositions);
+      this.zombies = new _WalkingEntitiesManager2.default(this.game, this.map.walls);
       // this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 9, y: 1 }, { x: 19, y: 1 } ], this.map.walls, this.player ) );
       this.zombies.add(new _Zombie2.default(this.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, [{ x: 5, y: 5 }, { x: 19, y: 1 }], this.map.walls, this.player));
-      // this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 4, y: 2 }, { x: 4, y: 6 } ], this.map.wallsPositions ) );
-      // this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 2, y: 2 }, { x: 7, y: 7 } ], this.map.wallsPositions ) );
+      this.zombies.add(new _Zombie2.default(this.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, [{ x: 4, y: 2 }, { x: 4, y: 6 }], this.map.walls, this.player));
+      this.zombies.add(new _Zombie2.default(this.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, [{ x: 2, y: 2 }, { x: 7, y: 7 }], this.map.walls, this.player));
       // this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 1, y: 6 }, { x: 9, y: 9 } ], this.map.wallsPositions ) );
     }
   }, {

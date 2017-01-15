@@ -1,10 +1,10 @@
 import { willEntitiesBeOnTheSameTile, getFreeTileAroundEntityExcludingOtherEntity } from '../utils/EntityManagerUtils';
-import { pixelsToTile } from '../utils/MapUtils';
+import { pixelsToTile, getWallsPostions } from '../utils/MapUtils.js';
 
 export default class WalkingEntitiesManager extends Phaser.Group {
   constructor( game, grid ) {
     super( game );
-    this.mapGrid = grid;
+    this.mapGrid = getWallsPostions( grid );
     this.allEntitiesInitialized = false;
   }
 

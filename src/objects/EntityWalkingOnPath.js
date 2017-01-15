@@ -31,7 +31,7 @@ export default class EntityWalkingOnPath extends Entity {
     this.line = new Phaser.Line();
     this.tileHits = [];
     this.isChasing = false;
-    this.lastKnownPlayerPoistion = { x: 1, y: 1 };
+    this.lastKnownPlayerPosition = { x: 1, y: 1 };
     this.angle = 90;
 
     /* disable update until paths are calculated */
