@@ -1,3 +1,5 @@
+import { pixelsToTile } from '../utils/MapUtils.js';
+
 export default class TileMap extends Phaser.Tilemap {
   /**
   * Create the Map. Draw map and set tiles that are supposed to collide with player. Also sets world size to match map size.
@@ -14,9 +16,13 @@ export default class TileMap extends Phaser.Tilemap {
     this.ground = this.createLayer( 'background' );
     this.walls = this.createLayer( 'walls' );
 
+    this.paths = [];
+
     this.setCollisionByExclusion( [], true, this.walls );
 
     this.ground.resizeWorld();
+
+    this.createPathPoints();
   }
 
   /**
@@ -25,5 +31,35 @@ export default class TileMap extends Phaser.Tilemap {
   */
   collide( entity, callback ) {
     this.game.physics.arcade.collide( entity, this.walls, callback );
+  }
+
+  createPathPoints() {
+    this.objects[ 'ZombiePaths' ].forEach( ( v ) => {
+      const props = v.properties;
+      if ( !this.paths[ props.PathId ] ) {
+        this.paths[ props.PathId ] = [];
+      }
+
+      this.paths[ props.PathId ][ props.PathIndex ] = pixelsToTile( { x: v.x, y: v.y } );
+    } );
+
+    this.normalizePaths();
+  }
+
+  normalizePaths() {
+    this.paths.forEach( ( pathArr ) => {
+      const tempArr = [];
+      pathArr.forEach( ( v ) => {
+        tempArr.push( v );
+      } );
+
+      pathArr = tempArr;
+    } );
+
+    console.log( this.paths );
+  }
+
+  getPath( i ) {
+    return this.paths[ i ];
   }
 }

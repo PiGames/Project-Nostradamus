@@ -32,7 +32,6 @@ export default class EntityWalkingOnPath extends Entity {
     this.tileHits = [];
     this.isChasing = false;
     this.lastKnownPlayerPosition = { x: 1, y: 1 };
-    this.angle = 90;
 
     /* disable update until paths are calculated */
     this.isInitialized = false;
@@ -158,7 +157,7 @@ export default class EntityWalkingOnPath extends Entity {
 
     if ( ( ( angleDelta <= ZOMBIE_SIGHT_ANGLE || angleDelta >= ( 360 - ZOMBIE_SIGHT_ANGLE ) ) && ( this.isChasing || this.line.length < ZOMBIE_SIGHT_RANGE ) ) || ( this.line.length < ZOMBIE_HEARING_RANGE && !this.player.isSneaking && this.player.isMoving() ) ) {
       this.isChasing = true;
-      this.lastKnownPlayerPoistion = { x: this.player.x, y: this.player.y };
+      this.lastKnownPlayerPosition = { x: this.player.x, y: this.player.y };
       return true;
     }
 
@@ -168,10 +167,10 @@ export default class EntityWalkingOnPath extends Entity {
   chasePlayer() {
     this.canSeePlayer();
     if ( this.isChasing ) {
-      this.game.physics.arcade.moveToObject( this, this.lastKnownPlayerPoistion, ZOMBIE_SPEED * ZOMBIE_SPEED_CHASING_MULTIPLIER );
-      this.lookAt( this.lastKnownPlayerPoistion.x, this.lastKnownPlayerPoistion.y );
+      this.game.physics.arcade.moveToObject( this, this.lastKnownPlayerPosition, ZOMBIE_SPEED * ZOMBIE_SPEED_CHASING_MULTIPLIER );
+      this.lookAt( this.lastKnownPlayerPosition.x, this.lastKnownPlayerPosition.y );
 
-      const distanceToTarget = this.game.physics.arcade.distanceBetween( this, this.lastKnownPlayerPoistion );
+      const distanceToTarget = this.game.physics.arcade.distanceBetween( this, this.lastKnownPlayerPosition );
       if ( !this.canSeePlayer() && ( distanceToTarget <= MIN_DISTANCE_TO_TARGET ) ) {
         this.body.velocity.x = 0;
         this.body.velocity.y = 0;

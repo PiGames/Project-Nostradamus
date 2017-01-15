@@ -1316,7 +1316,6 @@ var EntityWalkingOnPath = function (_Entity) {
     _this.tileHits = [];
     _this.isChasing = false;
     _this.lastKnownPlayerPosition = { x: 1, y: 1 };
-    _this.angle = 90;
 
     /* disable update until paths are calculated */
     _this.isInitialized = false;
@@ -1474,7 +1473,7 @@ var EntityWalkingOnPath = function (_Entity) {
 
       if ((angleDelta <= _ZombieConstants.ZOMBIE_SIGHT_ANGLE || angleDelta >= 360 - _ZombieConstants.ZOMBIE_SIGHT_ANGLE) && (this.isChasing || this.line.length < _ZombieConstants.ZOMBIE_SIGHT_RANGE) || this.line.length < _ZombieConstants.ZOMBIE_HEARING_RANGE && !this.player.isSneaking && this.player.isMoving()) {
         this.isChasing = true;
-        this.lastKnownPlayerPoistion = { x: this.player.x, y: this.player.y };
+        this.lastKnownPlayerPosition = { x: this.player.x, y: this.player.y };
         return true;
       }
 
@@ -1485,10 +1484,10 @@ var EntityWalkingOnPath = function (_Entity) {
     value: function chasePlayer() {
       this.canSeePlayer();
       if (this.isChasing) {
-        this.game.physics.arcade.moveToObject(this, this.lastKnownPlayerPoistion, _ZombieConstants.ZOMBIE_SPEED * _ZombieConstants.ZOMBIE_SPEED_CHASING_MULTIPLIER);
-        this.lookAt(this.lastKnownPlayerPoistion.x, this.lastKnownPlayerPoistion.y);
+        this.game.physics.arcade.moveToObject(this, this.lastKnownPlayerPosition, _ZombieConstants.ZOMBIE_SPEED * _ZombieConstants.ZOMBIE_SPEED_CHASING_MULTIPLIER);
+        this.lookAt(this.lastKnownPlayerPosition.x, this.lastKnownPlayerPosition.y);
 
-        var distanceToTarget = this.game.physics.arcade.distanceBetween(this, this.lastKnownPlayerPoistion);
+        var distanceToTarget = this.game.physics.arcade.distanceBetween(this, this.lastKnownPlayerPosition);
         if (!this.canSeePlayer() && distanceToTarget <= _ZombieConstants.MIN_DISTANCE_TO_TARGET) {
           this.body.velocity.x = 0;
           this.body.velocity.y = 0;
@@ -1745,6 +1744,8 @@ var _createClass = function () {
   };
 }();
 
+var _MapUtils = require('../utils/MapUtils.js');
+
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -1783,9 +1784,13 @@ var TileMap = function (_Phaser$Tilemap) {
     _this.ground = _this.createLayer('background');
     _this.walls = _this.createLayer('walls');
 
+    _this.paths = [];
+
     _this.setCollisionByExclusion([], true, _this.walls);
 
     _this.ground.resizeWorld();
+
+    _this.createPathPoints();
     return _this;
   }
 
@@ -1799,6 +1804,41 @@ var TileMap = function (_Phaser$Tilemap) {
     value: function collide(entity, callback) {
       this.game.physics.arcade.collide(entity, this.walls, callback);
     }
+  }, {
+    key: 'createPathPoints',
+    value: function createPathPoints() {
+      var _this2 = this;
+
+      this.objects['ZombiePaths'].forEach(function (v) {
+        var props = v.properties;
+        if (!_this2.paths[props.PathId]) {
+          _this2.paths[props.PathId] = [];
+        }
+
+        _this2.paths[props.PathId][props.PathIndex] = (0, _MapUtils.pixelsToTile)({ x: v.x, y: v.y });
+      });
+
+      this.normalizePaths();
+    }
+  }, {
+    key: 'normalizePaths',
+    value: function normalizePaths() {
+      this.paths.forEach(function (pathArr) {
+        var tempArr = [];
+        pathArr.forEach(function (v) {
+          tempArr.push(v);
+        });
+
+        pathArr = tempArr;
+      });
+
+      console.log(this.paths);
+    }
+  }, {
+    key: 'getPath',
+    value: function getPath(i) {
+      return this.paths[i];
+    }
   }]);
 
   return TileMap;
@@ -1806,7 +1846,7 @@ var TileMap = function (_Phaser$Tilemap) {
 
 exports.default = TileMap;
 
-},{}],16:[function(require,module,exports){
+},{"../utils/MapUtils.js":23}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2164,11 +2204,9 @@ var Game = function (_Phaser$State) {
       this.game.camera.follow(this.player);
 
       this.zombies = new _WalkingEntitiesManager2.default(this.game, this.map.walls);
-      // this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 9, y: 1 }, { x: 19, y: 1 } ], this.map.walls, this.player ) );
-      this.zombies.add(new _Zombie2.default(this.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, [{ x: 5, y: 5 }, { x: 19, y: 1 }], this.map.walls, this.player));
-      this.zombies.add(new _Zombie2.default(this.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, [{ x: 4, y: 2 }, { x: 4, y: 6 }], this.map.walls, this.player));
-      this.zombies.add(new _Zombie2.default(this.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, [{ x: 2, y: 2 }, { x: 7, y: 7 }], this.map.walls, this.player));
-      // this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 1, y: 6 }, { x: 9, y: 9 } ], this.map.wallsPositions ) );
+      for (var i = 0; i < this.map.paths.length; i++) {
+        this.zombies.add(new _Zombie2.default(this.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, this.map.getPath(i), this.map.walls, this.player));
+      }
     }
   }, {
     key: 'update',
