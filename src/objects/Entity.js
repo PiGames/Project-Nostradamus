@@ -48,6 +48,13 @@ class Entity extends Phaser.Sprite {
     this.body.velocity.x = 0;
     this.body.velocity.y = 0;
   }
+
+  /**
+  * Check if entity is moving.
+  */
+  isMoving() {
+    return this.body.velocity.x !== 0 || this.body.velocity.y !== 0;
+  }
 }
 
 export default Entity;

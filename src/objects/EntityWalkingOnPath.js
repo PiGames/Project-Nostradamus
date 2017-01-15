@@ -1,7 +1,7 @@
 import Entity from './Entity';
 import PathFinder from '../objects/PathFinder.js';
 import { ZOMBIE_SPEED, ZOMBIE_LOOKING_OFFSET, MIN_DISTANCE_TO_TARGET } from '../constants/ZombieConstants';
-import { tileToPixels } from '../utils/MapUtils.js';
+import { tileToPixels, getWallsPostions } from '../utils/MapUtils.js';
 
 /** Create Entity that is supposed to walk on given path. Set position of entity on first given target*/
 export default class EntityWalkingOnPath extends Entity {
@@ -11,7 +11,9 @@ export default class EntityWalkingOnPath extends Entity {
     super( game, position.x, position.y, imageKey, frame );
 
     this.pathfinder = new PathFinder();
-    this.pathfinder.setGrid( walls );
+    this.walls = getWallsPostions( walls );
+
+    this.pathfinder.setGrid( this.walls );
 
     this.targets = targets;
 

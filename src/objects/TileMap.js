@@ -20,7 +20,7 @@ export default class TileMap extends Phaser.Tilemap {
 
     this.ground.resizeWorld();
 
-    this.wallsPositions = this.getWallsPostions();
+    // this.wallsPositions = this.getWallsPostions();
   }
 
   /**
@@ -29,27 +29,5 @@ export default class TileMap extends Phaser.Tilemap {
   */
   collide( entity, callback ) {
     this.game.physics.arcade.collide( entity, this.walls, callback );
-  }
-
-  getWallsPostions() {
-    const walls = this.walls.getTiles( 0, 0, 2048, 2048 );
-    const wallsArr = [];
-
-    let currentY = [];
-
-    walls.forEach( ( v, i ) => {
-      if ( v.index !== -1 ) {
-        currentY.push( 1 );
-      } else {
-        currentY.push( 0 );
-      }
-
-      if ( i % MAP_WIDTH === ( MAP_WIDTH - 1 ) ) {
-        wallsArr.push( currentY );
-        currentY = [];
-      }
-    } );
-
-    return wallsArr;
   }
 }

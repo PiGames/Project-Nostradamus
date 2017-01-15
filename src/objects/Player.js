@@ -17,6 +17,9 @@ export default class Player extends Entity {
     this.width = PLAYER_WIDTH;
     this.height = PLAYER_HEIGHT;
 
+    this.isSneaking = false;
+    this.isSprinting = false;
+
     this.cursors = {
       up: this.game.input.keyboard.addKey( Phaser.Keyboard.W ),
       down: this.game.input.keyboard.addKey( Phaser.Keyboard.S ),
@@ -65,10 +68,15 @@ export default class Player extends Entity {
   handleMovementSpecialModes() {
     let specialEffectMultiplier = 1;
 
+    this.isSneaking = false;
+    this.isSprinting = false;
+
     if ( this.cursors.sneak.isDown ) {
       specialEffectMultiplier = PLAYER_SNEAK_MULTIPLIER;
+      this.isSneaking = true;
     } else if ( this.cursors.sprint.isDown ) {
       specialEffectMultiplier = PLAYER_SPRINT_MULTIPLIER;
+      this.isSprinting = true;
     }
 
     this.body.velocity.x *= specialEffectMultiplier;

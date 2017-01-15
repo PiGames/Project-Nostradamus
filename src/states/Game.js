@@ -15,10 +15,11 @@ export default class Game extends Phaser.State {
     this.game.camera.follow( this.player );
 
     this.zombies = new WalkingEntitiesManager( this.game, this.map.wallsPositions );
-    this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 2, y: 4 }, { x: 6, y: 4 } ], this.map.wallsPositions ) );
-    this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 4, y: 2 }, { x: 4, y: 6 } ], this.map.wallsPositions ) );
-    this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 2, y: 2 }, { x: 7, y: 7 } ], this.map.wallsPositions ) );
-    this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 1, y: 6 }, { x: 9, y: 9 } ], this.map.wallsPositions ) );
+    // this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 9, y: 1 }, { x: 19, y: 1 } ], this.map.walls, this.player ) );
+    this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 5, y: 5 }, { x: 19, y: 1 } ], this.map.walls, this.player ) );
+    // this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 4, y: 2 }, { x: 4, y: 6 } ], this.map.wallsPositions ) );
+    // this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 2, y: 2 }, { x: 7, y: 7 } ], this.map.wallsPositions ) );
+    // this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, [ { x: 1, y: 6 }, { x: 9, y: 9 } ], this.map.wallsPositions ) );
   }
 
   update() {
