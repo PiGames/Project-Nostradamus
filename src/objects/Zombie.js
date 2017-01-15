@@ -1,7 +1,7 @@
-import EntityReactsToPlayer from './EntityReactsToPlayer';
+import EntityWalkingOnPath from './EntityWalkingOnPath';
 
 /** Class representing zombie in game world. It derives after Entity class. It is responsible for zombie movement, animations, attacks etc.  */
-export default class Zombie extends EntityReactsToPlayer {
+export default class Zombie extends EntityWalkingOnPath {
   /**
   * Create the Zombie Entity.
   * @param {object} game - A reference to the currently running game.

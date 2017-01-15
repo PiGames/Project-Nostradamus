@@ -1,19 +1,19 @@
 import Entity from './Entity';
 import PathFinder from '../objects/PathFinder.js';
-import { ZOMBIE_SPEED, ZOMBIE_LOOKING_OFFSET, MIN_DISTANCE_TO_TARGET } from '../constants/ZombieConstants';
+import { ZOMBIE_SPEED, ZOMBIE_LOOKING_OFFSET, MIN_DISTANCE_TO_TARGET, ZOMBIE_SPEED_CHASING_MULTIPLIER, ZOMBIE_SIGHT_ANGLE, ZOMBIE_SIGHT_RANGE, ZOMBIE_HEARING_RANGE } from '../constants/ZombieConstants';
 import { tileToPixels, getWallsPostions } from '../utils/MapUtils.js';
 
 /** Create Entity that is supposed to walk on given path. Set position of entity on first given target*/
 export default class EntityWalkingOnPath extends Entity {
-  constructor( game, imageKey, frame, targets, walls ) {
+  constructor( game, imageKey, frame, targets, walls, player ) {
     const position = tileToPixels( targets[ 0 ] );
 
     super( game, position.x, position.y, imageKey, frame );
 
     this.pathfinder = new PathFinder();
-    this.walls = getWallsPostions( walls );
+    this.wallsPositions = getWallsPostions( walls );
 
-    this.pathfinder.setGrid( this.walls );
+    this.pathfinder.setGrid( this.wallsPositions );
 
     this.targets = targets;
 
@@ -25,6 +25,14 @@ export default class EntityWalkingOnPath extends Entity {
     this.isOnStandardPath = true;
     this.temporaryPath = [];
     this.temporaryStepIndex = 0;
+
+    this.player = player;
+    this.walls = walls;
+    this.line = new Phaser.Line();
+    this.tileHits = [];
+    this.isChasing = false;
+    this.lastKnownPlayerPoistion = { x: 1, y: 1 };
+    this.angle = 90;
 
     /* disable update until paths are calculated */
     this.isInitialized = false;
@@ -51,9 +59,9 @@ export default class EntityWalkingOnPath extends Entity {
       this.calculatePathsBetweenTargets( doneCallback, index + 1 );
     } );
   }
-  /** Check if current target or step target is reached. Move body in stepTarget direction. */
   update() {
-    if ( this.canMove ) {
+    /** Check if current target or step target is reached. Move body in stepTarget direction. */
+    if ( this.canMove && !this.isChasing ) {
       if ( this.isReached( this.stepTarget ) ) {
         this.onStepTargetReach();
       }
@@ -61,6 +69,14 @@ export default class EntityWalkingOnPath extends Entity {
 
       this.updateLookDirection();
     }
+
+    /** Draw line between player and zombie and check if it can see him. If yes chase him. */
+    this.line.start.set( this.x, this.y );
+    this.line.end.set( this.player.x, this.player.y );
+
+    this.tileHits = this.walls.getRayCastTiles( this.line, 0, false, false );
+
+    this.chasePlayer();
   }
   /** When current step target or temporary step target is reached, set step target to the next one.*/
   /** If current target is reached or temporary target is reached set path to the next one, or get back to standard path*/
@@ -126,5 +142,41 @@ export default class EntityWalkingOnPath extends Entity {
   }
   enableMovement() {
     this.canMove = true;
+  }
+
+  /* Reacting to player */
+  canSeePlayer() {
+    if ( this.tileHits.length > 0 ) {
+      for ( let i = 0; i < this.tileHits.length; i++ ) {
+        if ( this.tileHits[ i ].index >= 0 ) {
+          return false;
+        }
+      }
+    }
+
+    const angleDelta = Math.abs( Phaser.Math.radToDeg( Phaser.Math.angleBetween( this.x, this.y, this.player.x, this.player.y ) ) + 90 - this.angle );
+
+    if ( ( ( angleDelta <= ZOMBIE_SIGHT_ANGLE || angleDelta >= ( 360 - ZOMBIE_SIGHT_ANGLE ) ) && ( this.isChasing || this.line.length < ZOMBIE_SIGHT_RANGE ) ) || ( this.line.length < ZOMBIE_HEARING_RANGE && !this.player.isSneaking && this.player.isMoving() ) ) {
+      this.isChasing = true;
+      this.lastKnownPlayerPoistion = { x: this.player.x, y: this.player.y };
+      return true;
+    }
+
+    return false;
+  }
+
+  chasePlayer() {
+    this.canSeePlayer();
+    if ( this.isChasing ) {
+      this.game.physics.arcade.moveToObject( this, this.lastKnownPlayerPoistion, ZOMBIE_SPEED * ZOMBIE_SPEED_CHASING_MULTIPLIER );
+      this.lookAt( this.lastKnownPlayerPoistion.x, this.lastKnownPlayerPoistion.y );
+
+      const distanceToTarget = this.game.physics.arcade.distanceBetween( this, this.lastKnownPlayerPoistion );
+      if ( !this.canSeePlayer() && ( distanceToTarget <= MIN_DISTANCE_TO_TARGET ) ) {
+        this.body.velocity.x = 0;
+        this.body.velocity.y = 0;
+        this.isChasing = false;
+      }
+    }
   }
 }

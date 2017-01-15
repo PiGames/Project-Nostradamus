@@ -18,19 +18,8 @@ export default class EntityReactsToPlayer extends EntityWalkingOnPath {
     this.line.end.set( this.player.x, this.player.y );
 
     this.tileHits = this.walls.getRayCastTiles( this.line, 0, false, false );
-    this.debug();
 
     this.chasePlayer();
-  }
-
-  debug() {
-    if ( this.canSeePlayer() ) {
-      this.game.debug.geom( this.line, 'rgb(255, 0, 0)' );
-    } else if ( this.line.length < ZOMBIE_HEARING_RANGE ) {
-      this.game.debug.geom( this.line, 'rgb(255, 255, 0)' );
-    } else {
-      this.game.debug.geom( this.line, 'rgb(0, 255, 0)' );
-    }
   }
 
   canSeePlayer() {
@@ -54,7 +43,6 @@ export default class EntityReactsToPlayer extends EntityWalkingOnPath {
   }
 
   chasePlayer() {
-    // console.log( this.isChasing );
     if ( this.isChasing ) {
       this.game.physics.arcade.moveToObject( this, this.lastKnownPlayerPoistion, ZOMBIE_SPEED * ZOMBIE_SPEED_CHASING_MULTIPLIER );
       this.lookAt( this.lastKnownPlayerPoistion.x, this.lastKnownPlayerPoistion.y );
