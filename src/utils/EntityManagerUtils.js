@@ -72,7 +72,6 @@ const getDirectionBetweenTiles = ( tile1, tile2 ) => {
       throw new Error( `Uncorrect tiles coordinates! tile1.x: ${ tile1.x }, tile1.y: ${ tile1.y } | tile2.x: ${ tile2.x } tile2.y: ${ tile2.y }` );
     }
   } else {
-    console.warn( 'Unsafe prediction is made, collisions may not work :( ' );
     if ( tile1.y < tile2.y && tile1.x < tile2.x ) {
       return ( Math.random() > 0.5 ) ? 'SOUTH' : 'EAST';
     } else if ( tile1.y > tile2.y && tile1.x < tile2.x ) {

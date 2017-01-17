@@ -1038,7 +1038,7 @@ var ProjectNostradamus = function (_Phaser$Game) {
 
 exports.default = ProjectNostradamus;
 
-},{"./states/Boot":18,"./states/Game":19,"./states/Menu":20,"./states/Preload":21}],7:[function(require,module,exports){
+},{"./states/Boot":19,"./states/Game":20,"./states/Menu":21,"./states/Preload":22}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1287,7 +1287,7 @@ function _inherits(subClass, superClass) {
 var EntityWalkingOnPath = function (_Entity) {
   _inherits(EntityWalkingOnPath, _Entity);
 
-  function EntityWalkingOnPath(game, imageKey, frame, targets, walls, player) {
+  function EntityWalkingOnPath(game, imageKey, frame, targets, walls) {
     _classCallCheck(this, EntityWalkingOnPath);
 
     var position = (0, _MapUtils.tileToPixels)(targets[0]);
@@ -1309,13 +1309,6 @@ var EntityWalkingOnPath = function (_Entity) {
     _this.isOnStandardPath = true;
     _this.temporaryPath = [];
     _this.temporaryStepIndex = 0;
-
-    _this.player = player;
-    _this.walls = walls;
-    _this.line = new Phaser.Line();
-    _this.tileHits = [];
-    _this.isChasing = false;
-    _this.lastKnownPlayerPosition = { x: 1, y: 1 };
 
     /* disable update until paths are calculated */
     _this.isInitialized = false;
@@ -1354,7 +1347,7 @@ var EntityWalkingOnPath = function (_Entity) {
     key: 'update',
     value: function update() {
       /** Check if current target or step target is reached. Move body in stepTarget direction. */
-      if (this.canMove && !this.isChasing) {
+      if (this.canMove) {
         if (this.isReached(this.stepTarget)) {
           this.onStepTargetReach();
         }
@@ -1362,14 +1355,6 @@ var EntityWalkingOnPath = function (_Entity) {
 
         this.updateLookDirection();
       }
-
-      /** Draw line between player and zombie and check if it can see him. If yes chase him. */
-      this.line.start.set(this.x, this.y);
-      this.line.end.set(this.player.x, this.player.y);
-
-      this.tileHits = this.walls.getRayCastTiles(this.line, 0, false, false);
-
-      this.chasePlayer();
     }
     /** When current step target or temporary step target is reached, set step target to the next one.*/
     /** If current target is reached or temporary target is reached set path to the next one, or get back to standard path*/
@@ -1416,7 +1401,11 @@ var EntityWalkingOnPath = function (_Entity) {
     value: function calculateTemporaryPath(start, target, callback) {
       this.pathfinder.findPath(start.x, start.y, target.x, target.y, callback);
     }
-    /**Change path to temporary and automatically get back to standard path, after reaching temporary target ( it is recommended to set the target as current path target) */
+    /**
+    * Change path to temporary and automatically get back to standard path, after reaching temporary target.
+    * @param {tile} start - start tile coordinates, if this tile is different that entity's tile then it goes straight to this tile.
+    * @param {tile} target - target tile coordinates, this should be initialized with current path target otherwise some unpredictable things may happen.
+    */
 
   }, {
     key: 'changePathToTemporary',
@@ -1455,46 +1444,6 @@ var EntityWalkingOnPath = function (_Entity) {
     value: function enableMovement() {
       this.canMove = true;
     }
-
-    /* Reacting to player */
-
-  }, {
-    key: 'canSeePlayer',
-    value: function canSeePlayer() {
-      if (this.tileHits.length > 0) {
-        for (var i = 0; i < this.tileHits.length; i++) {
-          if (this.tileHits[i].index >= 0) {
-            return false;
-          }
-        }
-      }
-
-      var angleDelta = Math.abs(Phaser.Math.radToDeg(Phaser.Math.angleBetween(this.x, this.y, this.player.x, this.player.y)) + 90 - this.angle);
-
-      if ((angleDelta <= _ZombieConstants.ZOMBIE_SIGHT_ANGLE || angleDelta >= 360 - _ZombieConstants.ZOMBIE_SIGHT_ANGLE) && (this.isChasing || this.line.length < _ZombieConstants.ZOMBIE_SIGHT_RANGE) || this.line.length < _ZombieConstants.ZOMBIE_HEARING_RANGE && !this.player.isSneaking && this.player.isMoving()) {
-        this.isChasing = true;
-        this.lastKnownPlayerPosition = { x: this.player.x, y: this.player.y };
-        return true;
-      }
-
-      return false;
-    }
-  }, {
-    key: 'chasePlayer',
-    value: function chasePlayer() {
-      this.canSeePlayer();
-      if (this.isChasing) {
-        this.game.physics.arcade.moveToObject(this, this.lastKnownPlayerPosition, _ZombieConstants.ZOMBIE_SPEED * _ZombieConstants.ZOMBIE_SPEED_CHASING_MULTIPLIER);
-        this.lookAt(this.lastKnownPlayerPosition.x, this.lastKnownPlayerPosition.y);
-
-        var distanceToTarget = this.game.physics.arcade.distanceBetween(this, this.lastKnownPlayerPosition);
-        if (!this.canSeePlayer() && distanceToTarget <= _ZombieConstants.MIN_DISTANCE_TO_TARGET) {
-          this.body.velocity.x = 0;
-          this.body.velocity.y = 0;
-          this.isChasing = false;
-        }
-      }
-    }
   }]);
 
   return EntityWalkingOnPath;
@@ -1502,7 +1451,7 @@ var EntityWalkingOnPath = function (_Entity) {
 
 exports.default = EntityWalkingOnPath;
 
-},{"../constants/ZombieConstants":9,"../objects/PathFinder.js":13,"../utils/MapUtils.js":23,"./Entity":11}],13:[function(require,module,exports){
+},{"../constants/ZombieConstants":9,"../objects/PathFinder.js":13,"../utils/MapUtils.js":24,"./Entity":11}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1831,8 +1780,6 @@ var TileMap = function (_Phaser$Tilemap) {
 
         pathArr = tempArr;
       });
-
-      console.log(this.paths);
     }
   }, {
     key: 'getPath',
@@ -1846,7 +1793,7 @@ var TileMap = function (_Phaser$Tilemap) {
 
 exports.default = TileMap;
 
-},{"../utils/MapUtils.js":23}],16:[function(require,module,exports){
+},{"../utils/MapUtils.js":24}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1999,16 +1946,28 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
 
 exports.default = WalkingEntitiesManager;
 
-},{"../utils/EntityManagerUtils":22,"../utils/MapUtils.js":23}],17:[function(require,module,exports){
+},{"../utils/EntityManagerUtils":23,"../utils/MapUtils.js":24}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
+
 var _EntityWalkingOnPath2 = require('./EntityWalkingOnPath');
 
 var _EntityWalkingOnPath3 = _interopRequireDefault(_EntityWalkingOnPath2);
+
+var _ZombieConstants = require('../constants/ZombieConstants');
 
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : { default: obj };
@@ -2044,18 +2003,142 @@ var Zombie = function (_EntityWalkingOnPath) {
   * @param {string} imageKey - This is the key to image used by the Sprite during rendering.
   * @param {number} frame - If this Sprite is using part of a sprite sheet or texture atlas you can specify the exact frame to use by giving a numeric index.
   */
-  function Zombie(game, x, y, imageKey, frame, path, walls, player) {
+  function Zombie(game, imageKey, frame, targets, walls, player) {
     _classCallCheck(this, Zombie);
 
-    return _possibleConstructorReturn(this, (Zombie.__proto__ || Object.getPrototypeOf(Zombie)).call(this, game, x, y, imageKey, frame, path, walls, player));
+    var _this = _possibleConstructorReturn(this, (Zombie.__proto__ || Object.getPrototypeOf(Zombie)).call(this, game, imageKey, frame, targets, walls));
+
+    _this.player = player;
+    _this.walls = walls;
+    _this.playerSeekingRay = new Phaser.Line();
+    _this.tileHits = [];
+    _this.isChasing = false;
+    _this.lastKnownPlayerPosition = { x: 1, y: 1 };
+    return _this;
   }
+
+  _createClass(Zombie, [{
+    key: 'update',
+    value: function update() {
+      if (this.canSeePlayer()) {
+        this.isChasing = true;
+        this.lastKnownPlayerPosition = { x: this.player.x, y: this.player.y };
+      }
+
+      if (!this.isChasing) {
+        _EntityWalkingOnPath3.default.prototype.update.call(this);
+      } else {
+        this.chasePlayer();
+      }
+    }
+    /* Reacting to player */
+
+  }, {
+    key: 'canSeePlayer',
+    value: function canSeePlayer() {
+      /** Draw line between player and zombie and check if it can see him. If yes chase him. */
+      this.playerSeekingRay.start.set(this.x, this.y);
+      this.playerSeekingRay.end.set(this.player.x, this.player.y);
+
+      this.tileHits = this.walls.getRayCastTiles(this.playerSeekingRay, 0, false, false);
+
+      if (this.tileHits.length > 0) {
+        for (var i = 0; i < this.tileHits.length; i++) {
+          if (this.tileHits[i].index >= 0) {
+            return false;
+          }
+        }
+      }
+
+      var angleDelta = Math.abs(Phaser.Math.radToDeg(Phaser.Math.angleBetween(this.x, this.y, this.player.x, this.player.y)) + 90 - this.angle);
+
+      return (angleDelta <= _ZombieConstants.ZOMBIE_SIGHT_ANGLE || angleDelta >= 360 - _ZombieConstants.ZOMBIE_SIGHT_ANGLE) && (this.isChasing || this.playerSeekingRay.length < _ZombieConstants.ZOMBIE_SIGHT_RANGE) || this.playerSeekingRay.length < _ZombieConstants.ZOMBIE_HEARING_RANGE && !this.player.isSneaking && this.player.isMoving();
+    }
+  }, {
+    key: 'chasePlayer',
+    value: function chasePlayer() {
+      this.game.physics.arcade.moveToObject(this, this.lastKnownPlayerPosition, _ZombieConstants.ZOMBIE_SPEED * _ZombieConstants.ZOMBIE_SPEED_CHASING_MULTIPLIER);
+      this.lookAt(this.lastKnownPlayerPosition.x, this.lastKnownPlayerPosition.y);
+
+      var distanceToTarget = this.game.physics.arcade.distanceBetween(this, this.lastKnownPlayerPosition);
+      if (!this.canSeePlayer() && distanceToTarget <= _ZombieConstants.MIN_DISTANCE_TO_TARGET) {
+        this.body.velocity.x = 0;
+        this.body.velocity.y = 0;
+        this.isChasing = false;
+      }
+    }
+  }]);
 
   return Zombie;
 }(_EntityWalkingOnPath3.default);
 
 exports.default = Zombie;
 
-},{"./EntityWalkingOnPath":12}],18:[function(require,module,exports){
+},{"../constants/ZombieConstants":9,"./EntityWalkingOnPath":12}],18:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
+
+var _WalkingEntitiesManager = require('../objects/WalkingEntitiesManager');
+
+var _WalkingEntitiesManager2 = _interopRequireDefault(_WalkingEntitiesManager);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+function _possibleConstructorReturn(self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }return call && (typeof call === "object" || typeof call === "function") ? call : self;
+}
+
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+}
+
+var ZombieManager = function (_WalkingEntitiesManag) {
+  _inherits(ZombieManager, _WalkingEntitiesManag);
+
+  function ZombieManager(game, grid) {
+    _classCallCheck(this, ZombieManager);
+
+    return _possibleConstructorReturn(this, (ZombieManager.__proto__ || Object.getPrototypeOf(ZombieManager)).call(this, game, grid));
+  }
+
+  _createClass(ZombieManager, [{
+    key: 'update',
+    value: function update() {
+      _WalkingEntitiesManager2.default.prototype.update.call(this);
+    }
+  }]);
+
+  return ZombieManager;
+}(_WalkingEntitiesManager2.default);
+
+exports.default = ZombieManager;
+
+},{"../objects/WalkingEntitiesManager":16}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2126,7 +2209,7 @@ var Boot = function (_Phaser$State) {
 
 exports.default = Boot;
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2151,13 +2234,13 @@ var _Zombie = require('../objects/Zombie');
 
 var _Zombie2 = _interopRequireDefault(_Zombie);
 
-var _TileMap = require('../objects/TileMap.js');
+var _TileMap = require('../objects/TileMap');
 
 var _TileMap2 = _interopRequireDefault(_TileMap);
 
-var _WalkingEntitiesManager = require('../objects/WalkingEntitiesManager');
+var _ZombiesManager = require('../objects/ZombiesManager');
 
-var _WalkingEntitiesManager2 = _interopRequireDefault(_WalkingEntitiesManager);
+var _ZombiesManager2 = _interopRequireDefault(_ZombiesManager);
 
 var _PlayerConstants = require('../constants/PlayerConstants');
 
@@ -2200,10 +2283,10 @@ var Game = function (_Phaser$State) {
     value: function create() {
       this.map = new _TileMap2.default(this.game, 'map', 64, 64);
 
-      this.player = new _Player2.default(this.game, _TileMapConstants.TILE_WIDTH + _TileMapConstants.TILE_WIDTH / 2, _TileMapConstants.TILE_HEIGHT + _TileMapConstants.TILE_HEIGHT / 2, 'player', _PlayerConstants.PLAYER_INITIAL_FRAME);
+      this.player = new _Player2.default(this.game, 10 * _TileMapConstants.TILE_WIDTH + _TileMapConstants.TILE_WIDTH / 2, 2 * _TileMapConstants.TILE_HEIGHT + _TileMapConstants.TILE_HEIGHT / 2, 'player', _PlayerConstants.PLAYER_INITIAL_FRAME);
       this.game.camera.follow(this.player);
 
-      this.zombies = new _WalkingEntitiesManager2.default(this.game, this.map.walls);
+      this.zombies = new _ZombiesManager2.default(this.game, this.map.walls);
       for (var i = 0; i < this.map.paths.length; i++) {
         this.zombies.add(new _Zombie2.default(this.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, this.map.getPath(i), this.map.walls, this.player));
       }
@@ -2233,7 +2316,7 @@ var Game = function (_Phaser$State) {
 
 exports.default = Game;
 
-},{"../constants/PlayerConstants":7,"../constants/TileMapConstants":8,"../objects/Player":14,"../objects/TileMap.js":15,"../objects/WalkingEntitiesManager":16,"../objects/Zombie":17}],20:[function(require,module,exports){
+},{"../constants/PlayerConstants":7,"../constants/TileMapConstants":8,"../objects/Player":14,"../objects/TileMap":15,"../objects/Zombie":17,"../objects/ZombiesManager":18}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2289,7 +2372,7 @@ var Menu = function (_Phaser$State) {
 
 exports.default = Menu;
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2363,7 +2446,7 @@ var Preload = function (_Phaser$State) {
 
 exports.default = Preload;
 
-},{"../constants/PlayerConstants.js":7,"../constants/ZombieConstants.js":9}],22:[function(require,module,exports){
+},{"../constants/PlayerConstants.js":7,"../constants/ZombieConstants.js":9}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2447,7 +2530,6 @@ var getDirectionBetweenTiles = function getDirectionBetweenTiles(tile1, tile2) {
       throw new Error('Uncorrect tiles coordinates! tile1.x: ' + tile1.x + ', tile1.y: ' + tile1.y + ' | tile2.x: ' + tile2.x + ' tile2.y: ' + tile2.y);
     }
   } else {
-    console.warn('Unsafe prediction is made, collisions may not work :( ');
     if (tile1.y < tile2.y && tile1.x < tile2.x) {
       return Math.random() > 0.5 ? 'SOUTH' : 'EAST';
     } else if (tile1.y > tile2.y && tile1.x < tile2.x) {
@@ -2552,7 +2634,7 @@ function getFreeTileExcludingEast(entityTile, mapGrid) {
   return freeTile;
 }
 
-},{"../utils/MapUtils":23}],23:[function(require,module,exports){
+},{"../utils/MapUtils":24}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

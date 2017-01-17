@@ -55,8 +55,6 @@ export default class TileMap extends Phaser.Tilemap {
 
       pathArr = tempArr;
     } );
-
-    console.log( this.paths );
   }
 
   getPath( i ) {

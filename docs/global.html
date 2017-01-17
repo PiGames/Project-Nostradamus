@@ -152,7 +152,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="objects_EntityWalkingOnPath.js.html">objects/EntityWalkingOnPath.js</a>, <a href="objects_EntityWalkingOnPath.js.html#line38">line 38</a>
+        <a href="objects_EntityWalkingOnPath.js.html">objects/EntityWalkingOnPath.js</a>, <a href="objects_EntityWalkingOnPath.js.html#line40">line 40</a>
     </li></ul></dd>
     
 
@@ -183,14 +183,14 @@
 
     
 
-    <h4 class="name" id="changePathToTemporary"><span class="type-signature"></span>changePathToTemporary<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="changePathToTemporary"><span class="type-signature"></span>changePathToTemporary<span class="signature">(start, target)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Change path to temporary and automatically get back to standard path, after reaching temporary target ( it is recommended to set the target as current path target)
+    Change path to temporary and automatically get back to standard path, after reaching temporary target.
 </div>
 
 
@@ -199,6 +199,78 @@
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>start</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">tile</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">start tile coordinates, if this tile is different that entity's tile then it goes straight to this tile.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>target</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">tile</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">target tile coordinates, this should be initialized with current path target otherwise some unpredictable things may happen.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -234,7 +306,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="objects_EntityWalkingOnPath.js.html">objects/EntityWalkingOnPath.js</a>, <a href="objects_EntityWalkingOnPath.js.html#line101">line 101</a>
+        <a href="objects_EntityWalkingOnPath.js.html">objects/EntityWalkingOnPath.js</a>, <a href="objects_EntityWalkingOnPath.js.html#line107">line 107</a>
     </li></ul></dd>
     
 
@@ -365,7 +437,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="objects_TileMap.js.html">objects/TileMap.js</a>, <a href="objects_TileMap.js.html#line28">line 28</a>
+        <a href="objects_TileMap.js.html">objects/TileMap.js</a>, <a href="objects_TileMap.js.html#line32">line 32</a>
     </li></ul></dd>
     
 
@@ -447,7 +519,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="objects_Player.js.html">objects/Player.js</a>, <a href="objects_Player.js.html#line43">line 43</a>
+        <a href="objects_Player.js.html">objects/Player.js</a>, <a href="objects_Player.js.html#line46">line 46</a>
     </li></ul></dd>
     
 
@@ -529,7 +601,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="objects_Player.js.html">objects/Player.js</a>, <a href="objects_Player.js.html#line65">line 65</a>
+        <a href="objects_Player.js.html">objects/Player.js</a>, <a href="objects_Player.js.html#line68">line 68</a>
     </li></ul></dd>
     
 
@@ -611,89 +683,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="objects_EntityWalkingOnPath.js.html">objects/EntityWalkingOnPath.js</a>, <a href="objects_EntityWalkingOnPath.js.html#line65">line 65</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="update"><span class="type-signature"></span>update<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-<div class="description">
-    Check if current target or step target is reached. Move body in stepTarget direction.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="objects_EntityWalkingOnPath.js.html">objects/EntityWalkingOnPath.js</a>, <a href="objects_EntityWalkingOnPath.js.html#line53">line 53</a>
+        <a href="objects_EntityWalkingOnPath.js.html">objects/EntityWalkingOnPath.js</a>, <a href="objects_EntityWalkingOnPath.js.html#line67">line 67</a>
     </li></ul></dd>
     
 
@@ -775,7 +765,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="objects_Player.js.html">objects/Player.js</a>, <a href="objects_Player.js.html#line35">line 35</a>
+        <a href="objects_Player.js.html">objects/Player.js</a>, <a href="objects_Player.js.html#line38">line 38</a>
     </li></ul></dd>
     
 
@@ -823,7 +813,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Mon Jan 09 2017 22:23:01 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Tue Jan 17 2017 18:20:49 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>
