@@ -82,7 +82,6 @@ export default class EntityWalkingOnPath extends Entity {
       }
     }
   }
-
   updateLookDirection() {
     const lookTarget = tileToPixels( this.stepTarget );
 

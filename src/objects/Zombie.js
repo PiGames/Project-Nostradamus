@@ -1,16 +1,7 @@
 import EntityWalkingOnPath from './EntityWalkingOnPath';
 import { ZOMBIE_SPEED, MIN_DISTANCE_TO_TARGET, ZOMBIE_SPEED_CHASING_MULTIPLIER, ZOMBIE_SIGHT_ANGLE, ZOMBIE_SIGHT_RANGE, ZOMBIE_HEARING_RANGE } from '../constants/ZombieConstants';
 
-/** Class representing zombie in game world. It derives after Entity class. It is responsible for zombie movement, animations, attacks etc.  */
 export default class Zombie extends EntityWalkingOnPath {
-  /**
-  * Create the Zombie Entity.
-  * @param {object} game - A reference to the currently running game.
-  * @param {number} x - The x coordinate to position the Sprite at.
-  * @param {number} x - The y coordinate to position the Sprite at.
-  * @param {string} imageKey - This is the key to image used by the Sprite during rendering.
-  * @param {number} frame - If this Sprite is using part of a sprite sheet or texture atlas you can specify the exact frame to use by giving a numeric index.
-  */
   constructor( game, imageKey, frame, targets, walls, player ) {
     super( game, imageKey, frame, targets, walls );
 
@@ -33,9 +24,8 @@ export default class Zombie extends EntityWalkingOnPath {
       this.chasePlayer();
     }
   }
-  /* Reacting to player */
   canSeePlayer() {
-    /** Draw line between player and zombie and check if it can see him. If yes chase him. */
+    /** Draw line between player and zombie and check if it can see him. If yes, chase him. */
     this.playerSeekingRay.start.set( this.x, this.y );
     this.playerSeekingRay.end.set( this.player.x, this.player.y );
 
@@ -53,7 +43,6 @@ export default class Zombie extends EntityWalkingOnPath {
 
     return ( ( angleDelta <= ZOMBIE_SIGHT_ANGLE || angleDelta >= ( 360 - ZOMBIE_SIGHT_ANGLE ) ) && ( this.isChasing || this.playerSeekingRay.length < ZOMBIE_SIGHT_RANGE ) ) || ( this.playerSeekingRay.length < ZOMBIE_HEARING_RANGE && !this.player.isSneaking && this.player.isMoving() );
   }
-
   chasePlayer() {
     this.game.physics.arcade.moveToObject( this, this.lastKnownPlayerPosition, ZOMBIE_SPEED * ZOMBIE_SPEED_CHASING_MULTIPLIER );
     this.lookAt( this.lastKnownPlayerPosition.x, this.lastKnownPlayerPosition.y );

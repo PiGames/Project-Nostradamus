@@ -31,7 +31,6 @@ export const getEntityNextTile = ( entity ) => {
       return entity.pathsBetweenPathTargets[ pathIndex ].path[ stepIndex ];
     } else {
       if ( entity.temporaryPath[ stepIndex ] == undefined ) {
-        console.log( entity.temporaryPath );
         throw new Error( `Wrong temporary path data: stepIndex: ${stepIndex}` );
       }
       return entity.temporaryPath[ stepIndex ];

@@ -7,7 +7,6 @@ export default class WalkingEntitiesManager extends Phaser.Group {
     this.mapGrid = getWallsPostions( grid );
     this.allEntitiesInitialized = false;
   }
-
   update() {
     if ( this.allEntitiesInitialized || this.areAllEntitiesInitialized() ) {
       this.manageMovingEntities();
@@ -43,7 +42,6 @@ export default class WalkingEntitiesManager extends Phaser.Group {
     entity1.changePathToTemporary( freeTile1, currentTarget1 );
     entity1.changePathToTemporary( freeTile2, currentTarget2 );
   }
-
   onCollisionWithWalls( entity, tile ) {
     const entityTile = pixelsToTile( entity );
     let freeTile;
@@ -62,7 +60,6 @@ export default class WalkingEntitiesManager extends Phaser.Group {
 
     entity.changePathToTemporary( freeTile, currentTarget );
   }
-
   areAllEntitiesInitialized() {
     for ( const entity of this.children ) {
       if ( !entity.isInitialized ) {

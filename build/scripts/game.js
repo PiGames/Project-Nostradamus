@@ -952,16 +952,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-  };
-}();
-
 var _Boot = require('./states/Boot');
 
 var _Boot2 = _interopRequireDefault(_Boot);
@@ -1000,17 +990,9 @@ function _inherits(subClass, superClass) {
   }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 }
 
-/** Class representing whole game. Once created it displays game in defined container. */
 var ProjectNostradamus = function (_Phaser$Game) {
   _inherits(ProjectNostradamus, _Phaser$Game);
 
-  /**
-   * Create a game.
-   * @param {number | string } width - The width of game in pixels. If given as a string the value must be between - and 100 and will be used as percentage width.
-   * @param {number | string } height - The height of game in pixels. If given as a string the value must be between - and 100 and will be used as percentage height.
-   * @param {number} renderer - Which renderer to use: Phaser.AUTO will auto-detect, Phaser.WEBGL, Phaser.CANVAS or Phaser.HEADLESS (no rendering at all).
-   * @param {string | HTMLElement} - The DOM element into which this games canvas will be injected. Either a DOM ID (string) or the element itself.
-  */
   function ProjectNostradamus(width, height, renderer, parent) {
     _classCallCheck(this, ProjectNostradamus);
 
@@ -1025,13 +1007,6 @@ var ProjectNostradamus = function (_Phaser$Game) {
     _this.state.start('Boot');
     return _this;
   }
-
-  _createClass(ProjectNostradamus, [{
-    key: 'resize',
-    value: function resize() {
-      console.log(1);
-    }
-  }]);
 
   return ProjectNostradamus;
 }(Phaser.Game);
@@ -1152,18 +1127,9 @@ function _inherits(subClass, superClass) {
   }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 }
 
-/** Class representing any entity in game world. It derives after Phaser.Sprite.*/
 var Entity = function (_Phaser$Sprite) {
   _inherits(Entity, _Phaser$Sprite);
 
-  /**
-  * Create a Entity. Set its anchor to center, enable arcade physics on it add entity to existing game world.
-  * @param {object} game - A reference to the currently running game.
-  * @param {number} x - The x coordinate (in world space) to position the Sprite at.
-  * @param {number} x - The y coordinate (in world space) to position the Sprite at.
-  * @param {string} imageKey - This is the key to image used by the Sprite during rendering.
-  * @param {number} frame - If this Sprite is using part of a sprite sheet or texture atlas you can specify the exact frame to use by giving a numeric index.
-  */
   function Entity(game, x, y, imageKey, frame) {
     _classCallCheck(this, Entity);
 
@@ -1177,11 +1143,6 @@ var Entity = function (_Phaser$Sprite) {
     _this.game.world.add(_this);
     return _this;
   }
-  /**
-  * Rotate a Entity to look at given target.
-  * @param {number} targetX - The target x coordintate.
-  * @param {number} targetY - The target y coordintate.
-  */
 
   _createClass(Entity, [{
     key: "lookAt",
@@ -1197,10 +1158,6 @@ var Entity = function (_Phaser$Sprite) {
 
       this.angle = targetAngle;
     }
-    /**
-    * Check if entity is moving in both dimensions, if so, lower vector values to move with normal speed.
-    */
-
   }, {
     key: "normalizeVelocity",
     value: function normalizeVelocity() {
@@ -1215,11 +1172,6 @@ var Entity = function (_Phaser$Sprite) {
       this.body.velocity.x = 0;
       this.body.velocity.y = 0;
     }
-
-    /**
-    * Check if entity is moving.
-    */
-
   }, {
     key: "isMoving",
     value: function isMoving() {
@@ -1554,18 +1506,9 @@ function _inherits(subClass, superClass) {
   }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 }
 
-/** Class representing player in game world. It derives after Entity class. It is responsible for player movement, animations, attacks etc.  */
 var Player = function (_Entity) {
   _inherits(Player, _Entity);
 
-  /**
-  * Create the Player Entity.
-  * @param {object} game - A reference to the currently running game.
-  * @param {number} x - The x coordinate to position the Sprite at.
-  * @param {number} x - The y coordinate to position the Sprite at.
-  * @param {string} imageKey - This is the key to image used by the Sprite during rendering.
-  * @param {number} frame - If this Sprite is using part of a sprite sheet or texture atlas you can specify the exact frame to use by giving a numeric index.
-  */
   function Player(game, x, y, imageKey, frame) {
     _classCallCheck(this, Player);
 
@@ -1590,9 +1533,6 @@ var Player = function (_Entity) {
     _this.animations.add('fight', [3, 5, 4], 3);
     return _this;
   }
-  /**
-  * Update Player's properties, called every frame, such as: rotation angle.
-  */
 
   _createClass(Player, [{
     key: 'update',
@@ -1601,10 +1541,6 @@ var Player = function (_Entity) {
       this.handleAnimation();
       this.lookAtMouse();
     }
-    /**
-    * Handle player's movement. Handle movement special modes and normalize movement vector.
-    */
-
   }, {
     key: 'handleMovement',
     value: function handleMovement() {
@@ -1626,10 +1562,6 @@ var Player = function (_Entity) {
 
       this.normalizeVelocity();
     }
-    /**
-    * Check for special keys pressed, if so make player move slower or faster.
-    */
-
   }, {
     key: 'handleMovementSpecialModes',
     value: function handleMovementSpecialModes() {
@@ -1716,13 +1648,6 @@ function _inherits(subClass, superClass) {
 var TileMap = function (_Phaser$Tilemap) {
   _inherits(TileMap, _Phaser$Tilemap);
 
-  /**
-  * Create the Map. Draw map and set tiles that are supposed to collide with player. Also sets world size to match map size.
-  * @param {object} game - A reference to the currently running game.
-  * @param {string} key - A key to tilemap data.
-  * @param {number} tileWidth - Width of single tile.
-  * @param {number} tileHeight - Height of single tile.
-  */
   function TileMap(game, key, tileWidth, tileHeight) {
     _classCallCheck(this, TileMap);
 
@@ -1742,11 +1667,6 @@ var TileMap = function (_Phaser$Tilemap) {
     _this.createPathPoints();
     return _this;
   }
-
-  /**
-  * Add collision between entity and map.
-  * @param {object} entity - A reference to entity.
-  */
 
   _createClass(TileMap, [{
     key: 'collide',
@@ -1991,18 +1911,9 @@ function _inherits(subClass, superClass) {
   }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 }
 
-/** Class representing zombie in game world. It derives after Entity class. It is responsible for zombie movement, animations, attacks etc.  */
 var Zombie = function (_EntityWalkingOnPath) {
   _inherits(Zombie, _EntityWalkingOnPath);
 
-  /**
-  * Create the Zombie Entity.
-  * @param {object} game - A reference to the currently running game.
-  * @param {number} x - The x coordinate to position the Sprite at.
-  * @param {number} x - The y coordinate to position the Sprite at.
-  * @param {string} imageKey - This is the key to image used by the Sprite during rendering.
-  * @param {number} frame - If this Sprite is using part of a sprite sheet or texture atlas you can specify the exact frame to use by giving a numeric index.
-  */
   function Zombie(game, imageKey, frame, targets, walls, player) {
     _classCallCheck(this, Zombie);
 
@@ -2031,12 +1942,10 @@ var Zombie = function (_EntityWalkingOnPath) {
         this.chasePlayer();
       }
     }
-    /* Reacting to player */
-
   }, {
     key: 'canSeePlayer',
     value: function canSeePlayer() {
-      /** Draw line between player and zombie and check if it can see him. If yes chase him. */
+      /** Draw line between player and zombie and check if it can see him. If yes, chase him. */
       this.playerSeekingRay.start.set(this.x, this.y);
       this.playerSeekingRay.end.set(this.player.x, this.player.y);
 
@@ -2173,7 +2082,6 @@ function _inherits(subClass, superClass) {
   }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 }
 
-/** Class responsible for loading resources to show on loading screen in Preload state. */
 var Boot = function (_Phaser$State) {
   _inherits(Boot, _Phaser$State);
 
@@ -2185,10 +2093,6 @@ var Boot = function (_Phaser$State) {
 
   _createClass(Boot, [{
     key: 'preload',
-
-    /**
-    * Load resources for loading screen
-    */
     value: function preload() {}
   }, {
     key: 'create',
@@ -2268,7 +2172,6 @@ function _inherits(subClass, superClass) {
   }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 }
 
-/**Class representing Game state */
 var Game = function (_Phaser$State) {
   _inherits(Game, _Phaser$State);
 
@@ -2411,7 +2314,6 @@ function _inherits(subClass, superClass) {
   }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 }
 
-/** Class responsible for displaying loading screen and loading resources for game.  */
 var Preload = function (_Phaser$State) {
   _inherits(Preload, _Phaser$State);
 
@@ -2423,10 +2325,6 @@ var Preload = function (_Phaser$State) {
 
   _createClass(Preload, [{
     key: 'preload',
-
-    /**
-    * Display loading screen. Load resources for game.
-    */
     value: function preload() {
       this.load.tilemap('map', 'assets/tilemaps/maps/map.json', null, Phaser.Tilemap.TILED_JSON);
       this.load.image('tilemap', 'assets/tilemaps/tiles/tilemap.png');
@@ -2487,7 +2385,6 @@ var getEntityNextTile = exports.getEntityNextTile = function getEntityNextTile(e
       return entity.pathsBetweenPathTargets[_pathIndex].path[_stepIndex];
     } else {
       if (entity.temporaryPath[_stepIndex] == undefined) {
-        console.log(entity.temporaryPath);
         throw new Error('Wrong temporary path data: stepIndex: ' + _stepIndex);
       }
       return entity.temporaryPath[_stepIndex];

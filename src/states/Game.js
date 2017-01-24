@@ -6,7 +6,6 @@ import ZombiesManager from '../objects/ZombiesManager';
 import { PLAYER_INITIAL_FRAME } from '../constants/PlayerConstants';
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 
-/**Class representing Game state */
 export default class Game extends Phaser.State {
   create() {
     this.map = new TileMap( this.game, 'map', 64, 64 );
