@@ -1,5 +1,6 @@
 import EntityWalkingOnPath from './EntityWalkingOnPath';
 import { ZOMBIE_SPEED, MIN_DISTANCE_TO_TARGET, ZOMBIE_SPEED_CHASING_MULTIPLIER, ZOMBIE_SIGHT_ANGLE, ZOMBIE_SIGHT_RANGE, ZOMBIE_HEARING_RANGE } from '../constants/ZombieConstants';
+import { pixelsToTile } from '../utils/MapUtils.js';
 
 export default class Zombie extends EntityWalkingOnPath {
   constructor( game, imageKey, frame, targets, walls, player ) {
@@ -52,6 +53,7 @@ export default class Zombie extends EntityWalkingOnPath {
       this.body.velocity.x = 0;
       this.body.velocity.y = 0;
       this.isChasing = false;
+      this.changePathToTemporary( pixelsToTile( this ) );
     }
   }
 

@@ -1,5 +1,6 @@
 import { willEntitiesBeOnTheSameTile, getFreeTileAroundEntityExcludingOtherEntity } from '../utils/EntityManagerUtils';
 import { pixelsToTile, getWallsPostions } from '../utils/MapUtils.js';
+import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 
 export default class WalkingEntitiesManager extends Phaser.Group {
   constructor( game, grid ) {
@@ -36,14 +37,12 @@ export default class WalkingEntitiesManager extends Phaser.Group {
     const freeTile1 = getFreeTileAroundEntityExcludingOtherEntity( entity1, entity2, this.mapGrid );
     const freeTile2 = getFreeTileAroundEntityExcludingOtherEntity( entity2, entity1, this.mapGrid );
 
-    const currentTarget1 = entity1.pathsBetweenPathTargets[ entity1.currentPathIndex ].target;
-    const currentTarget2 = entity2.pathsBetweenPathTargets[ entity2.currentPathIndex ].target;
-
-    entity1.changePathToTemporary( freeTile1, currentTarget1 );
-    entity1.changePathToTemporary( freeTile2, currentTarget2 );
+    entity1.changePathToTemporary( freeTile1 );
+    entity1.changePathToTemporary( freeTile2 );
   }
-  onCollisionWithWalls( entity, tile ) {
+  onCollisionWithWalls( entity, tileBody ) {
     const entityTile = pixelsToTile( entity );
+    const tile = pixelsToTile( { x: tileBody.x + TILE_WIDTH / 2, y: tileBody.y + TILE_HEIGHT / 2 } );
     let freeTile;
 
     if ( entityTile.x > tile.x ) {
@@ -56,9 +55,7 @@ export default class WalkingEntitiesManager extends Phaser.Group {
       freeTile = { x: entityTile.x, y: entityTile.y + 1 };
     }
 
-    const currentTarget = entity.pathsBetweenPathTargets[ entity.currentPathIndex ].target;
-
-    entity.changePathToTemporary( freeTile, currentTarget );
+    entity.changePathToTemporary( freeTile );
   }
   areAllEntitiesInitialized() {
     for ( const entity of this.children ) {
@@ -69,5 +66,4 @@ export default class WalkingEntitiesManager extends Phaser.Group {
     this.allEntitiesInitialized = true;
     return true;
   }
-
 }

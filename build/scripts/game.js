@@ -1137,7 +1137,7 @@ var Entity = function (_Phaser$Sprite) {
 
     _this.anchor.setTo(0.5, 0.5);
 
-    _this.game.physics.enable(_this, Phaser.Physics.ARCADE);
+    _this.game.physics.p2.enable(_this);
     _this.body.collideWorldBounds = true;
 
     _this.game.world.add(_this);
@@ -1156,7 +1156,7 @@ var Entity = function (_Phaser$Sprite) {
         targetAngle += 360;
       }
 
-      this.angle = targetAngle;
+      this.body.angle = targetAngle;
     }
   }, {
     key: "normalizeVelocity",
@@ -1361,11 +1361,13 @@ var EntityWalkingOnPath = function (_Entity) {
 
   }, {
     key: 'changePathToTemporary',
-    value: function changePathToTemporary(start, target) {
+    value: function changePathToTemporary(start) {
       var _this3 = this;
 
+      var currentTarget = this.pathsBetweenPathTargets[this.currentPathIndex].target;
+
       this.canMove = false;
-      this.calculateTemporaryPath(start, target, function (path) {
+      this.calculateTemporaryPath(start, currentTarget, function (path) {
         if (path.length === 0) {
           _this3.changePathToStandard();
           return;
@@ -1531,6 +1533,8 @@ var Player = function (_Entity) {
 
     _this.animations.add('walk', [1, 2, 1, 0], 1);
     _this.animations.add('fight', [3, 5, 4], 3);
+
+    _this.body.addCircle(Math.max(_PlayerConstants.PLAYER_WIDTH, _PlayerConstants.PLAYER_HEIGHT));
     return _this;
   }
 
@@ -1664,14 +1668,66 @@ var TileMap = function (_Phaser$Tilemap) {
 
     _this.ground.resizeWorld();
 
+    _this.wallsBodiesArray = game.physics.p2.convertTilemap(_this, _this.walls);
+
+    _this.wallsCollisionGroup = _this.game.physics.p2.createCollisionGroup();
+
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+      for (var _iterator = _this.wallsBodiesArray[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var body = _step.value;
+
+        body.setCollisionGroup(_this.wallsCollisionGroup);
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
+    }
+
     _this.createPathPoints();
     return _this;
   }
 
   _createClass(TileMap, [{
-    key: 'collide',
-    value: function collide(entity, callback) {
-      this.game.physics.arcade.collide(entity, this.walls, callback);
+    key: 'collides',
+    value: function collides(collisionGroup, callback) {
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = this.wallsBodiesArray[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var body = _step2.value;
+
+          body.collides(collisionGroup, callback);
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
     }
   }, {
     key: 'createPathPoints',
@@ -1733,6 +1789,8 @@ var _createClass = function () {
 var _EntityManagerUtils = require('../utils/EntityManagerUtils');
 
 var _MapUtils = require('../utils/MapUtils.js');
+
+var _TileMapConstants = require('../constants/TileMapConstants');
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -1800,16 +1858,14 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
       var freeTile1 = (0, _EntityManagerUtils.getFreeTileAroundEntityExcludingOtherEntity)(entity1, entity2, this.mapGrid);
       var freeTile2 = (0, _EntityManagerUtils.getFreeTileAroundEntityExcludingOtherEntity)(entity2, entity1, this.mapGrid);
 
-      var currentTarget1 = entity1.pathsBetweenPathTargets[entity1.currentPathIndex].target;
-      var currentTarget2 = entity2.pathsBetweenPathTargets[entity2.currentPathIndex].target;
-
-      entity1.changePathToTemporary(freeTile1, currentTarget1);
-      entity1.changePathToTemporary(freeTile2, currentTarget2);
+      entity1.changePathToTemporary(freeTile1);
+      entity1.changePathToTemporary(freeTile2);
     }
   }, {
     key: 'onCollisionWithWalls',
-    value: function onCollisionWithWalls(entity, tile) {
+    value: function onCollisionWithWalls(entity, tileBody) {
       var entityTile = (0, _MapUtils.pixelsToTile)(entity);
+      var tile = (0, _MapUtils.pixelsToTile)({ x: tileBody.x + _TileMapConstants.TILE_WIDTH / 2, y: tileBody.y + _TileMapConstants.TILE_HEIGHT / 2 });
       var freeTile = void 0;
 
       if (entityTile.x > tile.x) {
@@ -1822,9 +1878,7 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
         freeTile = { x: entityTile.x, y: entityTile.y + 1 };
       }
 
-      var currentTarget = entity.pathsBetweenPathTargets[entity.currentPathIndex].target;
-
-      entity.changePathToTemporary(freeTile, currentTarget);
+      entity.changePathToTemporary(freeTile);
     }
   }, {
     key: 'areAllEntitiesInitialized',
@@ -1866,7 +1920,7 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
 
 exports.default = WalkingEntitiesManager;
 
-},{"../utils/EntityManagerUtils":23,"../utils/MapUtils.js":24}],17:[function(require,module,exports){
+},{"../constants/TileMapConstants":8,"../utils/EntityManagerUtils":23,"../utils/MapUtils.js":24}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1888,6 +1942,8 @@ var _EntityWalkingOnPath2 = require('./EntityWalkingOnPath');
 var _EntityWalkingOnPath3 = _interopRequireDefault(_EntityWalkingOnPath2);
 
 var _ZombieConstants = require('../constants/ZombieConstants');
+
+var _MapUtils = require('../utils/MapUtils.js');
 
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : { default: obj };
@@ -1974,6 +2030,7 @@ var Zombie = function (_EntityWalkingOnPath) {
         this.body.velocity.x = 0;
         this.body.velocity.y = 0;
         this.isChasing = false;
+        this.changePathToTemporary((0, _MapUtils.pixelsToTile)(this));
       }
     }
   }]);
@@ -1983,7 +2040,7 @@ var Zombie = function (_EntityWalkingOnPath) {
 
 exports.default = Zombie;
 
-},{"../constants/ZombieConstants":9,"./EntityWalkingOnPath":12}],18:[function(require,module,exports){
+},{"../constants/ZombieConstants":9,"../utils/MapUtils.js":24,"./EntityWalkingOnPath":12}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2101,9 +2158,12 @@ var Boot = function (_Phaser$State) {
 
       // this.game.scale.maxWidth = 800;
       // this.game.scale.maxHeight = 600;
+
       this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
       this.game.scale.updateLayout();
 
+      this.game.physics.startSystem(Phaser.Physics.P2JS);
+      this.game.physics.p2.setImpactEvents(true);
       this.state.start('Preload');
     }
   }]);
@@ -2184,34 +2244,38 @@ var Game = function (_Phaser$State) {
   _createClass(Game, [{
     key: 'create',
     value: function create() {
+      var _this2 = this;
+
       this.map = new _TileMap2.default(this.game, 'map', 64, 64);
 
       this.player = new _Player2.default(this.game, 10 * _TileMapConstants.TILE_WIDTH + _TileMapConstants.TILE_WIDTH / 2, 2 * _TileMapConstants.TILE_HEIGHT + _TileMapConstants.TILE_HEIGHT / 2, 'player', _PlayerConstants.PLAYER_INITIAL_FRAME);
       this.game.camera.follow(this.player);
 
+      //  Create our collision groups. One for the player, one for the pandas
+      this.playerCollisionGroup = this.game.physics.p2.createCollisionGroup(this.player);
+      this.zombiesCollisionGroup = this.game.physics.p2.createCollisionGroup();
+
       this.zombies = new _ZombiesManager2.default(this.game, this.map.walls);
       for (var i = 0; i < this.map.paths.length; i++) {
-        this.zombies.add(new _Zombie2.default(this.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, this.map.getPath(i), this.map.walls, this.player));
+        var newZombie = this.zombies.add(new _Zombie2.default(this.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, this.map.getPath(i), this.map.walls, this.player));
+
+        newZombie.body.setCollisionGroup(this.zombiesCollisionGroup);
+        newZombie.body.collides(this.zombiesCollisionGroup, function (body1, body2) {
+          return _this2.zombies.onCollisionWihOtherEntity(body1.sprite, body2.sprite);
+        });
+        newZombie.body.collides(this.map.wallsCollisionGroup, function (body, tileBody) {
+          return _this2.zombies.onCollisionWithWalls(body.sprite, tileBody);
+        });
+        newZombie.body.collides(this.playerCollisionGroup);
       }
+      this.player.body.collides([this.zombiesCollisionGroup, this.map.wallsCollisionGroup]);
+
+      this.map.collides(this.zombiesCollisionGroup);
+      this.map.collides(this.playerCollisionGroup);
     }
   }, {
     key: 'update',
-    value: function update() {
-      var _this2 = this;
-
-      this.map.collide(this.player);
-      this.map.collide(this.zombies, function () {
-        var _zombies;
-
-        return (_zombies = _this2.zombies).onCollisionWithWalls.apply(_zombies, arguments);
-      });
-      this.game.physics.arcade.collide(this.zombies, this.zombies, function () {
-        var _zombies2;
-
-        return (_zombies2 = _this2.zombies).onCollisionWihOtherEntity.apply(_zombies2, arguments);
-      });
-      this.game.physics.arcade.collide(this.zombies, this.player);
-    }
+    value: function update() {}
   }]);
 
   return Game;

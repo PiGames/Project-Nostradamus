@@ -4,7 +4,7 @@ class Entity extends Phaser.Sprite {
 
     this.anchor.setTo( 0.5, 0.5 );
 
-    this.game.physics.enable( this, Phaser.Physics.ARCADE );
+    this.game.physics.p2.enable( this );
     this.body.collideWorldBounds = true;
 
     this.game.world.add( this );
@@ -19,7 +19,7 @@ class Entity extends Phaser.Sprite {
       targetAngle += 360;
     }
 
-    this.angle = targetAngle;
+    this.body.angle = targetAngle;
   }
   normalizeVelocity() {
     if ( this.body.velocity.x !== 0 && this.body.velocity.y !== 0 ) {

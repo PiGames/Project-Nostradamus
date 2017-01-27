@@ -15,10 +15,20 @@ export default class TileMap extends Phaser.Tilemap {
 
     this.ground.resizeWorld();
 
+    this.wallsBodiesArray = game.physics.p2.convertTilemap( this, this.walls );
+
+    this.wallsCollisionGroup = this.game.physics.p2.createCollisionGroup();
+
+    for ( const body of this.wallsBodiesArray ) {
+      body.setCollisionGroup( this.wallsCollisionGroup );
+    }
+
     this.createPathPoints();
   }
-  collide( entity, callback ) {
-    this.game.physics.arcade.collide( entity, this.walls, callback );
+  collides( collisionGroup, callback ) {
+    for ( const body of this.wallsBodiesArray ) {
+      body.collides( collisionGroup, callback );
+    }
   }
   createPathPoints() {
     this.objects[ 'ZombiePaths' ].forEach( ( v ) => {

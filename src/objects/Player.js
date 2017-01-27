@@ -22,6 +22,8 @@ export default class Player extends Entity {
 
     this.animations.add( 'walk', [ 1, 2, 1, 0 ], 1 );
     this.animations.add( 'fight', [ 3, 5, 4 ], 3 );
+
+    this.body.addCircle( Math.max( PLAYER_WIDTH, PLAYER_HEIGHT ) );
   }
   update() {
     this.handleMovement();

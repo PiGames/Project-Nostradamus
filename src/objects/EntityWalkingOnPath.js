@@ -103,9 +103,11 @@ export default class EntityWalkingOnPath extends Entity {
   * @param {tile} start - start tile coordinates, if this tile is different that entity's tile then it goes straight to this tile.
   * @param {tile} target - target tile coordinates, this should be initialized with current path target otherwise some unpredictable things may happen.
   */
-  changePathToTemporary( start, target ) {
+  changePathToTemporary( start ) {
+    const currentTarget = this.pathsBetweenPathTargets[ this.currentPathIndex ].target;
+
     this.canMove = false;
-    this.calculateTemporaryPath( start, target, ( path ) => {
+    this.calculateTemporaryPath( start, currentTarget, ( path ) => {
       if ( path.length === 0 ) {
         this.changePathToStandard();
         return;
