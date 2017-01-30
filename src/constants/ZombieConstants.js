@@ -10,3 +10,4 @@ export const MIN_DISTANCE_TO_TARGET = 10;
 export const ZOMBIE_SIGHT_ANGLE = 45;
 export const ZOMBIE_SIGHT_RANGE = 500;
 export const ZOMBIE_HEARING_RANGE = 100;
+export const ZOMBIE_ROTATING_SPEED = 50;

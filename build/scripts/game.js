@@ -1057,6 +1057,7 @@ var MIN_DISTANCE_TO_TARGET = exports.MIN_DISTANCE_TO_TARGET = 10;
 var ZOMBIE_SIGHT_ANGLE = exports.ZOMBIE_SIGHT_ANGLE = 45;
 var ZOMBIE_SIGHT_RANGE = exports.ZOMBIE_SIGHT_RANGE = 500;
 var ZOMBIE_HEARING_RANGE = exports.ZOMBIE_HEARING_RANGE = 100;
+var ZOMBIE_ROTATING_SPEED = exports.ZOMBIE_ROTATING_SPEED = 50;
 
 },{}],10:[function(require,module,exports){
 'use strict';
@@ -1335,12 +1336,19 @@ var EntityWalkingOnPath = function (_Entity) {
     key: 'updateLookDirection',
     value: function updateLookDirection() {
       var lookTarget = (0, _MapUtils.tileToPixels)(this.stepTarget);
+      //TODO make target point be the end of target tile
+      var targetPoint = new Phaser.Point(lookTarget.x, lookTarget.y);
+      var entityCenter = new Phaser.Point(this.body.x + this.width / 2, this.body.y + this.height / 2);
 
-      /* Not sure if this works properly */
-      var lookX = lookTarget.x + _ZombieConstants.ZOMBIE_LOOKING_OFFSET * (lookTarget.x - this.position.x);
-      var lookY = lookTarget.y + _ZombieConstants.ZOMBIE_LOOKING_OFFSET * (lookTarget.y - this.position.y);
+      var deltaTargetRad = this.rotation - Phaser.Math.angleBetweenPoints(targetPoint, entityCenter) - Math.PI / 2 - Math.PI;
 
-      this.lookAt(lookX, lookY);
+      deltaTargetRad = deltaTargetRad % (Math.PI * 2);
+
+      if (deltaTargetRad != deltaTargetRad % Math.PI) {
+        deltaTargetRad = deltaTargetRad < 0 ? deltaTargetRad + Math.PI * 2 : deltaTargetRad - Math.PI * 2;
+      }
+
+      this.body.rotateLeft(_ZombieConstants.ZOMBIE_ROTATING_SPEED * deltaTargetRad);
     }
   }, {
     key: 'isReached',

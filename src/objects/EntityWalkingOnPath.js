@@ -1,6 +1,6 @@
 import Entity from './Entity';
 import PathFinder from '../objects/PathFinder.js';
-import { ZOMBIE_SPEED, ZOMBIE_LOOKING_OFFSET, MIN_DISTANCE_TO_TARGET } from '../constants/ZombieConstants';
+import { ZOMBIE_SPEED, ZOMBIE_ROTATING_SPEED, MIN_DISTANCE_TO_TARGET } from '../constants/ZombieConstants';
 import { tileToPixels, getWallsPostions } from '../utils/MapUtils.js';
 
 /** Create Entity that is supposed to walk on given path. Set position of entity on first given target*/
@@ -84,12 +84,19 @@ export default class EntityWalkingOnPath extends Entity {
   }
   updateLookDirection() {
     const lookTarget = tileToPixels( this.stepTarget );
+    //TODO make target point be the end of target tile
+    const targetPoint = new Phaser.Point( lookTarget.x, lookTarget.y );
+    const entityCenter = new Phaser.Point( this.body.x + this.width / 2, this.body.y + this.height / 2 );
 
-    /* Not sure if this works properly */
-    const lookX = lookTarget.x + ZOMBIE_LOOKING_OFFSET * ( lookTarget.x - this.position.x );
-    const lookY = lookTarget.y + ZOMBIE_LOOKING_OFFSET * ( lookTarget.y - this.position.y );
+    let deltaTargetRad = ( this.rotation - Phaser.Math.angleBetweenPoints( targetPoint, entityCenter ) - Math.PI / 2 ) - Math.PI;
 
-    this.lookAt( lookX, lookY );
+    deltaTargetRad = deltaTargetRad % ( Math.PI * 2 );
+
+    if ( deltaTargetRad != deltaTargetRad % ( Math.PI ) ) {
+      deltaTargetRad = ( deltaTargetRad < 0 ) ? deltaTargetRad + Math.PI * 2 : deltaTargetRad - Math.PI * 2;
+    }
+
+    this.body.rotateLeft( ZOMBIE_ROTATING_SPEED * deltaTargetRad );
   }
   isReached( target ) {
     const distanceToTarget = this.game.physics.arcade.distanceBetween( this, tileToPixels( target ) );
