@@ -103,15 +103,15 @@ export default class EntityWalkingOnPath extends Entity {
     const tileCoords = tileToPixels( tile );
     if ( Math.abs( this.body.velocity.x ) > Math.abs( this.body.velocity.y ) ) {
       if ( this.body.velocity.x > 0 ) {
-        tileCoords.x += 2 * TILE_WIDTH;
+        tileCoords.x += 1000 * TILE_WIDTH;
       } else {
-        tileCoords.x -= 2 * TILE_WIDTH;
+        tileCoords.x -= 1000 * TILE_WIDTH;
       }
     } else if ( Math.abs( this.body.velocity.x ) < Math.abs( this.body.velocity.y ) ) {
       if ( this.body.velocity.y > 0 ) {
-        tileCoords.y += 2 * TILE_HEIGHT;
+        tileCoords.y += 1000 * TILE_HEIGHT;
       } else {
-        tileCoords.y -= 2 * TILE_HEIGHT;
+        tileCoords.y -= 1000 * TILE_HEIGHT;
       }
     }
 
