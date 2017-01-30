@@ -1,7 +1,7 @@
 export const ZOMBIE_WIDTH = 30;
 export const ZOMBIE_HEIGHT = 24;
 export const ZOMBIE_INITIAL_FRAME = 1;
-export const ZOMBIE_SPEED = 100;
+export const ZOMBIE_SPEED = 50;
 export const ZOMBIE_SPEED_CHASING_MULTIPLIER = 2;
 export const ZOMBIE_LOOKING_OFFSET = 10;
 export const ZOMBIE_WALK_ANIMATION_FRAMERATE = 5;
