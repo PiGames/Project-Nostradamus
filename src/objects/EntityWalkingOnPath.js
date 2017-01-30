@@ -1,6 +1,7 @@
 import Entity from './Entity';
 import PathFinder from '../objects/PathFinder.js';
 import { ZOMBIE_SPEED, ZOMBIE_ROTATING_SPEED, MIN_DISTANCE_TO_TARGET } from '../constants/ZombieConstants';
+import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 import { tileToPixels, getWallsPostions } from '../utils/MapUtils.js';
 
 /** Create Entity that is supposed to walk on given path. Set position of entity on first given target*/
@@ -83,20 +84,38 @@ export default class EntityWalkingOnPath extends Entity {
     }
   }
   updateLookDirection() {
-    const lookTarget = tileToPixels( this.stepTarget );
     //TODO make target point be the end of target tile
+    const lookTarget = this.getTilesEndCoords( this.stepTarget );
     const targetPoint = new Phaser.Point( lookTarget.x, lookTarget.y );
     const entityCenter = new Phaser.Point( this.body.x + this.width / 2, this.body.y + this.height / 2 );
 
-    let deltaTargetRad = ( this.rotation - Phaser.Math.angleBetweenPoints( targetPoint, entityCenter ) - Math.PI / 2 ) - Math.PI;
+    let deltaTargetRad = this.rotation - Phaser.Math.angleBetweenPoints( targetPoint, entityCenter ) - 1.5 * Math.PI;
 
     deltaTargetRad = deltaTargetRad % ( Math.PI * 2 );
 
     if ( deltaTargetRad != deltaTargetRad % ( Math.PI ) ) {
-      deltaTargetRad = ( deltaTargetRad < 0 ) ? deltaTargetRad + Math.PI * 2 : deltaTargetRad - Math.PI * 2;
+      deltaTargetRad = deltaTargetRad + Math.PI * ( ( deltaTargetRad < 0 ) ? 2 : -2 );
     }
 
     this.body.rotateLeft( ZOMBIE_ROTATING_SPEED * deltaTargetRad );
+  }
+  getTilesEndCoords( tile ) {
+    const tileCoords = tileToPixels( tile );
+    if ( Math.abs( this.body.velocity.x ) > Math.abs( this.body.velocity.y ) ) {
+      if ( this.body.velocity.x > 0 ) {
+        tileCoords.x += 2 * TILE_WIDTH;
+      } else {
+        tileCoords.x -= 2 * TILE_WIDTH;
+      }
+    } else if ( Math.abs( this.body.velocity.x ) < Math.abs( this.body.velocity.y ) ) {
+      if ( this.body.velocity.y > 0 ) {
+        tileCoords.y += 2 * TILE_HEIGHT;
+      } else {
+        tileCoords.y -= 2 * TILE_HEIGHT;
+      }
+    }
+
+    return tileCoords;
   }
   isReached( target ) {
     const distanceToTarget = this.game.physics.arcade.distanceBetween( this, tileToPixels( target ) );
@@ -108,7 +127,6 @@ export default class EntityWalkingOnPath extends Entity {
   /**
   * Change path to temporary and automatically get back to standard path, after reaching temporary target.
   * @param {tile} start - start tile coordinates, if this tile is different that entity's tile then it goes straight to this tile.
-  * @param {tile} target - target tile coordinates, this should be initialized with current path target otherwise some unpredictable things may happen.
   */
   changePathToTemporary( start ) {
     const currentTarget = this.pathsBetweenPathTargets[ this.currentPathIndex ].target;

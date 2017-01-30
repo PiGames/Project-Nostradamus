@@ -1022,9 +1022,9 @@ Object.defineProperty(exports, "__esModule", {
 var PLAYER_WIDTH = exports.PLAYER_WIDTH = 30;
 var PLAYER_HEIGHT = exports.PLAYER_HEIGHT = 24;
 var PLAYER_INITIAL_FRAME = exports.PLAYER_INITIAL_FRAME = 1;
-var PLAYER_SPEED = exports.PLAYER_SPEED = 200;
+var PLAYER_SPEED = exports.PLAYER_SPEED = 120;
 var PLAYER_SNEAK_MULTIPLIER = exports.PLAYER_SNEAK_MULTIPLIER = 0.75;
-var PLAYER_SPRINT_MULTIPLIER = exports.PLAYER_SPRINT_MULTIPLIER = 2.5;
+var PLAYER_SPRINT_MULTIPLIER = exports.PLAYER_SPRINT_MULTIPLIER = 1.5;
 var PLAYER_WALK_ANIMATION_FRAMERATE = exports.PLAYER_WALK_ANIMATION_FRAMERATE = 5;
 var PLAYER_FIGHT_ANIMATION_FRAMERATE = exports.PLAYER_FIGHT_ANIMATION_FRAMERATE = 10;
 
@@ -1048,7 +1048,7 @@ Object.defineProperty(exports, "__esModule", {
 var ZOMBIE_WIDTH = exports.ZOMBIE_WIDTH = 30;
 var ZOMBIE_HEIGHT = exports.ZOMBIE_HEIGHT = 24;
 var ZOMBIE_INITIAL_FRAME = exports.ZOMBIE_INITIAL_FRAME = 1;
-var ZOMBIE_SPEED = exports.ZOMBIE_SPEED = 100;
+var ZOMBIE_SPEED = exports.ZOMBIE_SPEED = 50;
 var ZOMBIE_SPEED_CHASING_MULTIPLIER = exports.ZOMBIE_SPEED_CHASING_MULTIPLIER = 2;
 var ZOMBIE_LOOKING_OFFSET = exports.ZOMBIE_LOOKING_OFFSET = 10;
 var ZOMBIE_WALK_ANIMATION_FRAMERATE = exports.ZOMBIE_WALK_ANIMATION_FRAMERATE = 5;
@@ -1212,6 +1212,8 @@ var _PathFinder2 = _interopRequireDefault(_PathFinder);
 
 var _ZombieConstants = require('../constants/ZombieConstants');
 
+var _TileMapConstants = require('../constants/TileMapConstants');
+
 var _MapUtils = require('../utils/MapUtils.js');
 
 function _interopRequireDefault(obj) {
@@ -1335,20 +1337,40 @@ var EntityWalkingOnPath = function (_Entity) {
   }, {
     key: 'updateLookDirection',
     value: function updateLookDirection() {
-      var lookTarget = (0, _MapUtils.tileToPixels)(this.stepTarget);
       //TODO make target point be the end of target tile
+      var lookTarget = this.getTilesEndCoords(this.stepTarget);
       var targetPoint = new Phaser.Point(lookTarget.x, lookTarget.y);
       var entityCenter = new Phaser.Point(this.body.x + this.width / 2, this.body.y + this.height / 2);
 
-      var deltaTargetRad = this.rotation - Phaser.Math.angleBetweenPoints(targetPoint, entityCenter) - Math.PI / 2 - Math.PI;
+      var deltaTargetRad = this.rotation - Phaser.Math.angleBetweenPoints(targetPoint, entityCenter) - 1.5 * Math.PI;
 
       deltaTargetRad = deltaTargetRad % (Math.PI * 2);
 
       if (deltaTargetRad != deltaTargetRad % Math.PI) {
-        deltaTargetRad = deltaTargetRad < 0 ? deltaTargetRad + Math.PI * 2 : deltaTargetRad - Math.PI * 2;
+        deltaTargetRad = deltaTargetRad + Math.PI * (deltaTargetRad < 0 ? 2 : -2);
       }
 
       this.body.rotateLeft(_ZombieConstants.ZOMBIE_ROTATING_SPEED * deltaTargetRad);
+    }
+  }, {
+    key: 'getTilesEndCoords',
+    value: function getTilesEndCoords(tile) {
+      var tileCoords = (0, _MapUtils.tileToPixels)(tile);
+      if (Math.abs(this.body.velocity.x) > Math.abs(this.body.velocity.y)) {
+        if (this.body.velocity.x > 0) {
+          tileCoords.x += 2 * _TileMapConstants.TILE_WIDTH;
+        } else {
+          tileCoords.x -= 2 * _TileMapConstants.TILE_WIDTH;
+        }
+      } else if (Math.abs(this.body.velocity.x) < Math.abs(this.body.velocity.y)) {
+        if (this.body.velocity.y > 0) {
+          tileCoords.y += 2 * _TileMapConstants.TILE_HEIGHT;
+        } else {
+          tileCoords.y -= 2 * _TileMapConstants.TILE_HEIGHT;
+        }
+      }
+
+      return tileCoords;
     }
   }, {
     key: 'isReached',
@@ -1364,7 +1386,6 @@ var EntityWalkingOnPath = function (_Entity) {
     /**
     * Change path to temporary and automatically get back to standard path, after reaching temporary target.
     * @param {tile} start - start tile coordinates, if this tile is different that entity's tile then it goes straight to this tile.
-    * @param {tile} target - target tile coordinates, this should be initialized with current path target otherwise some unpredictable things may happen.
     */
 
   }, {
@@ -1413,7 +1434,7 @@ var EntityWalkingOnPath = function (_Entity) {
 
 exports.default = EntityWalkingOnPath;
 
-},{"../constants/ZombieConstants":9,"../objects/PathFinder.js":13,"../utils/MapUtils.js":24,"./Entity":11}],13:[function(require,module,exports){
+},{"../constants/TileMapConstants":8,"../constants/ZombieConstants":9,"../objects/PathFinder.js":13,"../utils/MapUtils.js":24,"./Entity":11}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
