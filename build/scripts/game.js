@@ -1337,7 +1337,6 @@ var EntityWalkingOnPath = function (_Entity) {
   }, {
     key: 'updateLookDirection',
     value: function updateLookDirection() {
-      //TODO make target point be the end of target tile
       var lookTarget = this.getTilesEndCoords(this.stepTarget);
       var targetPoint = new Phaser.Point(lookTarget.x, lookTarget.y);
       var entityCenter = new Phaser.Point(this.body.x + this.width / 2, this.body.y + this.height / 2);
@@ -1356,17 +1355,18 @@ var EntityWalkingOnPath = function (_Entity) {
     key: 'getTilesEndCoords',
     value: function getTilesEndCoords(tile) {
       var tileCoords = (0, _MapUtils.tileToPixels)(tile);
+      var veryFarAway = 1000;
       if (Math.abs(this.body.velocity.x) > Math.abs(this.body.velocity.y)) {
         if (this.body.velocity.x > 0) {
-          tileCoords.x += 1000 * _TileMapConstants.TILE_WIDTH;
+          tileCoords.x += veryFarAway * _TileMapConstants.TILE_WIDTH;
         } else {
-          tileCoords.x -= 1000 * _TileMapConstants.TILE_WIDTH;
+          tileCoords.x -= veryFarAway * _TileMapConstants.TILE_WIDTH;
         }
       } else if (Math.abs(this.body.velocity.x) < Math.abs(this.body.velocity.y)) {
         if (this.body.velocity.y > 0) {
-          tileCoords.y += 1000 * _TileMapConstants.TILE_HEIGHT;
+          tileCoords.y += veryFarAway * _TileMapConstants.TILE_HEIGHT;
         } else {
-          tileCoords.y -= 1000 * _TileMapConstants.TILE_HEIGHT;
+          tileCoords.y -= veryFarAway * _TileMapConstants.TILE_HEIGHT;
         }
       }
 
