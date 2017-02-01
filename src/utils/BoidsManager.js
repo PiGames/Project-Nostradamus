@@ -4,14 +4,12 @@ export default class BoidsManager {
     this.obstacles = obstacles;
   }
   update() {
-    if ( this.allEntitiesInitialized ) {
-      for ( const entityIndex1 in this.children ) {
-        const velocity1 = this.flyTowardsMassCenterRule( this.children[ entityIndex1 ] );
-        const velocity2 = this.keepSmallDistanceFromObstacleRule( this.children[ entityIndex1 ] );
-        const velocity3 = this.tryMatchingOtherEnitiesVelocityRule( this.children[ entityIndex1 ] );
+    for ( const entityIndex1 in this.children ) {
+      const velocity1 = this.flyTowardsMassCenterRule( this.children[ entityIndex1 ] );
+      const velocity2 = this.keepSmallDistanceFromObstacleRule( this.children[ entityIndex1 ] );
+      const velocity3 = this.tryMatchingOtherEnitiesVelocityRule( this.children[ entityIndex1 ] );
 
-        this.children[ entityIndex1 ].body.velocity += velocity1 + velocity2 + velocity3;
-      }
+      this.children[ entityIndex1 ].body.velocity += velocity1 + velocity2 + velocity3;
     }
   }
   flyTowardsMassCenterRule() {
