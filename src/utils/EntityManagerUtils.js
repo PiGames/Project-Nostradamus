@@ -89,7 +89,7 @@ const getDirectionBetweenEntities = ( entity1, entity2 ) => {
   const entityTile2 = pixelsToTile( entity2 );
 
   if ( areTilesTheSame( entityTile1, entityTile2 ) ) {
-    console.warn( 'Doing somethink untested: ' );
+    // this case maybe can be handled better
     return getDirectionBetweenTiles( entity1, entity2 );
   } else {
     return getDirectionBetweenTiles( entityTile1, entityTile2 );

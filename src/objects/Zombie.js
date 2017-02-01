@@ -50,11 +50,15 @@ export default class Zombie extends EntityWalkingOnPath {
 
     const distanceToTarget = this.game.physics.arcade.distanceBetween( this, this.lastKnownPlayerPosition );
     if ( !this.canSeePlayer() && ( distanceToTarget <= MIN_DISTANCE_TO_TARGET ) ) {
-      this.body.velocity.x = 0;
-      this.body.velocity.y = 0;
-      this.isChasing = false;
-      this.changePathToTemporary( pixelsToTile( this ) );
+      this.stopChasingPlayer();
     }
+  }
+
+  stopChasingPlayer() {
+    this.body.velocity.x = 0;
+    this.body.velocity.y = 0;
+    this.isChasing = false;
+    this.changePathToTemporary( pixelsToTile( this ) );
   }
 
 }

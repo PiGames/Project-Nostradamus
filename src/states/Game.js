@@ -8,12 +8,11 @@ import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 
 export default class Game extends Phaser.State {
   create() {
-    this.map = new TileMap( this.game, 'map', 64, 64 );
+    this.map = new TileMap( this.game, 'map', TILE_WIDTH, TILE_HEIGHT );
 
     this.player = new Player( this.game, 10 * TILE_WIDTH + TILE_WIDTH / 2, 2 * TILE_HEIGHT + TILE_HEIGHT / 2, 'player', PLAYER_INITIAL_FRAME );
     this.game.camera.follow( this.player );
 
-    //  Create our collision groups. One for the player, one for the pandas
     this.playerCollisionGroup = this.game.physics.p2.createCollisionGroup( this.player );
     this.zombiesCollisionGroup = this.game.physics.p2.createCollisionGroup();
 
@@ -28,8 +27,7 @@ export default class Game extends Phaser.State {
     }
     this.player.body.collides( [ this.zombiesCollisionGroup, this.map.wallsCollisionGroup ] );
 
-    this.map.collides( this.zombiesCollisionGroup );
-    this.map.collides( this.playerCollisionGroup );
+    this.map.collides( [ this.zombiesCollisionGroup, this.playerCollisionGroup ] );
   }
   update() {
   }

@@ -1,5 +1,6 @@
 import { willEntitiesBeOnTheSameTile, getFreeTileAroundEntityExcludingOtherEntity } from '../utils/EntityManagerUtils';
 import { pixelsToTile, getWallsPostions } from '../utils/MapUtils.js';
+import BoidsManager from '../utils/BoidsManager.js';
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 
 export default class WalkingEntitiesManager extends Phaser.Group {
@@ -7,6 +8,8 @@ export default class WalkingEntitiesManager extends Phaser.Group {
     super( game );
     this.mapGrid = getWallsPostions( grid );
     this.allEntitiesInitialized = false;
+
+    this.boidsManager = new BoidsManager( 1 );
   }
   update() {
     if ( this.allEntitiesInitialized || this.areAllEntitiesInitialized() ) {
@@ -14,6 +17,8 @@ export default class WalkingEntitiesManager extends Phaser.Group {
     }
 
     Phaser.Group.prototype.update.call( this );
+
+    this.boidsManager.update();
   }
   manageMovingEntities() {
     for ( const entityIndex1 in this.children ) {

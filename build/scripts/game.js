@@ -1434,7 +1434,7 @@ var EntityWalkingOnPath = function (_Entity) {
 
 exports.default = EntityWalkingOnPath;
 
-},{"../constants/TileMapConstants":8,"../constants/ZombieConstants":9,"../objects/PathFinder.js":13,"../utils/MapUtils.js":24,"./Entity":11}],13:[function(require,module,exports){
+},{"../constants/TileMapConstants":8,"../constants/ZombieConstants":9,"../objects/PathFinder.js":13,"../utils/MapUtils.js":25,"./Entity":11}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1799,7 +1799,7 @@ var TileMap = function (_Phaser$Tilemap) {
 
 exports.default = TileMap;
 
-},{"../utils/MapUtils.js":24}],16:[function(require,module,exports){
+},{"../utils/MapUtils.js":25}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1820,7 +1820,15 @@ var _EntityManagerUtils = require('../utils/EntityManagerUtils');
 
 var _MapUtils = require('../utils/MapUtils.js');
 
+var _BoidsManager = require('../utils/BoidsManager.js');
+
+var _BoidsManager2 = _interopRequireDefault(_BoidsManager);
+
 var _TileMapConstants = require('../constants/TileMapConstants');
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -1850,6 +1858,8 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
 
     _this.mapGrid = (0, _MapUtils.getWallsPostions)(grid);
     _this.allEntitiesInitialized = false;
+
+    _this.boidsManager = new _BoidsManager2.default(1);
     return _this;
   }
 
@@ -1861,6 +1871,8 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
       }
 
       Phaser.Group.prototype.update.call(this);
+
+      this.boidsManager.update();
     }
   }, {
     key: 'manageMovingEntities',
@@ -1950,7 +1962,7 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
 
 exports.default = WalkingEntitiesManager;
 
-},{"../constants/TileMapConstants":8,"../utils/EntityManagerUtils":23,"../utils/MapUtils.js":24}],17:[function(require,module,exports){
+},{"../constants/TileMapConstants":8,"../utils/BoidsManager.js":23,"../utils/EntityManagerUtils":24,"../utils/MapUtils.js":25}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2057,11 +2069,16 @@ var Zombie = function (_EntityWalkingOnPath) {
 
       var distanceToTarget = this.game.physics.arcade.distanceBetween(this, this.lastKnownPlayerPosition);
       if (!this.canSeePlayer() && distanceToTarget <= _ZombieConstants.MIN_DISTANCE_TO_TARGET) {
-        this.body.velocity.x = 0;
-        this.body.velocity.y = 0;
-        this.isChasing = false;
-        this.changePathToTemporary((0, _MapUtils.pixelsToTile)(this));
+        this.stopChasingPlayer();
       }
+    }
+  }, {
+    key: 'stopChasingPlayer',
+    value: function stopChasingPlayer() {
+      this.body.velocity.x = 0;
+      this.body.velocity.y = 0;
+      this.isChasing = false;
+      this.changePathToTemporary((0, _MapUtils.pixelsToTile)(this));
     }
   }]);
 
@@ -2070,7 +2087,7 @@ var Zombie = function (_EntityWalkingOnPath) {
 
 exports.default = Zombie;
 
-},{"../constants/ZombieConstants":9,"../utils/MapUtils.js":24,"./EntityWalkingOnPath":12}],18:[function(require,module,exports){
+},{"../constants/ZombieConstants":9,"../utils/MapUtils.js":25,"./EntityWalkingOnPath":12}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2276,12 +2293,11 @@ var Game = function (_Phaser$State) {
     value: function create() {
       var _this2 = this;
 
-      this.map = new _TileMap2.default(this.game, 'map', 64, 64);
+      this.map = new _TileMap2.default(this.game, 'map', _TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT);
 
       this.player = new _Player2.default(this.game, 10 * _TileMapConstants.TILE_WIDTH + _TileMapConstants.TILE_WIDTH / 2, 2 * _TileMapConstants.TILE_HEIGHT + _TileMapConstants.TILE_HEIGHT / 2, 'player', _PlayerConstants.PLAYER_INITIAL_FRAME);
       this.game.camera.follow(this.player);
 
-      //  Create our collision groups. One for the player, one for the pandas
       this.playerCollisionGroup = this.game.physics.p2.createCollisionGroup(this.player);
       this.zombiesCollisionGroup = this.game.physics.p2.createCollisionGroup();
 
@@ -2300,8 +2316,7 @@ var Game = function (_Phaser$State) {
       }
       this.player.body.collides([this.zombiesCollisionGroup, this.map.wallsCollisionGroup]);
 
-      this.map.collides(this.zombiesCollisionGroup);
-      this.map.collides(this.playerCollisionGroup);
+      this.map.collides([this.zombiesCollisionGroup, this.playerCollisionGroup]);
     }
   }, {
     key: 'update',
@@ -2439,6 +2454,59 @@ var Preload = function (_Phaser$State) {
 exports.default = Preload;
 
 },{"../constants/PlayerConstants.js":7,"../constants/ZombieConstants.js":9}],23:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+var BoidsManager = function () {
+  function BoidsManager(entities) {
+    var obstacles = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : entities;
+
+    _classCallCheck(this, BoidsManager);
+
+    this.entities = entities;
+    this.obstacles = obstacles;
+  }
+
+  _createClass(BoidsManager, [{
+    key: "update",
+    value: function update() {
+      // if ( this.allEntitiesInitialized ) {
+      //   for ( const entityIndex1 in this.children ) {
+      //     const velocity1 = rule1( this.children[ entityIndex1 ] );
+      //     const velocity2 = rule2( this.children[ entityIndex1 ] );
+      //     const velocity3 = rule3( this.children[ entityIndex1 ] );
+      //
+      //     this.children[ entityIndex1 ].body.velocity += velocity1 + velocity2 + velocity3;
+      //   }
+      // }
+    }
+  }]);
+
+  return BoidsManager;
+}();
+
+exports.default = BoidsManager;
+
+},{}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2539,7 +2607,7 @@ var getDirectionBetweenEntities = function getDirectionBetweenEntities(entity1, 
   var entityTile2 = (0, _MapUtils.pixelsToTile)(entity2);
 
   if (areTilesTheSame(entityTile1, entityTile2)) {
-    console.warn('Doing somethink untested: ');
+    // this case maybe can be handled better
     return getDirectionBetweenTiles(entity1, entity2);
   } else {
     return getDirectionBetweenTiles(entityTile1, entityTile2);
@@ -2625,7 +2693,7 @@ function getFreeTileExcludingEast(entityTile, mapGrid) {
   return freeTile;
 }
 
-},{"../utils/MapUtils":24}],24:[function(require,module,exports){
+},{"../utils/MapUtils":25}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
