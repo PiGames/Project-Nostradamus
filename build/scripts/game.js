@@ -1563,6 +1563,7 @@ var Player = function (_Entity) {
     _this.animations.add('walk', [1, 2, 1, 0], 1);
     _this.animations.add('fight', [3, 5, 4], 3);
 
+    _this.body.clearShapes();
     _this.body.addCircle(Math.max(_PlayerConstants.PLAYER_WIDTH, _PlayerConstants.PLAYER_HEIGHT));
     return _this;
   }
