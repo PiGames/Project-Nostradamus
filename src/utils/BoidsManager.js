@@ -1,24 +1,44 @@
+import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
+
 export default class BoidsManager {
-  constructor( entities, obstacles = entities ) {
+  constructor( game, entities, obstacles = entities, boidsDistance = Math.max( TILE_WIDTH, TILE_HEIGHT ) ) {
     this.entities = entities;
     this.obstacles = obstacles;
+    this.boidsDistance = boidsDistance;
+    this.game = game;
   }
   update() {
-    for ( const entityIndex1 in this.children ) {
-      const velocity1 = this.flyTowardsMassCenterRule( this.children[ entityIndex1 ] );
-      const velocity2 = this.keepSmallDistanceFromObstacleRule( this.children[ entityIndex1 ] );
-      const velocity3 = this.tryMatchingOtherEnitiesVelocityRule( this.children[ entityIndex1 ] );
+    for ( const boid of this.entities ) {
+      if ( boid.isChasing === false ) {
+        continue;
+      }
+      const velocity1 = this.flyTowardsMassCenterRule( boid );
+      const velocity2 = this.keepSmallDistanceFromObstaclesRule( boid );
+      const velocity3 = this.tryMatchingOtherEnitiesVelocityRule( boid );
 
-      this.children[ entityIndex1 ].body.velocity += velocity1 + velocity2 + velocity3;
+      boid.body.velocity.x += velocity1.x + velocity2.x + velocity3.x;
+      boid.body.velocity.y += velocity1.y + velocity2.y + velocity3.y;
     }
   }
   flyTowardsMassCenterRule() {
-    return 0;
+    return { x: 0, y: 0 };
   }
-  keepSmallDistanceFromObstacleRule() {
-    return 0;
+  keepSmallDistanceFromObstaclesRule( boid ) {
+    const velocity = { x: 0, y: 0 };
+
+    for ( const obstacle of this.obstacles ) {
+      if ( obstacle === boid ) {
+        continue;
+      }
+      if ( this.game.physics.arcade.distanceBetween( obstacle, boid ) <= this.boidsDistance ) {
+        velocity.x -= obstacle.body.x - boid.body.x;
+        velocity.x -= obstacle.body.y - boid.body.y;
+      }
+    }
+
+    return velocity;
   }
   tryMatchingOtherEnitiesVelocityRule() {
-    return 0;
+    return { x: 0, y: 0 };
   }
 }

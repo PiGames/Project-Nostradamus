@@ -9,7 +9,7 @@ export default class WalkingEntitiesManager extends Phaser.Group {
     this.mapGrid = getWallsPostions( grid );
     this.allEntitiesInitialized = false;
 
-    this.boidsManager = new BoidsManager( this.children );
+    this.boidsManager = new BoidsManager( this.game, this.children, this.children );
   }
   update() {
     if ( this.allEntitiesInitialized || this.areAllEntitiesInitialized() ) {

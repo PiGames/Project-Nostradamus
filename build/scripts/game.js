@@ -1859,7 +1859,7 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
     _this.mapGrid = (0, _MapUtils.getWallsPostions)(grid);
     _this.allEntitiesInitialized = false;
 
-    _this.boidsManager = new _BoidsManager2.default(_this.children);
+    _this.boidsManager = new _BoidsManager2.default(_this.game, _this.children, _this.children);
     return _this;
   }
 
@@ -2454,7 +2454,7 @@ var Preload = function (_Phaser$State) {
 exports.default = Preload;
 
 },{"../constants/PlayerConstants.js":7,"../constants/ZombieConstants.js":9}],23:[function(require,module,exports){
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -2470,6 +2470,8 @@ var _createClass = function () {
   };
 }();
 
+var _TileMapConstants = require('../constants/TileMapConstants');
+
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -2477,42 +2479,101 @@ function _classCallCheck(instance, Constructor) {
 }
 
 var BoidsManager = function () {
-  function BoidsManager(entities) {
-    var obstacles = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : entities;
+  function BoidsManager(game, entities) {
+    var obstacles = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : entities;
+    var boidsDistance = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : Math.max(_TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT);
 
     _classCallCheck(this, BoidsManager);
 
     this.entities = entities;
     this.obstacles = obstacles;
+    this.boidsDistance = boidsDistance;
+    this.game = game;
   }
 
   _createClass(BoidsManager, [{
-    key: "update",
+    key: 'update',
     value: function update() {
-      if (this.allEntitiesInitialized) {
-        for (var entityIndex1 in this.children) {
-          var velocity1 = this.flyTowardsMassCenterRule(this.children[entityIndex1]);
-          var velocity2 = this.keepSmallDistanceFromObstacleRule(this.children[entityIndex1]);
-          var velocity3 = this.tryMatchingOtherEnitiesVelocityRule(this.children[entityIndex1]);
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
 
-          this.children[entityIndex1].body.velocity += velocity1 + velocity2 + velocity3;
+      try {
+        for (var _iterator = this.entities[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var boid = _step.value;
+
+          if (boid.isChasing === false) {
+            continue;
+          }
+          var velocity1 = this.flyTowardsMassCenterRule(boid);
+          var velocity2 = this.keepSmallDistanceFromObstaclesRule(boid);
+          var velocity3 = this.tryMatchingOtherEnitiesVelocityRule(boid);
+
+          boid.body.velocity.x += velocity1.x + velocity2.x + velocity3.x;
+          boid.body.velocity.y += velocity1.y + velocity2.y + velocity3.y;
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
         }
       }
     }
   }, {
-    key: "flyTowardsMassCenterRule",
+    key: 'flyTowardsMassCenterRule',
     value: function flyTowardsMassCenterRule() {
-      return 0;
+      return { x: 0, y: 0 };
     }
   }, {
-    key: "keepSmallDistanceFromObstacleRule",
-    value: function keepSmallDistanceFromObstacleRule() {
-      return 0;
+    key: 'keepSmallDistanceFromObstaclesRule',
+    value: function keepSmallDistanceFromObstaclesRule(boid) {
+      var velocity = { x: 0, y: 0 };
+
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = this.obstacles[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var obstacle = _step2.value;
+
+          if (obstacle === boid) {
+            continue;
+          }
+          if (this.game.physics.arcade.distanceBetween(obstacle, boid) <= this.boidsDistance) {
+            velocity.x -= obstacle.body.x - boid.body.x;
+            velocity.x -= obstacle.body.y - boid.body.y;
+          }
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+
+      return velocity;
     }
   }, {
-    key: "tryMatchingOtherEnitiesVelocityRule",
+    key: 'tryMatchingOtherEnitiesVelocityRule',
     value: function tryMatchingOtherEnitiesVelocityRule() {
-      return 0;
+      return { x: 0, y: 0 };
     }
   }]);
 
@@ -2521,7 +2582,7 @@ var BoidsManager = function () {
 
 exports.default = BoidsManager;
 
-},{}],24:[function(require,module,exports){
+},{"../constants/TileMapConstants":8}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
