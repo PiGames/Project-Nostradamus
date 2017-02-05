@@ -20,8 +20,21 @@ export default class BoidsManager {
       boid.body.velocity.y += velocity1.y + velocity2.y + velocity3.y;
     }
   }
-  flyTowardsMassCenterRule() {
-    return { x: 0, y: 0 };
+  flyTowardsMassCenterRule( boid ) {
+    const velocity = { x: 0, y: 0 };
+
+    for ( const entity of this.entities ) {
+      if ( entity === boid ) {
+        continue;
+      }
+      velocity.x += entity.body.x;
+      velocity.y += entity.body.y;
+    }
+
+    velocity.x = ( velocity.x / ( this.entities.length - 1 ) ) / 100;
+    velocity.y = ( velocity.y / ( this.entities.length - 1 ) ) / 100;
+
+    return velocity;
   }
   keepSmallDistanceFromObstaclesRule( boid ) {
     const velocity = { x: 0, y: 0 };

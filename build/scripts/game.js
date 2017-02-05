@@ -2529,12 +2529,7 @@ var BoidsManager = function () {
     }
   }, {
     key: 'flyTowardsMassCenterRule',
-    value: function flyTowardsMassCenterRule() {
-      return { x: 0, y: 0 };
-    }
-  }, {
-    key: 'keepSmallDistanceFromObstaclesRule',
-    value: function keepSmallDistanceFromObstaclesRule(boid) {
+    value: function flyTowardsMassCenterRule(boid) {
       var velocity = { x: 0, y: 0 };
 
       var _iteratorNormalCompletion2 = true;
@@ -2542,16 +2537,14 @@ var BoidsManager = function () {
       var _iteratorError2 = undefined;
 
       try {
-        for (var _iterator2 = this.obstacles[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var obstacle = _step2.value;
+        for (var _iterator2 = this.entities[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var entity = _step2.value;
 
-          if (obstacle === boid) {
+          if (entity === boid) {
             continue;
           }
-          if (this.game.physics.arcade.distanceBetween(obstacle, boid) <= this.boidsDistance) {
-            velocity.x -= obstacle.body.x - boid.body.x;
-            velocity.x -= obstacle.body.y - boid.body.y;
-          }
+          velocity.x += entity.body.x;
+          velocity.y += entity.body.y;
         }
       } catch (err) {
         _didIteratorError2 = true;
@@ -2564,6 +2557,47 @@ var BoidsManager = function () {
         } finally {
           if (_didIteratorError2) {
             throw _iteratorError2;
+          }
+        }
+      }
+
+      velocity.x = velocity.x / (this.entities.length - 1) / 100;
+      velocity.y = velocity.y / (this.entities.length - 1) / 100;
+
+      return velocity;
+    }
+  }, {
+    key: 'keepSmallDistanceFromObstaclesRule',
+    value: function keepSmallDistanceFromObstaclesRule(boid) {
+      var velocity = { x: 0, y: 0 };
+
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
+
+      try {
+        for (var _iterator3 = this.obstacles[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var obstacle = _step3.value;
+
+          if (obstacle === boid) {
+            continue;
+          }
+          if (this.game.physics.arcade.distanceBetween(obstacle, boid) <= this.boidsDistance) {
+            velocity.x -= obstacle.body.x - boid.body.x;
+            velocity.x -= obstacle.body.y - boid.body.y;
+          }
+        }
+      } catch (err) {
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion3 && _iterator3.return) {
+            _iterator3.return();
+          }
+        } finally {
+          if (_didIteratorError3) {
+            throw _iteratorError3;
           }
         }
       }
