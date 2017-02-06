@@ -1,10 +1,12 @@
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
+import { pixelsToTile, tileToPixels } from '../utils/MapUtils.js';
 
 export default class BoidsManager {
-  constructor( game, entities, obstacles = entities, boidsDistance = Math.max( TILE_WIDTH, TILE_HEIGHT ) ) {
+  constructor( game, entities, mapGrid, boidsDistance = Math.max( TILE_WIDTH, TILE_HEIGHT ), distanceBetweenBoidsAndWalls = boidsDistance ) {
     this.entities = entities;
-    this.obstacles = obstacles;
+    this.mapGrid = mapGrid;
     this.boidsDistance = boidsDistance;
+    this.distanceBetweenBoidsAndWalls = distanceBetweenBoidsAndWalls;
     this.game = game;
   }
   update() {
@@ -39,17 +41,41 @@ export default class BoidsManager {
   keepSmallDistanceFromObstaclesRule( boid ) {
     const velocity = { x: 0, y: 0 };
 
-    for ( const obstacle of this.obstacles ) {
-      if ( obstacle === boid ) {
+    for ( const otherBoid of this.entities ) {
+      if ( otherBoid === boid ) {
         continue;
       }
-      if ( this.game.physics.arcade.distanceBetween( obstacle, boid ) <= this.boidsDistance ) {
-        velocity.x -= obstacle.body.x - boid.body.x;
-        velocity.x -= obstacle.body.y - boid.body.y;
+      if ( this.game.physics.arcade.distanceBetween( otherBoid, boid ) <= this.boidsDistance ) {
+        velocity.x -= otherBoid.body.x - boid.body.x;
+        velocity.y -= otherBoid.body.y - boid.body.y;
+      }
+    }
+
+    const wallBodies = this.getAdjoiningWallBodies( boid );
+    for ( const wallBody of wallBodies ) {
+      if ( this.game.physics.arcade.distanceBetween( wallBody, boid ) <= this.distanceBetweenBoidsAndWalls ) {
+        velocity.x -= wallBody.x - boid.body.x;
+        velocity.y -= wallBody.y - boid.body.y;
       }
     }
 
     return velocity;
+  }
+  getAdjoiningWallBodies( entity ) {
+    const entityTile = pixelsToTile( entity );
+    const adjoiningTiles = [
+      { x: entityTile.x - 1, y: entityTile.y - 1 },
+      { x: entityTile.x - 1, y: entityTile.y },
+      { x: entityTile.x - 1, y: entityTile.y + 1 },
+      { x: entityTile.x, y: entityTile.y - 1 },
+      { x: entityTile.x, y: entityTile.y + 1 },
+      { x: entityTile.x + 1, y: entityTile.y - 1 },
+      { x: entityTile.x + 1, y: entityTile.y },
+      { x: entityTile.x + 1, y: entityTile.y + 1 },
+    ];
+
+    const adjoiningWallTiles = adjoiningTiles.filter( ( tile ) => this.mapGrid[ tile.y ][ tile.x ] === 1 );
+    return adjoiningWallTiles.map( tileToPixels );
   }
   tryMatchingOtherEnitiesVelocityRule() {
     return { x: 0, y: 0 };

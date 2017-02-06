@@ -84,7 +84,7 @@ const getDirectionBetweenTiles = ( tile1, tile2 ) => {
   throw new Error( `Uncorrect tiles coordinates! tile1.x: ${ tile1.x }, tile1.y: ${ tile1.y } | tile2.x: ${ tile2.x } tile2.y: ${ tile2.y }` );
 };
 
-const getDirectionBetweenEntities = ( entity1, entity2 ) => {
+export const getDirectionBetweenEntities = ( entity1, entity2 ) => {
   const entityTile1 = pixelsToTile( entity1 );
   const entityTile2 = pixelsToTile( entity2 );
 

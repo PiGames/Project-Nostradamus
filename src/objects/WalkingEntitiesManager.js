@@ -9,7 +9,7 @@ export default class WalkingEntitiesManager extends Phaser.Group {
     this.mapGrid = getWallsPostions( grid );
     this.allEntitiesInitialized = false;
 
-    this.boidsManager = new BoidsManager( this.game, this.children, this.children );
+    this.boidsManager = new BoidsManager( this.game, this.children, this.mapGrid );
   }
   update() {
     if ( this.allEntitiesInitialized || this.areAllEntitiesInitialized() ) {
@@ -46,6 +46,13 @@ export default class WalkingEntitiesManager extends Phaser.Group {
     entity1.changePathToTemporary( freeTile2 );
   }
   onCollisionWithWalls( entity, tileBody ) {
+    if ( entity.isChasing === false ) {
+      this.findAdjoiningFreeTileAndGoBackOnPath( entity, tileBody );
+    } else {
+      // TODO do smth
+    }
+  }
+  findAdjoiningFreeTileAndGoBackOnPath( entity, tileBody ) {
     const entityTile = pixelsToTile( entity );
     const tile = pixelsToTile( { x: tileBody.x + TILE_WIDTH / 2, y: tileBody.y + TILE_HEIGHT / 2 } );
     let freeTile;

@@ -1859,7 +1859,7 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
     _this.mapGrid = (0, _MapUtils.getWallsPostions)(grid);
     _this.allEntitiesInitialized = false;
 
-    _this.boidsManager = new _BoidsManager2.default(_this.game, _this.children, _this.children);
+    _this.boidsManager = new _BoidsManager2.default(_this.game, _this.children, _this.mapGrid);
     return _this;
   }
 
@@ -1906,6 +1906,15 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
   }, {
     key: 'onCollisionWithWalls',
     value: function onCollisionWithWalls(entity, tileBody) {
+      if (entity.isChasing === false) {
+        this.findAdjoiningFreeTileAndGoBackOnPath(entity, tileBody);
+      } else {
+        // TODO do smth
+      }
+    }
+  }, {
+    key: 'findAdjoiningFreeTileAndGoBackOnPath',
+    value: function findAdjoiningFreeTileAndGoBackOnPath(entity, tileBody) {
       var entityTile = (0, _MapUtils.pixelsToTile)(entity);
       var tile = (0, _MapUtils.pixelsToTile)({ x: tileBody.x + _TileMapConstants.TILE_WIDTH / 2, y: tileBody.y + _TileMapConstants.TILE_HEIGHT / 2 });
       var freeTile = void 0;
@@ -2472,6 +2481,8 @@ var _createClass = function () {
 
 var _TileMapConstants = require('../constants/TileMapConstants');
 
+var _MapUtils = require('../utils/MapUtils.js');
+
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -2479,15 +2490,16 @@ function _classCallCheck(instance, Constructor) {
 }
 
 var BoidsManager = function () {
-  function BoidsManager(game, entities) {
-    var obstacles = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : entities;
+  function BoidsManager(game, entities, mapGrid) {
     var boidsDistance = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : Math.max(_TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT);
+    var distanceBetweenBoidsAndWalls = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : boidsDistance;
 
     _classCallCheck(this, BoidsManager);
 
     this.entities = entities;
-    this.obstacles = obstacles;
+    this.mapGrid = mapGrid;
     this.boidsDistance = boidsDistance;
+    this.distanceBetweenBoidsAndWalls = distanceBetweenBoidsAndWalls;
     this.game = game;
   }
 
@@ -2576,15 +2588,15 @@ var BoidsManager = function () {
       var _iteratorError3 = undefined;
 
       try {
-        for (var _iterator3 = this.obstacles[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-          var obstacle = _step3.value;
+        for (var _iterator3 = this.entities[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var otherBoid = _step3.value;
 
-          if (obstacle === boid) {
+          if (otherBoid === boid) {
             continue;
           }
-          if (this.game.physics.arcade.distanceBetween(obstacle, boid) <= this.boidsDistance) {
-            velocity.x -= obstacle.body.x - boid.body.x;
-            velocity.x -= obstacle.body.y - boid.body.y;
+          if (this.game.physics.arcade.distanceBetween(otherBoid, boid) <= this.boidsDistance) {
+            velocity.x -= otherBoid.body.x - boid.body.x;
+            velocity.y -= otherBoid.body.y - boid.body.y;
           }
         }
       } catch (err) {
@@ -2602,7 +2614,49 @@ var BoidsManager = function () {
         }
       }
 
+      var wallBodies = this.getAdjoiningWallBodies(boid);
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
+
+      try {
+        for (var _iterator4 = wallBodies[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          var wallBody = _step4.value;
+
+          if (this.game.physics.arcade.distanceBetween(wallBody, boid) <= this.distanceBetweenBoidsAndWalls) {
+            velocity.x -= wallBody.x - boid.body.x;
+            velocity.y -= wallBody.y - boid.body.y;
+          }
+        }
+      } catch (err) {
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion4 && _iterator4.return) {
+            _iterator4.return();
+          }
+        } finally {
+          if (_didIteratorError4) {
+            throw _iteratorError4;
+          }
+        }
+      }
+
       return velocity;
+    }
+  }, {
+    key: 'getAdjoiningWallBodies',
+    value: function getAdjoiningWallBodies(entity) {
+      var _this = this;
+
+      var entityTile = (0, _MapUtils.pixelsToTile)(entity);
+      var adjoiningTiles = [{ x: entityTile.x - 1, y: entityTile.y - 1 }, { x: entityTile.x - 1, y: entityTile.y }, { x: entityTile.x - 1, y: entityTile.y + 1 }, { x: entityTile.x, y: entityTile.y - 1 }, { x: entityTile.x, y: entityTile.y + 1 }, { x: entityTile.x + 1, y: entityTile.y - 1 }, { x: entityTile.x + 1, y: entityTile.y }, { x: entityTile.x + 1, y: entityTile.y + 1 }];
+
+      var adjoiningWallTiles = adjoiningTiles.filter(function (tile) {
+        return _this.mapGrid[tile.y][tile.x] === 1;
+      });
+      return adjoiningWallTiles.map(_MapUtils.tileToPixels);
     }
   }, {
     key: 'tryMatchingOtherEnitiesVelocityRule',
@@ -2616,13 +2670,13 @@ var BoidsManager = function () {
 
 exports.default = BoidsManager;
 
-},{"../constants/TileMapConstants":8}],24:[function(require,module,exports){
+},{"../constants/TileMapConstants":8,"../utils/MapUtils.js":25}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getFreeTileAroundEntityExcludingOtherEntity = exports.willEntitiesBeOnTheSameTile = exports.getEntityCurrentStepTarget = exports.getEntityNextTile = undefined;
+exports.getFreeTileAroundEntityExcludingOtherEntity = exports.getDirectionBetweenEntities = exports.willEntitiesBeOnTheSameTile = exports.getEntityCurrentStepTarget = exports.getEntityNextTile = undefined;
 
 var _MapUtils = require('../utils/MapUtils');
 
@@ -2712,7 +2766,7 @@ var getDirectionBetweenTiles = function getDirectionBetweenTiles(tile1, tile2) {
   throw new Error('Uncorrect tiles coordinates! tile1.x: ' + tile1.x + ', tile1.y: ' + tile1.y + ' | tile2.x: ' + tile2.x + ' tile2.y: ' + tile2.y);
 };
 
-var getDirectionBetweenEntities = function getDirectionBetweenEntities(entity1, entity2) {
+var getDirectionBetweenEntities = exports.getDirectionBetweenEntities = function getDirectionBetweenEntities(entity1, entity2) {
   var entityTile1 = (0, _MapUtils.pixelsToTile)(entity1);
   var entityTile2 = (0, _MapUtils.pixelsToTile)(entity2);
 
