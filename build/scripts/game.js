@@ -1909,7 +1909,7 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
       if (entity.isChasing === false) {
         this.findAdjoiningFreeTileAndGoBackOnPath(entity, tileBody);
       } else {
-        // TODO do smth
+        this.resetVelocityInCorrespondingDimension(entity, tileBody);
       }
     }
   }, {
@@ -1930,6 +1930,19 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
       }
 
       entity.changePathToTemporary(freeTile);
+    }
+  }, {
+    key: 'resetVelocityInCorrespondingDimension',
+    value: function resetVelocityInCorrespondingDimension(entity, tileBody) {
+      var direction = (0, _EntityManagerUtils.getDirectionBetweenEntities)(entity, tileBody);
+      // direction is not always correct becuase of the cases when zombie is colliding with tile's corner
+      if (direction === 'NORTH' || direction === 'SOUTH') {
+        entity.body.velocity.x = entity.body.velocity.x / Math.abs(entity.body.velocity.x) * Math.sqrt(Math.pow(entity.body.velocity.x, 2) + Math.pow(entity.body.velocity.y, 2));
+        entity.body.velocity.y = 0;
+      } else {
+        entity.body.velocity.y = entity.body.velocity.y / Math.abs(entity.body.velocity.y) * Math.sqrt(Math.pow(entity.body.velocity.x, 2) + Math.pow(entity.body.velocity.y, 2));
+        entity.body.velocity.x = 0;
+      }
     }
   }, {
     key: 'areAllEntitiesInitialized',

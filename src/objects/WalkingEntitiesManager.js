@@ -1,4 +1,4 @@
-import { willEntitiesBeOnTheSameTile, getFreeTileAroundEntityExcludingOtherEntity } from '../utils/EntityManagerUtils';
+import { willEntitiesBeOnTheSameTile, getFreeTileAroundEntityExcludingOtherEntity, getDirectionBetweenEntities } from '../utils/EntityManagerUtils';
 import { pixelsToTile, getWallsPostions } from '../utils/MapUtils.js';
 import BoidsManager from '../utils/BoidsManager.js';
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
@@ -49,7 +49,7 @@ export default class WalkingEntitiesManager extends Phaser.Group {
     if ( entity.isChasing === false ) {
       this.findAdjoiningFreeTileAndGoBackOnPath( entity, tileBody );
     } else {
-      // TODO do smth
+      this.resetVelocityInCorrespondingDimension( entity, tileBody );
     }
   }
   findAdjoiningFreeTileAndGoBackOnPath( entity, tileBody ) {
@@ -68,6 +68,17 @@ export default class WalkingEntitiesManager extends Phaser.Group {
     }
 
     entity.changePathToTemporary( freeTile );
+  }
+  resetVelocityInCorrespondingDimension( entity, tileBody ) {
+    const direction = getDirectionBetweenEntities( entity, tileBody );
+    // direction is not always correct becuase of the cases when zombie is colliding with tile's corner
+    if ( direction === 'NORTH' || direction === 'SOUTH' ) {
+      entity.body.velocity.x = ( entity.body.velocity.x / Math.abs( entity.body.velocity.x ) ) * Math.sqrt( Math.pow( entity.body.velocity.x, 2 ) + Math.pow( entity.body.velocity.y, 2 ) );
+      entity.body.velocity.y = 0;
+    } else {
+      entity.body.velocity.y = ( entity.body.velocity.y / Math.abs( entity.body.velocity.y ) ) * Math.sqrt( Math.pow( entity.body.velocity.x, 2 ) + Math.pow( entity.body.velocity.y, 2 ) );
+      entity.body.velocity.x = 0;
+    }
   }
   areAllEntitiesInitialized() {
     for ( const entity of this.children ) {
