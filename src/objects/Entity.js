@@ -34,6 +34,11 @@ class Entity extends Phaser.Sprite {
   isMoving() {
     return this.body.velocity.x !== 0 || this.body.velocity.y !== 0;
   }
+  isInDegreeRange( entity, target, sightAngle ) {
+    const angleDelta = Math.abs( Phaser.Math.radToDeg( Phaser.Math.angleBetween( entity.x, entity.y, target.x, target.y ) ) + 90 - entity.angle );
+
+    return angleDelta <= sightAngle || angleDelta >= ( 360 - sightAngle );
+  }
 }
 
 export default Entity;

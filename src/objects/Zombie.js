@@ -1,5 +1,5 @@
 import EntityWalkingOnPath from './EntityWalkingOnPath';
-import { ZOMBIE_SPEED, MIN_DISTANCE_TO_TARGET, ZOMBIE_SPEED_CHASING_MULTIPLIER, ZOMBIE_SIGHT_ANGLE, ZOMBIE_SIGHT_RANGE, ZOMBIE_HEARING_RANGE } from '../constants/ZombieConstants';
+import { ZOMBIE_SPEED, MIN_DISTANCE_TO_TARGET, ZOMBIE_SPEED_CHASING_MULTIPLIER, ZOMBIE_SIGHT_ANGLE, ZOMBIE_SIGHT_RANGE, ZOMBIE_HEARING_RANGE, ZOMBIE_DAMAGE_TAKEN, ZOMBIE_DAMAGE_COOLDOWN, ZOMBIE_DAMAGE_MULTIPLIER } from '../constants/ZombieConstants';
 import { pixelsToTile } from '../utils/MapUtils.js';
 
 export default class Zombie extends EntityWalkingOnPath {
@@ -12,11 +12,17 @@ export default class Zombie extends EntityWalkingOnPath {
     this.tileHits = [];
     this.isChasing = false;
     this.lastKnownPlayerPosition = { x: 1, y: 1 };
+    this.canDealDamage = true;
+
+    this.damageTaken = ZOMBIE_DAMAGE_TAKEN;
   }
   update() {
     if ( this.canSeePlayer() ) {
       this.isChasing = true;
       this.lastKnownPlayerPosition = { x: this.player.x, y: this.player.y };
+      if ( this.alive ) {
+        this.dealDamage();
+      }
     }
 
     if ( !this.isChasing ) {
@@ -40,12 +46,11 @@ export default class Zombie extends EntityWalkingOnPath {
       }
     }
 
-    const angleDelta = Math.abs( Phaser.Math.radToDeg( Phaser.Math.angleBetween( this.x, this.y, this.player.x, this.player.y ) ) + 90 - this.angle );
-
-    return ( ( angleDelta <= ZOMBIE_SIGHT_ANGLE || angleDelta >= ( 360 - ZOMBIE_SIGHT_ANGLE ) )
+    return ( this.isInDegreeRange( this, this.player, ZOMBIE_SIGHT_ANGLE )
     && ( this.isChasing || this.playerSeekingRay.length < ZOMBIE_SIGHT_RANGE ) )
     || ( this.playerSeekingRay.length < ZOMBIE_HEARING_RANGE && !this.player.isSneaking && this.player.isMoving() );
   }
+
   chasePlayer() {
     this.game.physics.arcade.moveToObject( this, this.lastKnownPlayerPosition, ZOMBIE_SPEED * ZOMBIE_SPEED_CHASING_MULTIPLIER );
     this.lookAt( this.lastKnownPlayerPosition.x, this.lastKnownPlayerPosition.y );
@@ -54,6 +59,25 @@ export default class Zombie extends EntityWalkingOnPath {
     if ( !this.canSeePlayer() && ( distanceToTarget <= MIN_DISTANCE_TO_TARGET ) ) {
       this.stopChasingPlayer();
     }
+  }
+
+  dealDamage() {
+    if ( this.canDealDamage ) {
+      const distanceToPlayer = this.game.physics.arcade.distanceBetween( this, this.player );
+      if ( distanceToPlayer < 50 ) {
+        this.player.takeDamage( 0.1 );
+        this.canDealDamage = false;
+        this.game.time.events.add( Phaser.Timer.SECOND * ZOMBIE_DAMAGE_COOLDOWN, this.endCooldown, this );
+      }
+    }
+  }
+
+  takeDamage( damage ) {
+    this.damage( damage * ZOMBIE_DAMAGE_MULTIPLIER );
+  }
+
+  endCooldown() {
+    this.canDealDamage = true;
   }
 
   stopChasingPlayer() {

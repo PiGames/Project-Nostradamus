@@ -1024,9 +1024,12 @@ var PLAYER_HEIGHT = exports.PLAYER_HEIGHT = 24;
 var PLAYER_INITIAL_FRAME = exports.PLAYER_INITIAL_FRAME = 1;
 var PLAYER_SPEED = exports.PLAYER_SPEED = 120;
 var PLAYER_SNEAK_MULTIPLIER = exports.PLAYER_SNEAK_MULTIPLIER = 0.75;
-var PLAYER_SPRINT_MULTIPLIER = exports.PLAYER_SPRINT_MULTIPLIER = 1.5;
+var PLAYER_SPRINT_MULTIPLIER = exports.PLAYER_SPRINT_MULTIPLIER = 2 * 1.5;
 var PLAYER_WALK_ANIMATION_FRAMERATE = exports.PLAYER_WALK_ANIMATION_FRAMERATE = 5;
 var PLAYER_FIGHT_ANIMATION_FRAMERATE = exports.PLAYER_FIGHT_ANIMATION_FRAMERATE = 10;
+var PLAYER_HAND_ATTACK_RANGE = exports.PLAYER_HAND_ATTACK_RANGE = 50;
+var PLAYER_HAND_ATTACK_ANGLE = exports.PLAYER_HAND_ATTACK_ANGLE = 60;
+var PLAYER_HAND_ATTACK_DAMAGE = exports.PLAYER_HAND_ATTACK_DAMAGE = 0.2;
 
 },{}],8:[function(require,module,exports){
 "use strict";
@@ -1058,6 +1061,8 @@ var ZOMBIE_SIGHT_ANGLE = exports.ZOMBIE_SIGHT_ANGLE = 45;
 var ZOMBIE_SIGHT_RANGE = exports.ZOMBIE_SIGHT_RANGE = 500;
 var ZOMBIE_HEARING_RANGE = exports.ZOMBIE_HEARING_RANGE = 100;
 var ZOMBIE_ROTATING_SPEED = exports.ZOMBIE_ROTATING_SPEED = 50;
+var ZOMBIE_DAMAGE_MULTIPLIER = exports.ZOMBIE_DAMAGE_MULTIPLIER = 1;
+var ZOMBIE_DAMAGE_COOLDOWN = exports.ZOMBIE_DAMAGE_COOLDOWN = 0.05;
 
 },{}],10:[function(require,module,exports){
 'use strict';
@@ -1177,6 +1182,13 @@ var Entity = function (_Phaser$Sprite) {
     key: "isMoving",
     value: function isMoving() {
       return this.body.velocity.x !== 0 || this.body.velocity.y !== 0;
+    }
+  }, {
+    key: "isInDegreeRange",
+    value: function isInDegreeRange(entity, target, sightAngle) {
+      var angleDelta = Math.abs(Phaser.Math.radToDeg(Phaser.Math.angleBetween(entity.x, entity.y, target.x, target.y)) + 90 - entity.angle);
+
+      return angleDelta <= sightAngle || angleDelta >= 360 - sightAngle;
     }
   }]);
 
@@ -1540,7 +1552,7 @@ function _inherits(subClass, superClass) {
 var Player = function (_Entity) {
   _inherits(Player, _Entity);
 
-  function Player(game, x, y, imageKey, frame) {
+  function Player(game, x, y, imageKey, frame, zombies) {
     _classCallCheck(this, Player);
 
     var _this = _possibleConstructorReturn(this, (Player.__proto__ || Object.getPrototypeOf(Player)).call(this, game, x, y, imageKey, frame));
@@ -1548,8 +1560,18 @@ var Player = function (_Entity) {
     _this.width = _PlayerConstants.PLAYER_WIDTH;
     _this.height = _PlayerConstants.PLAYER_HEIGHT;
 
+    _this.zombies = zombies.children;
+
     _this.isSneaking = false;
     _this.isSprinting = false;
+
+    _this.attackRange = _PlayerConstants.PLAYER_HAND_ATTACK_RANGE;
+    _this.dealingDamage = _PlayerConstants.PLAYER_HAND_ATTACK_DAMAGE;
+
+    _this.healthbar = _this.game.add.graphics(0, 0);
+    _this.healthbar.anchor.x = 1;
+    _this.healthbar.anchor.y = 1;
+    _this.healthbar.fixedToCamera = true;
 
     _this.cursors = {
       up: _this.game.input.keyboard.addKey(Phaser.Keyboard.W),
@@ -1565,6 +1587,8 @@ var Player = function (_Entity) {
 
     _this.body.clearShapes();
     _this.body.addCircle(Math.max(_PlayerConstants.PLAYER_WIDTH, _PlayerConstants.PLAYER_HEIGHT));
+
+    _this.drawHealthBar();
     return _this;
   }
 
@@ -1574,6 +1598,8 @@ var Player = function (_Entity) {
       this.handleMovement();
       this.handleAnimation();
       this.lookAtMouse();
+      this.handleAttack();
+      // console.log( this.zombies.children );
     }
   }, {
     key: 'handleMovement',
@@ -1634,6 +1660,42 @@ var Player = function (_Entity) {
       var mouseY = this.game.input.mousePointer.worldY;
 
       this.lookAt(mouseX, mouseY);
+    }
+  }, {
+    key: 'handleAttack',
+    value: function handleAttack() {
+      var _this2 = this;
+
+      if (this.game.input.activePointer.leftButton.isDown) {
+        this.zombies.forEach(function (v) {
+          if (v.alive) {
+            var distanceToZombie = _this2.game.physics.arcade.distanceBetween(_this2, v);
+            if (distanceToZombie < _this2.attackRange && _this2.isInDegreeRange(_this2, v, _PlayerConstants.PLAYER_HAND_ATTACK_ANGLE)) {
+              v.takeDamage(_this2.dealingDamage);
+            }
+          }
+        });
+      }
+    }
+  }, {
+    key: 'takeDamage',
+    value: function takeDamage(damage) {
+      this.damage(damage);
+      this.drawHealthBar();
+    }
+  }, {
+    key: 'drawHealthBar',
+    value: function drawHealthBar() {
+      var width = 300;
+      var height = 32;
+
+      this.healthbar.clear();
+      this.healthbar.beginFill(0xFF0000, 0.85);
+      this.healthbar.drawRect(this.game.width - (width + 24), this.game.height - (height + 24), width * Math.max(this.health, 0), height);
+      this.healthbar.endFill();
+      this.healthbar.lineStyle(2, 0x880000, 1);
+      this.healthbar.drawRect(this.game.width - (width + 24), this.game.height - (height + 24), width, height);
+      this.healthbar.lineStyle(0);
     }
   }]);
 
@@ -2045,6 +2107,9 @@ var Zombie = function (_EntityWalkingOnPath) {
     _this.tileHits = [];
     _this.isChasing = false;
     _this.lastKnownPlayerPosition = { x: 1, y: 1 };
+    _this.canDealDamage = true;
+
+    _this.damageTaken = _ZombieConstants.ZOMBIE_DAMAGE_TAKEN;
     return _this;
   }
 
@@ -2054,6 +2119,9 @@ var Zombie = function (_EntityWalkingOnPath) {
       if (this.canSeePlayer()) {
         this.isChasing = true;
         this.lastKnownPlayerPosition = { x: this.player.x, y: this.player.y };
+        if (this.alive) {
+          this.dealDamage();
+        }
       }
 
       if (!this.isChasing) {
@@ -2079,9 +2147,7 @@ var Zombie = function (_EntityWalkingOnPath) {
         }
       }
 
-      var angleDelta = Math.abs(Phaser.Math.radToDeg(Phaser.Math.angleBetween(this.x, this.y, this.player.x, this.player.y)) + 90 - this.angle);
-
-      return (angleDelta <= _ZombieConstants.ZOMBIE_SIGHT_ANGLE || angleDelta >= 360 - _ZombieConstants.ZOMBIE_SIGHT_ANGLE) && (this.isChasing || this.playerSeekingRay.length < _ZombieConstants.ZOMBIE_SIGHT_RANGE) || this.playerSeekingRay.length < _ZombieConstants.ZOMBIE_HEARING_RANGE && !this.player.isSneaking && this.player.isMoving();
+      return this.isInDegreeRange(this, this.player, _ZombieConstants.ZOMBIE_SIGHT_ANGLE) && (this.isChasing || this.playerSeekingRay.length < _ZombieConstants.ZOMBIE_SIGHT_RANGE) || this.playerSeekingRay.length < _ZombieConstants.ZOMBIE_HEARING_RANGE && !this.player.isSneaking && this.player.isMoving();
     }
   }, {
     key: 'chasePlayer',
@@ -2093,6 +2159,28 @@ var Zombie = function (_EntityWalkingOnPath) {
       if (!this.canSeePlayer() && distanceToTarget <= _ZombieConstants.MIN_DISTANCE_TO_TARGET) {
         this.stopChasingPlayer();
       }
+    }
+  }, {
+    key: 'dealDamage',
+    value: function dealDamage() {
+      if (this.canDealDamage) {
+        var distanceToPlayer = this.game.physics.arcade.distanceBetween(this, this.player);
+        if (distanceToPlayer < 50) {
+          this.player.takeDamage(0.1);
+          this.canDealDamage = false;
+          this.game.time.events.add(Phaser.Timer.SECOND * _ZombieConstants.ZOMBIE_DAMAGE_COOLDOWN, this.endCooldown, this);
+        }
+      }
+    }
+  }, {
+    key: 'takeDamage',
+    value: function takeDamage(damage) {
+      this.damage(damage * _ZombieConstants.ZOMBIE_DAMAGE_MULTIPLIER);
+    }
+  }, {
+    key: 'endCooldown',
+    value: function endCooldown() {
+      this.canDealDamage = true;
     }
   }, {
     key: 'stopChasingPlayer',
@@ -2177,67 +2265,67 @@ exports.default = ZombieManager;
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 
 var _createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-  };
+    function defineProperties(target, props) {
+        for (var i = 0; i < props.length; i++) {
+            var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+        }
+    }return function (Constructor, protoProps, staticProps) {
+        if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+    };
 }();
 
 function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
+    if (!(instance instanceof Constructor)) {
+        throw new TypeError("Cannot call a class as a function");
+    }
 }
 
 function _possibleConstructorReturn(self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }return call && (typeof call === "object" || typeof call === "function") ? call : self;
+    if (!self) {
+        throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+    }return call && (typeof call === "object" || typeof call === "function") ? call : self;
 }
 
 function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+    if (typeof superClass !== "function" && superClass !== null) {
+        throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+    }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 }
 
 var Boot = function (_Phaser$State) {
-  _inherits(Boot, _Phaser$State);
+    _inherits(Boot, _Phaser$State);
 
-  function Boot() {
-    _classCallCheck(this, Boot);
+    function Boot() {
+        _classCallCheck(this, Boot);
 
-    return _possibleConstructorReturn(this, (Boot.__proto__ || Object.getPrototypeOf(Boot)).apply(this, arguments));
-  }
-
-  _createClass(Boot, [{
-    key: 'preload',
-    value: function preload() {}
-  }, {
-    key: 'create',
-    value: function create() {
-      // this.game.stage.disableVisibilityChange = true;
-
-      // this.game.scale.maxWidth = 800;
-      // this.game.scale.maxHeight = 600;
-
-      this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-      this.game.scale.updateLayout();
-
-      this.game.physics.startSystem(Phaser.Physics.P2JS);
-      this.game.physics.p2.setImpactEvents(true);
-      this.state.start('Preload');
+        return _possibleConstructorReturn(this, (Boot.__proto__ || Object.getPrototypeOf(Boot)).apply(this, arguments));
     }
-  }]);
 
-  return Boot;
+    _createClass(Boot, [{
+        key: 'preload',
+        value: function preload() {}
+    }, {
+        key: 'create',
+        value: function create() {
+            // this.game.stage.disableVisibilityChange = true;
+
+            // this.game.scale.maxWidth = 800;
+            // this.game.scale.maxHeight = 600;
+
+            this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+            this.game.scale.updateLayout();
+
+            this.game.physics.startSystem(Phaser.Physics.P2JS);
+            this.game.physics.p2.setImpactEvents(true);
+            this.state.start('Preload');
+        }
+    }]);
+
+    return Boot;
 }(Phaser.State);
 
 exports.default = Boot;
@@ -2246,17 +2334,17 @@ exports.default = Boot;
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 
 var _createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-  };
+    function defineProperties(target, props) {
+        for (var i = 0; i < props.length; i++) {
+            var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+        }
+    }return function (Constructor, protoProps, staticProps) {
+        if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+    };
 }();
 
 var _Player = require('../objects/Player');
@@ -2280,72 +2368,73 @@ var _PlayerConstants = require('../constants/PlayerConstants');
 var _TileMapConstants = require('../constants/TileMapConstants');
 
 function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : { default: obj };
+    return obj && obj.__esModule ? obj : { default: obj };
 }
 
 function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
+    if (!(instance instanceof Constructor)) {
+        throw new TypeError("Cannot call a class as a function");
+    }
 }
 
 function _possibleConstructorReturn(self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }return call && (typeof call === "object" || typeof call === "function") ? call : self;
+    if (!self) {
+        throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+    }return call && (typeof call === "object" || typeof call === "function") ? call : self;
 }
 
 function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+    if (typeof superClass !== "function" && superClass !== null) {
+        throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+    }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 }
 
 var Game = function (_Phaser$State) {
-  _inherits(Game, _Phaser$State);
+    _inherits(Game, _Phaser$State);
 
-  function Game() {
-    _classCallCheck(this, Game);
+    function Game() {
+        _classCallCheck(this, Game);
 
-    return _possibleConstructorReturn(this, (Game.__proto__ || Object.getPrototypeOf(Game)).apply(this, arguments));
-  }
-
-  _createClass(Game, [{
-    key: 'create',
-    value: function create() {
-      var _this2 = this;
-
-      this.map = new _TileMap2.default(this.game, 'map', _TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT);
-
-      this.player = new _Player2.default(this.game, 10 * _TileMapConstants.TILE_WIDTH + _TileMapConstants.TILE_WIDTH / 2, 2 * _TileMapConstants.TILE_HEIGHT + _TileMapConstants.TILE_HEIGHT / 2, 'player', _PlayerConstants.PLAYER_INITIAL_FRAME);
-      this.game.camera.follow(this.player);
-
-      this.playerCollisionGroup = this.game.physics.p2.createCollisionGroup(this.player);
-      this.zombiesCollisionGroup = this.game.physics.p2.createCollisionGroup();
-
-      this.zombies = new _ZombiesManager2.default(this.game, this.map.walls);
-      for (var i = 0; i < this.map.paths.length; i++) {
-        var newZombie = this.zombies.add(new _Zombie2.default(this.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, this.map.getPath(i), this.map.walls, this.player));
-
-        newZombie.body.setCollisionGroup(this.zombiesCollisionGroup);
-        newZombie.body.collides(this.zombiesCollisionGroup, function (body1, body2) {
-          return _this2.zombies.onCollisionWihOtherEntity(body1.sprite, body2.sprite);
-        });
-        newZombie.body.collides(this.map.wallsCollisionGroup, function (body, tileBody) {
-          return _this2.zombies.onCollisionWithWalls(body.sprite, tileBody);
-        });
-        newZombie.body.collides(this.playerCollisionGroup);
-      }
-      this.player.body.collides([this.zombiesCollisionGroup, this.map.wallsCollisionGroup]);
-
-      this.map.collides([this.zombiesCollisionGroup, this.playerCollisionGroup]);
+        return _possibleConstructorReturn(this, (Game.__proto__ || Object.getPrototypeOf(Game)).apply(this, arguments));
     }
-  }, {
-    key: 'update',
-    value: function update() {}
-  }]);
 
-  return Game;
+    _createClass(Game, [{
+        key: 'create',
+        value: function create() {
+            var _this2 = this;
+
+            this.map = new _TileMap2.default(this.game, 'map', _TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT);
+
+            this.zombies = new _ZombiesManager2.default(this.game, this.map.walls);
+
+            this.player = new _Player2.default(this.game, 10 * _TileMapConstants.TILE_WIDTH + _TileMapConstants.TILE_WIDTH / 2, 2 * _TileMapConstants.TILE_HEIGHT + _TileMapConstants.TILE_HEIGHT / 2, 'player', _PlayerConstants.PLAYER_INITIAL_FRAME, this.zombies);
+            this.game.camera.follow(this.player);
+
+            this.playerCollisionGroup = this.game.physics.p2.createCollisionGroup(this.player);
+            this.zombiesCollisionGroup = this.game.physics.p2.createCollisionGroup();
+
+            for (var i = 0; i < this.map.paths.length; i++) {
+                var newZombie = this.zombies.add(new _Zombie2.default(this.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, this.map.getPath(i), this.map.walls, this.player));
+
+                newZombie.body.setCollisionGroup(this.zombiesCollisionGroup);
+                newZombie.body.collides(this.zombiesCollisionGroup, function (body1, body2) {
+                    return _this2.zombies.onCollisionWihOtherEntity(body1.sprite, body2.sprite);
+                });
+                newZombie.body.collides(this.map.wallsCollisionGroup, function (body, tileBody) {
+                    return _this2.zombies.onCollisionWithWalls(body.sprite, tileBody);
+                });
+                newZombie.body.collides(this.playerCollisionGroup);
+            }
+            this.player.body.collides([this.zombiesCollisionGroup, this.map.wallsCollisionGroup]);
+
+            this.map.collides([this.zombiesCollisionGroup, this.playerCollisionGroup]);
+        }
+    }, {
+        key: 'update',
+        value: function update() {}
+    }]);
+
+    return Game;
 }(Phaser.State);
 
 exports.default = Game;

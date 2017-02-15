@@ -1,15 +1,25 @@
 import Entity from './Entity';
-import { PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, PLAYER_SNEAK_MULTIPLIER, PLAYER_SPRINT_MULTIPLIER, PLAYER_WALK_ANIMATION_FRAMERATE, PLAYER_FIGHT_ANIMATION_FRAMERATE } from '../constants/PlayerConstants';
+import { PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, PLAYER_SNEAK_MULTIPLIER, PLAYER_SPRINT_MULTIPLIER, PLAYER_WALK_ANIMATION_FRAMERATE, PLAYER_FIGHT_ANIMATION_FRAMERATE, PLAYER_HAND_ATTACK_RANGE, PLAYER_HAND_ATTACK_ANGLE, PLAYER_HAND_ATTACK_DAMAGE } from '../constants/PlayerConstants';
 
 export default class Player extends Entity {
-  constructor( game, x, y, imageKey, frame ) {
+  constructor( game, x, y, imageKey, frame, zombies ) {
     super( game, x, y, imageKey, frame );
 
     this.width = PLAYER_WIDTH;
     this.height = PLAYER_HEIGHT;
 
+    this.zombies = zombies.children;
+
     this.isSneaking = false;
     this.isSprinting = false;
+
+    this.attackRange = PLAYER_HAND_ATTACK_RANGE;
+    this.dealingDamage = PLAYER_HAND_ATTACK_DAMAGE;
+
+    this.healthbar = this.game.add.graphics( 0, 0 );
+    this.healthbar.anchor.x = 1;
+    this.healthbar.anchor.y = 1;
+    this.healthbar.fixedToCamera = true;
 
     this.cursors = {
       up: this.game.input.keyboard.addKey( Phaser.Keyboard.W ),
@@ -25,11 +35,16 @@ export default class Player extends Entity {
 
     this.body.clearShapes();
     this.body.addCircle( Math.max( PLAYER_WIDTH, PLAYER_HEIGHT ) );
+
+    this.drawHealthBar();
   }
+
   update() {
     this.handleMovement();
     this.handleAnimation();
     this.lookAtMouse();
+    this.handleAttack();
+    // console.log( this.zombies.children );
   }
   handleMovement() {
     this.resetVelocity();
@@ -77,6 +92,7 @@ export default class Player extends Entity {
       this.animations.play( 'fight', PLAYER_FIGHT_ANIMATION_FRAMERATE, false );
     }
   }
+
   lookAtMouse() {
     const mouseX = this.game.input.mousePointer.worldX;
     const mouseY = this.game.input.mousePointer.worldY;
@@ -84,4 +100,34 @@ export default class Player extends Entity {
     this.lookAt( mouseX, mouseY );
   }
 
+  handleAttack() {
+    if ( this.game.input.activePointer.leftButton.isDown ) {
+      this.zombies.forEach( ( v ) => {
+        if ( v.alive ) {
+          const distanceToZombie = this.game.physics.arcade.distanceBetween( this, v );
+          if ( distanceToZombie < this.attackRange && this.isInDegreeRange( this, v, PLAYER_HAND_ATTACK_ANGLE ) ) {
+            v.takeDamage( this.dealingDamage );
+          }
+        }
+      } );
+    }
+  }
+
+  takeDamage( damage ) {
+    this.damage( damage );
+    this.drawHealthBar();
+  }
+
+  drawHealthBar() {
+    const width = 300;
+    const height = 32;
+
+    this.healthbar.clear();
+    this.healthbar.beginFill( 0xFF0000, 0.85 );
+    this.healthbar.drawRect( this.game.width - ( width + 24 ), this.game.height - ( height + 24 ), width * Math.max( this.health, 0 ), height );
+    this.healthbar.endFill();
+    this.healthbar.lineStyle( 2, 0x880000, 1 );
+    this.healthbar.drawRect( this.game.width - ( width + 24 ), this.game.height - ( height + 24 ), width, height );
+    this.healthbar.lineStyle( 0 );
+  }
 }
