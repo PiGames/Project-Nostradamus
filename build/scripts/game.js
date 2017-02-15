@@ -1023,8 +1023,8 @@ var PLAYER_WIDTH = exports.PLAYER_WIDTH = 30;
 var PLAYER_HEIGHT = exports.PLAYER_HEIGHT = 24;
 var PLAYER_INITIAL_FRAME = exports.PLAYER_INITIAL_FRAME = 1;
 var PLAYER_SPEED = exports.PLAYER_SPEED = 120;
-var PLAYER_SNEAK_MULTIPLIER = exports.PLAYER_SNEAK_MULTIPLIER = 0.75;
-var PLAYER_SPRINT_MULTIPLIER = exports.PLAYER_SPRINT_MULTIPLIER = 2 * 1.5;
+var PLAYER_SNEAK_MULTIPLIER = exports.PLAYER_SNEAK_MULTIPLIER = 0.25;
+var PLAYER_SPRINT_MULTIPLIER = exports.PLAYER_SPRINT_MULTIPLIER = 1.5;
 var PLAYER_WALK_ANIMATION_FRAMERATE = exports.PLAYER_WALK_ANIMATION_FRAMERATE = 5;
 var PLAYER_FIGHT_ANIMATION_FRAMERATE = exports.PLAYER_FIGHT_ANIMATION_FRAMERATE = 10;
 var PLAYER_HAND_ATTACK_RANGE = exports.PLAYER_HAND_ATTACK_RANGE = 50;
@@ -1062,7 +1062,7 @@ var ZOMBIE_SIGHT_RANGE = exports.ZOMBIE_SIGHT_RANGE = 500;
 var ZOMBIE_HEARING_RANGE = exports.ZOMBIE_HEARING_RANGE = 100;
 var ZOMBIE_ROTATING_SPEED = exports.ZOMBIE_ROTATING_SPEED = 50;
 var ZOMBIE_DAMAGE_MULTIPLIER = exports.ZOMBIE_DAMAGE_MULTIPLIER = 1;
-var ZOMBIE_DAMAGE_COOLDOWN = exports.ZOMBIE_DAMAGE_COOLDOWN = 0.05;
+var ZOMBIE_DAMAGE_COOLDOWN = exports.ZOMBIE_DAMAGE_COOLDOWN = 0.2;
 
 },{}],10:[function(require,module,exports){
 'use strict';
@@ -1578,9 +1578,23 @@ var Player = function (_Entity) {
       down: _this.game.input.keyboard.addKey(Phaser.Keyboard.S),
       left: _this.game.input.keyboard.addKey(Phaser.Keyboard.A),
       right: _this.game.input.keyboard.addKey(Phaser.Keyboard.D),
-      sneak: _this.game.input.keyboard.addKey(Phaser.Keyboard.ALT),
+      sneak: _this.game.input.keyboard.addKey(Phaser.Keyboard.CAPS_LOCK),
       sprint: _this.game.input.keyboard.addKey(Phaser.Keyboard.SHIFT)
     };
+
+    _this.isSneakPressed = false;
+
+    var style = { font: '16px Arial', fill: '#fff' };
+
+    _this.sneakText = _this.game.add.text(0, 0, 'Sneaking: off', style);
+    _this.sneakText.x = _this.game.width - (_this.sneakText.width + 24);
+    _this.sneakText.y = _this.game.height - (_this.sneakText.height + 24 + 32);
+    _this.sneakText.fixedToCamera = true;
+
+    _this.sprintText = _this.game.add.text(0, 0, 'Sprinting: off', style);
+    _this.sprintText.x = _this.game.width - (_this.sprintText.width + 24);
+    _this.sprintText.y = _this.game.height - (_this.sprintText.height + 24 + 32 + _this.sneakText.height);
+    _this.sprintText.fixedToCamera = true;
 
     _this.animations.add('walk', [1, 2, 1, 0], 1);
     _this.animations.add('fight', [3, 5, 4], 3);
@@ -1627,16 +1641,27 @@ var Player = function (_Entity) {
     value: function handleMovementSpecialModes() {
       var specialEffectMultiplier = 1;
 
-      this.isSneaking = false;
       this.isSprinting = false;
 
       if (this.cursors.sneak.isDown) {
-        specialEffectMultiplier = _PlayerConstants.PLAYER_SNEAK_MULTIPLIER;
-        this.isSneaking = true;
-      } else if (this.cursors.sprint.isDown) {
-        specialEffectMultiplier = _PlayerConstants.PLAYER_SPRINT_MULTIPLIER;
-        this.isSprinting = true;
+        this.isSneakPressed = true;
+      } else if (this.isSneakPressed) {
+        this.isSneaking = !this.isSneaking;
+        this.isSneakPressed = false;
       }
+
+      if (this.cursors.sprint.isDown) {
+        this.isSprinting = true;
+        this.isSneaking = false;
+        specialEffectMultiplier = _PlayerConstants.PLAYER_SPRINT_MULTIPLIER;
+      }
+
+      if (this.isSneaking) {
+        specialEffectMultiplier = _PlayerConstants.PLAYER_SNEAK_MULTIPLIER;
+      }
+
+      this.sneakText.setText('Sneaking: ' + (this.isSneaking ? 'on' : 'off'));
+      this.sprintText.setText('Sprinting: ' + (this.isSprinting ? 'on' : 'off'));
 
       this.body.velocity.x *= specialEffectMultiplier;
       this.body.velocity.y *= specialEffectMultiplier;

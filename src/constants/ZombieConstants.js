@@ -12,4 +12,4 @@ export const ZOMBIE_SIGHT_RANGE = 500;
 export const ZOMBIE_HEARING_RANGE = 100;
 export const ZOMBIE_ROTATING_SPEED = 50;
 export const ZOMBIE_DAMAGE_MULTIPLIER = 1;
-export const ZOMBIE_DAMAGE_COOLDOWN = 0.05;
+export const ZOMBIE_DAMAGE_COOLDOWN = 0.2;

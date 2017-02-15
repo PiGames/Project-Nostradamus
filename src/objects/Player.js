@@ -26,9 +26,23 @@ export default class Player extends Entity {
       down: this.game.input.keyboard.addKey( Phaser.Keyboard.S ),
       left: this.game.input.keyboard.addKey( Phaser.Keyboard.A ),
       right: this.game.input.keyboard.addKey( Phaser.Keyboard.D ),
-      sneak: this.game.input.keyboard.addKey( Phaser.Keyboard.ALT ),
+      sneak: this.game.input.keyboard.addKey( Phaser.Keyboard.CAPS_LOCK ),
       sprint: this.game.input.keyboard.addKey( Phaser.Keyboard.SHIFT ),
     };
+
+    this.isSneakPressed = false;
+
+    const style = { font: '16px Arial', fill: '#fff' };
+
+    this.sneakText = this.game.add.text( 0, 0, 'Sneaking: off', style );
+    this.sneakText.x = this.game.width - ( this.sneakText.width + 24 );
+    this.sneakText.y = this.game.height - ( this.sneakText.height + 24 + 32 );
+    this.sneakText.fixedToCamera = true;
+
+    this.sprintText = this.game.add.text( 0, 0, 'Sprinting: off', style );
+    this.sprintText.x = this.game.width - ( this.sprintText.width + 24 );
+    this.sprintText.y = this.game.height - ( this.sprintText.height + 24 + 32 + this.sneakText.height );
+    this.sprintText.fixedToCamera = true;
 
     this.animations.add( 'walk', [ 1, 2, 1, 0 ], 1 );
     this.animations.add( 'fight', [ 3, 5, 4 ], 3 );
@@ -68,16 +82,27 @@ export default class Player extends Entity {
   handleMovementSpecialModes() {
     let specialEffectMultiplier = 1;
 
-    this.isSneaking = false;
     this.isSprinting = false;
 
     if ( this.cursors.sneak.isDown ) {
-      specialEffectMultiplier = PLAYER_SNEAK_MULTIPLIER;
-      this.isSneaking = true;
-    } else if ( this.cursors.sprint.isDown ) {
-      specialEffectMultiplier = PLAYER_SPRINT_MULTIPLIER;
-      this.isSprinting = true;
+      this.isSneakPressed = true;
+    } else if ( this.isSneakPressed ) {
+      this.isSneaking = !this.isSneaking;
+      this.isSneakPressed = false;
     }
+
+    if ( this.cursors.sprint.isDown ) {
+      this.isSprinting = true;
+      this.isSneaking = false;
+      specialEffectMultiplier = PLAYER_SPRINT_MULTIPLIER;
+    }
+
+    if ( this.isSneaking ) {
+      specialEffectMultiplier = PLAYER_SNEAK_MULTIPLIER;
+    }
+
+    this.sneakText.setText( 'Sneaking: ' + ( ( this.isSneaking ) ? 'on' : 'off' ) );
+    this.sprintText.setText( 'Sprinting: ' + ( ( this.isSprinting ) ? 'on' : 'off' ) );
 
     this.body.velocity.x *= specialEffectMultiplier;
     this.body.velocity.y *= specialEffectMultiplier;
