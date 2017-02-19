@@ -1013,7 +1013,16 @@ var ProjectNostradamus = function (_Phaser$Game) {
 
 exports.default = ProjectNostradamus;
 
-},{"./states/Boot":19,"./states/Game":20,"./states/Menu":21,"./states/Preload":22}],7:[function(require,module,exports){
+},{"./states/Boot":20,"./states/Game":21,"./states/Menu":22,"./states/Preload":23}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var COMPUTER_WIDTH = exports.COMPUTER_WIDTH = 32;
+var COMPUTER_HEIGHT = exports.COMPUTER_HEIGHT = 39;
+
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1031,7 +1040,7 @@ var PLAYER_HAND_ATTACK_RANGE = exports.PLAYER_HAND_ATTACK_RANGE = 50;
 var PLAYER_HAND_ATTACK_ANGLE = exports.PLAYER_HAND_ATTACK_ANGLE = 60;
 var PLAYER_HAND_ATTACK_DAMAGE = exports.PLAYER_HAND_ATTACK_DAMAGE = 0.2;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1042,7 +1051,7 @@ var TILE_HEIGHT = exports.TILE_HEIGHT = 64;
 var MAP_WIDTH = exports.MAP_WIDTH = 32;
 var MAP_HEIGHT = exports.MAP_HEIGHT = 32;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1064,7 +1073,7 @@ var ZOMBIE_ROTATING_SPEED = exports.ZOMBIE_ROTATING_SPEED = 50;
 var ZOMBIE_DAMAGE_MULTIPLIER = exports.ZOMBIE_DAMAGE_MULTIPLIER = 1;
 var ZOMBIE_DAMAGE_COOLDOWN = exports.ZOMBIE_DAMAGE_COOLDOWN = 0.2;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 var _ProjectNostradamus = require('./ProjectNostradamus');
@@ -1098,7 +1107,7 @@ document.onkeydown = ( e ) => {
 };
 */
 
-},{"./ProjectNostradamus":6}],11:[function(require,module,exports){
+},{"./ProjectNostradamus":6}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1197,7 +1206,7 @@ var Entity = function (_Phaser$Sprite) {
 
 exports.default = Entity;
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1446,7 +1455,7 @@ var EntityWalkingOnPath = function (_Entity) {
 
 exports.default = EntityWalkingOnPath;
 
-},{"../constants/TileMapConstants":8,"../constants/ZombieConstants":9,"../objects/PathFinder.js":13,"../utils/MapUtils.js":25,"./Entity":11}],13:[function(require,module,exports){
+},{"../constants/TileMapConstants":9,"../constants/ZombieConstants":10,"../objects/PathFinder.js":14,"../utils/MapUtils.js":26,"./Entity":12}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1504,7 +1513,7 @@ var PathFinder = function () {
 
 exports.default = PathFinder;
 
-},{"easystarjs":1}],14:[function(require,module,exports){
+},{"easystarjs":1}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1729,7 +1738,7 @@ var Player = function (_Entity) {
 
 exports.default = Player;
 
-},{"../constants/PlayerConstants":7,"./Entity":11}],15:[function(require,module,exports){
+},{"../constants/PlayerConstants":8,"./Entity":12}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1886,7 +1895,7 @@ var TileMap = function (_Phaser$Tilemap) {
 
 exports.default = TileMap;
 
-},{"../utils/MapUtils.js":25}],16:[function(require,module,exports){
+},{"../utils/MapUtils.js":26}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2071,7 +2080,7 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
 
 exports.default = WalkingEntitiesManager;
 
-},{"../constants/TileMapConstants":8,"../utils/BoidsManager.js":23,"../utils/EntityManagerUtils":24,"../utils/MapUtils.js":25}],17:[function(require,module,exports){
+},{"../constants/TileMapConstants":9,"../utils/BoidsManager.js":24,"../utils/EntityManagerUtils":25,"../utils/MapUtils.js":26}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2222,7 +2231,7 @@ var Zombie = function (_EntityWalkingOnPath) {
 
 exports.default = Zombie;
 
-},{"../constants/ZombieConstants":9,"../utils/MapUtils.js":25,"./EntityWalkingOnPath":12}],18:[function(require,module,exports){
+},{"../constants/ZombieConstants":10,"../utils/MapUtils.js":26,"./EntityWalkingOnPath":13}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2286,90 +2295,90 @@ var ZombieManager = function (_WalkingEntitiesManag) {
 
 exports.default = ZombieManager;
 
-},{"../objects/WalkingEntitiesManager":16}],19:[function(require,module,exports){
+},{"../objects/WalkingEntitiesManager":17}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
 
 var _createClass = function () {
-    function defineProperties(target, props) {
-        for (var i = 0; i < props.length; i++) {
-            var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-        }
-    }return function (Constructor, protoProps, staticProps) {
-        if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-    };
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
 }();
 
 function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-        throw new TypeError("Cannot call a class as a function");
-    }
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
 }
 
 function _possibleConstructorReturn(self, call) {
-    if (!self) {
-        throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-    }return call && (typeof call === "object" || typeof call === "function") ? call : self;
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }return call && (typeof call === "object" || typeof call === "function") ? call : self;
 }
 
 function _inherits(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-        throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 }
 
 var Boot = function (_Phaser$State) {
-    _inherits(Boot, _Phaser$State);
+  _inherits(Boot, _Phaser$State);
 
-    function Boot() {
-        _classCallCheck(this, Boot);
+  function Boot() {
+    _classCallCheck(this, Boot);
 
-        return _possibleConstructorReturn(this, (Boot.__proto__ || Object.getPrototypeOf(Boot)).apply(this, arguments));
+    return _possibleConstructorReturn(this, (Boot.__proto__ || Object.getPrototypeOf(Boot)).apply(this, arguments));
+  }
+
+  _createClass(Boot, [{
+    key: 'preload',
+    value: function preload() {}
+  }, {
+    key: 'create',
+    value: function create() {
+      // this.game.stage.disableVisibilityChange = true;
+
+      // this.game.scale.maxWidth = 800;
+      // this.game.scale.maxHeight = 600;
+
+      this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+      this.game.scale.updateLayout();
+
+      this.game.physics.startSystem(Phaser.Physics.P2JS);
+      this.game.physics.p2.setImpactEvents(true);
+      this.state.start('Preload');
     }
+  }]);
 
-    _createClass(Boot, [{
-        key: 'preload',
-        value: function preload() {}
-    }, {
-        key: 'create',
-        value: function create() {
-            // this.game.stage.disableVisibilityChange = true;
-
-            // this.game.scale.maxWidth = 800;
-            // this.game.scale.maxHeight = 600;
-
-            this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-            this.game.scale.updateLayout();
-
-            this.game.physics.startSystem(Phaser.Physics.P2JS);
-            this.game.physics.p2.setImpactEvents(true);
-            this.state.start('Preload');
-        }
-    }]);
-
-    return Boot;
+  return Boot;
 }(Phaser.State);
 
 exports.default = Boot;
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
 
 var _createClass = function () {
-    function defineProperties(target, props) {
-        for (var i = 0; i < props.length; i++) {
-            var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-        }
-    }return function (Constructor, protoProps, staticProps) {
-        if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-    };
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
 }();
 
 var _Player = require('../objects/Player');
@@ -2392,79 +2401,100 @@ var _PlayerConstants = require('../constants/PlayerConstants');
 
 var _TileMapConstants = require('../constants/TileMapConstants');
 
+var _ItemConstants = require('../constants/ItemConstants');
+
 function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : { default: obj };
+  return obj && obj.__esModule ? obj : { default: obj };
 }
 
 function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-        throw new TypeError("Cannot call a class as a function");
-    }
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
 }
 
 function _possibleConstructorReturn(self, call) {
-    if (!self) {
-        throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-    }return call && (typeof call === "object" || typeof call === "function") ? call : self;
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }return call && (typeof call === "object" || typeof call === "function") ? call : self;
 }
 
 function _inherits(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-        throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 }
 
 var Game = function (_Phaser$State) {
-    _inherits(Game, _Phaser$State);
+  _inherits(Game, _Phaser$State);
 
-    function Game() {
-        _classCallCheck(this, Game);
+  function Game() {
+    _classCallCheck(this, Game);
 
-        return _possibleConstructorReturn(this, (Game.__proto__ || Object.getPrototypeOf(Game)).apply(this, arguments));
+    return _possibleConstructorReturn(this, (Game.__proto__ || Object.getPrototypeOf(Game)).apply(this, arguments));
+  }
+
+  _createClass(Game, [{
+    key: 'create',
+    value: function create() {
+      var _this2 = this;
+
+      this.map = new _TileMap2.default(this.game, 'map', _TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT);
+
+      this.zombies = new _ZombiesManager2.default(this.game, this.map.walls);
+
+      this.player = new _Player2.default(this.game, 10 * _TileMapConstants.TILE_WIDTH + _TileMapConstants.TILE_WIDTH / 2, 2 * _TileMapConstants.TILE_HEIGHT + _TileMapConstants.TILE_HEIGHT / 2, 'player', _PlayerConstants.PLAYER_INITIAL_FRAME, this.zombies);
+      this.game.camera.follow(this.player);
+
+      this.playerCollisionGroup = this.game.physics.p2.createCollisionGroup(this.player);
+      this.zombiesCollisionGroup = this.game.physics.p2.createCollisionGroup();
+
+      for (var i = 0; i < this.map.paths.length; i++) {
+        var newZombie = this.zombies.add(new _Zombie2.default(this.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, this.map.getPath(i), this.map.walls, this.player));
+
+        newZombie.body.setCollisionGroup(this.zombiesCollisionGroup);
+        newZombie.body.collides(this.zombiesCollisionGroup, function (body1, body2) {
+          return _this2.zombies.onCollisionWihOtherEntity(body1.sprite, body2.sprite);
+        });
+        newZombie.body.collides(this.map.wallsCollisionGroup, function (body, tileBody) {
+          return _this2.zombies.onCollisionWithWalls(body.sprite, tileBody);
+        });
+        newZombie.body.collides(this.playerCollisionGroup);
+      }
+      this.player.body.collides([this.zombiesCollisionGroup, this.map.wallsCollisionGroup]);
+
+      this.map.collides([this.zombiesCollisionGroup, this.playerCollisionGroup]);
+
+      this.computer = this.game.add.sprite(9 * _TileMapConstants.TILE_WIDTH + _ItemConstants.COMPUTER_WIDTH / 2, _TileMapConstants.TILE_HEIGHT + _ItemConstants.COMPUTER_HEIGHT / 2, 'computer');
+      this.game.physics.p2.enable(this.computer);
+      this.computer.body.static = true;
+      this.computer.body.addRectangle(_TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT, _ItemConstants.COMPUTER_WIDTH / 2, _ItemConstants.COMPUTER_HEIGHT / 2);
+
+      this.computersCollisionGroup = this.game.physics.p2.createCollisionGroup(this.computer);
+      this.computer.body.collides(this.playerCollisionGroup, function () {
+        return console.log('player in range');
+      });
+      // TODO make the rectangle collider not trigger physical collision
+
+      this.player.body.collides(this.computersCollisionGroup);
     }
+  }, {
+    key: 'update',
+    value: function update() {}
+  }, {
+    key: 'render',
+    value: function render() {
+      this.game.debug.body(this.computer);
+      this.game.debug.body(this.player);
+    }
+  }]);
 
-    _createClass(Game, [{
-        key: 'create',
-        value: function create() {
-            var _this2 = this;
-
-            this.map = new _TileMap2.default(this.game, 'map', _TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT);
-
-            this.zombies = new _ZombiesManager2.default(this.game, this.map.walls);
-
-            this.player = new _Player2.default(this.game, 10 * _TileMapConstants.TILE_WIDTH + _TileMapConstants.TILE_WIDTH / 2, 2 * _TileMapConstants.TILE_HEIGHT + _TileMapConstants.TILE_HEIGHT / 2, 'player', _PlayerConstants.PLAYER_INITIAL_FRAME, this.zombies);
-            this.game.camera.follow(this.player);
-
-            this.playerCollisionGroup = this.game.physics.p2.createCollisionGroup(this.player);
-            this.zombiesCollisionGroup = this.game.physics.p2.createCollisionGroup();
-
-            for (var i = 0; i < this.map.paths.length; i++) {
-                var newZombie = this.zombies.add(new _Zombie2.default(this.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, this.map.getPath(i), this.map.walls, this.player));
-
-                newZombie.body.setCollisionGroup(this.zombiesCollisionGroup);
-                newZombie.body.collides(this.zombiesCollisionGroup, function (body1, body2) {
-                    return _this2.zombies.onCollisionWihOtherEntity(body1.sprite, body2.sprite);
-                });
-                newZombie.body.collides(this.map.wallsCollisionGroup, function (body, tileBody) {
-                    return _this2.zombies.onCollisionWithWalls(body.sprite, tileBody);
-                });
-                newZombie.body.collides(this.playerCollisionGroup);
-            }
-            this.player.body.collides([this.zombiesCollisionGroup, this.map.wallsCollisionGroup]);
-
-            this.map.collides([this.zombiesCollisionGroup, this.playerCollisionGroup]);
-        }
-    }, {
-        key: 'update',
-        value: function update() {}
-    }]);
-
-    return Game;
+  return Game;
 }(Phaser.State);
 
 exports.default = Game;
 
-},{"../constants/PlayerConstants":7,"../constants/TileMapConstants":8,"../objects/Player":14,"../objects/TileMap":15,"../objects/Zombie":17,"../objects/ZombiesManager":18}],21:[function(require,module,exports){
+},{"../constants/ItemConstants":7,"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"../objects/Player":15,"../objects/TileMap":16,"../objects/Zombie":18,"../objects/ZombiesManager":19}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2520,7 +2550,7 @@ var Menu = function (_Phaser$State) {
 
 exports.default = Menu;
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2576,6 +2606,8 @@ var Preload = function (_Phaser$State) {
 
       this.game.load.spritesheet('player', './assets/images/player-sheet.png', _PlayerConstants.PLAYER_WIDTH, _PlayerConstants.PLAYER_HEIGHT);
       this.game.load.spritesheet('zombie', './assets/images/zombie-sheet.png', _ZombieConstants.ZOMBIE_WIDTH, _ZombieConstants.ZOMBIE_HEIGHT);
+
+      this.game.load.image('computer', './assets/images/computer.png');
     }
   }, {
     key: 'create',
@@ -2589,7 +2621,7 @@ var Preload = function (_Phaser$State) {
 
 exports.default = Preload;
 
-},{"../constants/PlayerConstants.js":7,"../constants/ZombieConstants.js":9}],23:[function(require,module,exports){
+},{"../constants/PlayerConstants.js":8,"../constants/ZombieConstants.js":10}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2797,7 +2829,7 @@ var BoidsManager = function () {
 
 exports.default = BoidsManager;
 
-},{"../constants/TileMapConstants":8,"../utils/MapUtils.js":25}],24:[function(require,module,exports){
+},{"../constants/TileMapConstants":9,"../utils/MapUtils.js":26}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2984,7 +3016,7 @@ function getFreeTileExcludingEast(entityTile, mapGrid) {
   return freeTile;
 }
 
-},{"../utils/MapUtils":25}],25:[function(require,module,exports){
+},{"../utils/MapUtils":26}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3037,5 +3069,5 @@ var getWallsPostions = exports.getWallsPostions = function getWallsPostions(laye
   return wallsArr;
 };
 
-},{"../constants/TileMapConstants":8}]},{},[10])
+},{"../constants/TileMapConstants":9}]},{},[11])
 //# sourceMappingURL=game.js.map

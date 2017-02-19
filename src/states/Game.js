@@ -5,6 +5,7 @@ import ZombiesManager from '../objects/ZombiesManager';
 
 import { PLAYER_INITIAL_FRAME } from '../constants/PlayerConstants';
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
+import { COMPUTER_WIDTH, COMPUTER_HEIGHT } from '../constants/ItemConstants';
 
 export default class Game extends Phaser.State {
   create() {
@@ -29,7 +30,24 @@ export default class Game extends Phaser.State {
     this.player.body.collides( [ this.zombiesCollisionGroup, this.map.wallsCollisionGroup ] );
 
     this.map.collides( [ this.zombiesCollisionGroup, this.playerCollisionGroup ] );
+
+    this.computer = this.game.add.sprite( 9 * TILE_WIDTH + COMPUTER_WIDTH / 2, TILE_HEIGHT + COMPUTER_HEIGHT / 2, 'computer' );
+    this.game.physics.p2.enable( this.computer );
+    this.computer.body.static = true;
+    this.computer.body.addRectangle( TILE_WIDTH, TILE_HEIGHT, COMPUTER_WIDTH / 2, COMPUTER_HEIGHT / 2 );
+
+    this.computersCollisionGroup = this.game.physics.p2.createCollisionGroup( this.computer );
+    this.computer.body.collides( this.playerCollisionGroup, () => console.log( 'player in range' ) );
+    // TODO make the rectangle collider not trigger physical collision
+
+    this.player.body.collides( this.computersCollisionGroup );
   }
   update() {
+
+  }
+
+  render() {
+    this.game.debug.body( this.computer );
+    this.game.debug.body( this.player );
   }
 }
