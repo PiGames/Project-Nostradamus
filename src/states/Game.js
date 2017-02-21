@@ -2,6 +2,7 @@ import Player from '../objects/Player';
 import Zombie from '../objects/Zombie';
 import TileMap from '../objects/TileMap';
 import ZombiesManager from '../objects/ZombiesManager';
+import p2 from 'p2';
 
 import { PLAYER_INITIAL_FRAME } from '../constants/PlayerConstants';
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
@@ -34,20 +35,42 @@ export default class Game extends Phaser.State {
     this.computer = this.game.add.sprite( 9 * TILE_WIDTH + COMPUTER_WIDTH / 2, TILE_HEIGHT + COMPUTER_HEIGHT / 2, 'computer' );
     this.game.physics.p2.enable( this.computer );
     this.computer.body.static = true;
-    this.computer.body.addRectangle( TILE_WIDTH, TILE_HEIGHT, COMPUTER_WIDTH / 2, COMPUTER_HEIGHT / 2 );
+
+    const rectangleSensor = new p2.Box( { width: TILE_WIDTH / 20, height: TILE_HEIGHT / 20 } );
+    rectangleSensor.sensor = true;
+
+    this.computer.body.addShape( rectangleSensor, COMPUTER_WIDTH / 2, COMPUTER_HEIGHT / 2 );
 
     this.computersCollisionGroup = this.game.physics.p2.createCollisionGroup( this.computer );
-    this.computer.body.collides( this.playerCollisionGroup, () => console.log( 'player in range' ) );
-    // TODO make the rectangle collider not trigger physical collision
 
+    this.computer.body.collides( this.playerCollisionGroup );
     this.player.body.collides( this.computersCollisionGroup );
+
+    const style = { font: '16px Arial', fill: '#fff' };
+
+    this.pressToOpenTerminalText = this.game.add.text( 0, 0, '', style );
+    this.pressToOpenTerminalText.x = 24;
+    this.pressToOpenTerminalText.y = this.game.height - 24 - 32;
+    this.pressToOpenTerminalText .fixedToCamera = true;
+
+    this.player.body.onBeginContact.add( ( body, bodyB, shapeA, shapeB ) => {
+      if ( this.isItComputerArea( body, shapeB ) ) {
+        this.pressToOpenTerminalText.setText( 'Press \'E\' to open terminal.' );
+      }
+    } );
+    this.player.body.onEndContact.add( ( body, bodyB, shapeA, shapeB ) => {
+      if ( this.isItComputerArea( body, shapeB ) ) {
+        this.pressToOpenTerminalText.setText( '' );
+      }
+    } );
+  }
+  isItComputerArea( body, shape ) {
+    if ( body.sprite == null || shape.sensor == null ) {
+      return false;
+    }
+    return body.sprite.key === 'computer' && shape.sensor;
   }
   update() {
 
-  }
-
-  render() {
-    this.game.debug.body( this.computer );
-    this.game.debug.body( this.player );
   }
 }
