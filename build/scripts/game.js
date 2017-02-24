@@ -2807,14 +2807,17 @@ var Game = function (_Phaser$State) {
       this.player = new _Player2.default(this.game, 10 * _TileMapConstants.TILE_WIDTH + _TileMapConstants.TILE_WIDTH / 2, 2 * _TileMapConstants.TILE_HEIGHT + _TileMapConstants.TILE_HEIGHT / 2, 'player', _PlayerConstants.PLAYER_INITIAL_FRAME, this.zombies);
       this.journals = new _JournalsManager2.default(this.game);
 
+      this.playerCollisionGroup = this.game.physics.p2.createCollisionGroup(this.player);
+      this.zombiesCollisionGroup = this.game.physics.p2.createCollisionGroup();
+      this.journalsCollisionGroup = this.game.physics.p2.createCollisionGroup();
+
       // init player
       this.game.camera.follow(this.player);
-      this.playerCollisionGroup = this.game.physics.p2.createCollisionGroup(this.player);
+
       this.map.collides([this.playerCollisionGroup]);
       this.player.body.collides([this.map.wallsCollisionGroup]);
 
       // init zombies
-      this.zombiesCollisionGroup = this.game.physics.p2.createCollisionGroup();
       for (var i = 0; i < this.map.paths.length; i++) {
         var newZombie = this.zombies.add(new _Zombie2.default(this.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, this.map.getPath(i), this.map.walls, this.player));
 
@@ -2825,14 +2828,12 @@ var Game = function (_Phaser$State) {
         newZombie.body.collides(this.map.wallsCollisionGroup, function (body, tileBody) {
           return _this2.zombies.onCollisionWithWalls(body.sprite, tileBody);
         });
-        newZombie.body.collides(this.playerCollisionGroup);
+        newZombie.body.collides([this.playerCollisionGroup, this.journalsCollisionGroup]);
       }
       this.player.body.collides([this.zombiesCollisionGroup]);
       this.map.collides([this.zombiesCollisionGroup]);
 
       // init journals
-      this.journalsCollisionGroup = this.game.physics.p2.createCollisionGroup();
-
       var journalsData = [{ x: 9, y: 1, cornerX: 'WEST', cornerY: 'NORTH' }, { x: 22, y: 1, cornerX: 'EAST', cornerY: 'NORTH' }, { x: 9, y: 3, cornerX: 'WEST', cornerY: 'SOUTH' }, { x: 22, y: 3, cornerX: 'EAST', cornerY: 'SOUTH' }];
 
       for (var _i = 0; _i < journalsData.length; _i++) {
