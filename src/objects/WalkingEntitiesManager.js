@@ -1,6 +1,6 @@
 import { willEntitiesBeOnTheSameTile, getFreeTileAroundEntityExcludingOtherEntity, getDirectionBetweenEntities } from '../utils/EntityManagerUtils';
 import { pixelsToTile, getWallsPostions } from '../utils/MapUtils.js';
-import BoidsManager from '../utils/BoidsManager.js';
+import BoidsManager from './BoidsManager.js';
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 
 export default class WalkingEntitiesManager extends Phaser.Group {
