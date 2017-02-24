@@ -1,22 +1,54 @@
 export default class JournalsManager extends Phaser.Group {
-  constructor( game ) {
+  constructor( game, messageText ) {
     super( game );
 
-    const style = { font: '24px Arial', fill: '#fff' };
+    this.messageText = messageText;
 
-    this.pressToOpenTerminalText = this.game.add.text( 0, 0, '', style );
-    this.pressToOpenTerminalText.x = 24;
-    this.pressToOpenTerminalText.y = this.game.height - 24 - 32;
-    this.pressToOpenTerminalText.fixedToCamera = true;
+    this.activateKey = this.game.input.keyboard.addKey( Phaser.Keyboard.E );
+    this.activateKey.onDown.add( this.tryToShowJournal, this );
+    this.game.input.keyboard.removeKeyCapture( Phaser.Keyboard.E );
+
+    this.activateKey = this.game.input.keyboard.addKey( Phaser.Keyboard.ESC );
+    this.activateKey.onDown.add( this.tryToHideJournal, this );
+    this.game.input.keyboard.removeKeyCapture( Phaser.Keyboard.ESC );
+
+    this.isJournalOpened = false;
+  }
+  tryToShowJournal() {
+    const approachedJournals = this.children.filter( journal => journal.hasPlayerApproached );
+    if ( approachedJournals.length > 0 ) {
+      this.isJournalOpened = true;
+      this.game.paused = true;
+      this.messageText.setText( 'Press \'ESC\' to close personal journal.' );
+      this.showJournal( approachedJournals[ 0 ] );
+    }
+  }
+  showJournal( ) {
+    console.log( this.game.camera );
+    this.backgroundLayer = this.game.add.sprite( this.game.camera.x + this.game.camera.width / 2, this.game.camera.y + this.game.camera.height / 2, 'layer-background' );
+    this.backgroundLayer.width = this.game.width + 100;
+    this.backgroundLayer.height = this.game.height + 100;
+    this.backgroundLayer.anchor.setTo( 0.5 );
+    this.backgroundLayer.alpha = 0.4;
+  }
+  tryToHideJournal() {
+    if ( this.isJournalOpened && this.game.paused ) {
+      this.isJournalOpened = false;
+      this.game.paused = false;
+      this.messageText.setText( 'Press \'E\' to open personal journal.' );
+      this.backgroundLayer.destroy();
+    }
   }
   onCollisionEnter( bodyA, bodyB, shapeA, shapeB ) {
     if ( this.isItSensorArea( bodyA, shapeB ) ) {
-      this.pressToOpenTerminalText.setText( 'Press \'E\' to open personal journal.' );
+      this.messageText.setText( 'Press \'E\' to open personal journal.' );
+      bodyA.sprite.hasPlayerApproached = true;
     }
   }
   onCollisionLeave( bodyA, bodyB, shapeA, shapeB ) {
     if ( this.isItSensorArea( bodyA, shapeB ) ) {
-      this.pressToOpenTerminalText.setText( '' );
+      this.messageText.setText( '' );
+      bodyA.sprite.hasPlayerApproached = false;
     }
   }
   isItSensorArea( body, shape ) {

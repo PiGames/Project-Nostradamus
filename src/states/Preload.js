@@ -10,6 +10,7 @@ class Preload extends Phaser.State {
     this.game.load.spritesheet( 'zombie', './assets/images/zombie-sheet.png', ZOMBIE_WIDTH, ZOMBIE_HEIGHT );
 
     this.game.load.image( 'computer', './assets/images/computer.png' );
+    this.game.load.image( 'layer-background', './assets/images/bg-color.png' );
   }
   create() {
     this.state.start( 'Menu' );

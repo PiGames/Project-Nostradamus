@@ -1721,6 +1721,8 @@ var Journal = function (_Phaser$Sprite) {
 
     var rectangleSensor = _this.body.addRectangle(_TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT, sensorOffsetX, sensorOffsetY);
     rectangleSensor.sensor = true;
+
+    _this.hasPlayerApproached = false;
     return _this;
   }
 
@@ -1767,32 +1769,72 @@ function _inherits(subClass, superClass) {
 var JournalsManager = function (_Phaser$Group) {
   _inherits(JournalsManager, _Phaser$Group);
 
-  function JournalsManager(game) {
+  function JournalsManager(game, messageText) {
     _classCallCheck(this, JournalsManager);
 
     var _this = _possibleConstructorReturn(this, (JournalsManager.__proto__ || Object.getPrototypeOf(JournalsManager)).call(this, game));
 
-    var style = { font: '24px Arial', fill: '#fff' };
+    _this.messageText = messageText;
 
-    _this.pressToOpenTerminalText = _this.game.add.text(0, 0, '', style);
-    _this.pressToOpenTerminalText.x = 24;
-    _this.pressToOpenTerminalText.y = _this.game.height - 24 - 32;
-    _this.pressToOpenTerminalText.fixedToCamera = true;
+    _this.activateKey = _this.game.input.keyboard.addKey(Phaser.Keyboard.E);
+    _this.activateKey.onDown.add(_this.tryToShowJournal, _this);
+    _this.game.input.keyboard.removeKeyCapture(Phaser.Keyboard.E);
+
+    _this.activateKey = _this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
+    _this.activateKey.onDown.add(_this.tryToHideJournal, _this);
+    _this.game.input.keyboard.removeKeyCapture(Phaser.Keyboard.ESC);
+
+    _this.isJournalOpened = false;
     return _this;
   }
 
   _createClass(JournalsManager, [{
+    key: 'tryToShowJournal',
+    value: function tryToShowJournal() {
+      var approachedJournals = this.children.filter(function (journal) {
+        return journal.hasPlayerApproached;
+      });
+      if (approachedJournals.length > 0) {
+        this.isJournalOpened = true;
+        this.game.paused = true;
+        this.messageText.setText('Press \'ESC\' to close personal journal.');
+        this.showJournal(approachedJournals[0]);
+      }
+    }
+  }, {
+    key: 'showJournal',
+    value: function showJournal() {
+      console.log(this.game.camera);
+      this.backgroundLayer = this.game.add.sprite(this.game.camera.x + this.game.camera.width / 2, this.game.camera.y + this.game.camera.height / 2, 'layer-background');
+      this.backgroundLayer.width = this.game.width + 100;
+      this.backgroundLayer.height = this.game.height + 100;
+      this.backgroundLayer.anchor.setTo(0.5);
+      this.backgroundLayer.alpha = 0.4;
+    }
+  }, {
+    key: 'tryToHideJournal',
+    value: function tryToHideJournal() {
+      if (this.isJournalOpened && this.game.paused) {
+        this.isJournalOpened = false;
+        this.game.paused = false;
+        this.messageText.setText('Press \'E\' to open personal journal.');
+        this.backgroundLayer.destroy();
+      }
+    }
+  }, {
     key: 'onCollisionEnter',
     value: function onCollisionEnter(bodyA, bodyB, shapeA, shapeB) {
       if (this.isItSensorArea(bodyA, shapeB)) {
-        this.pressToOpenTerminalText.setText('Press \'E\' to open personal journal.');
+        this.messageText.setText('Press \'E\' to open personal journal.');
+        bodyA.sprite.hasPlayerApproached = true;
       }
     }
   }, {
     key: 'onCollisionLeave',
     value: function onCollisionLeave(bodyA, bodyB, shapeA, shapeB) {
       if (this.isItSensorArea(bodyA, shapeB)) {
-        this.pressToOpenTerminalText.setText('');
+        this.messageText.setText('');
+        bodyA.sprite.hasPlayerApproached = false;
       }
     }
   }, {
@@ -2805,7 +2847,15 @@ var Game = function (_Phaser$State) {
       this.map = new _TileMap2.default(this.game, 'map', _TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT);
       this.zombies = new _ZombiesManager2.default(this.game, this.map.walls);
       this.player = new _Player2.default(this.game, 10 * _TileMapConstants.TILE_WIDTH + _TileMapConstants.TILE_WIDTH / 2, 2 * _TileMapConstants.TILE_HEIGHT + _TileMapConstants.TILE_HEIGHT / 2, 'player', _PlayerConstants.PLAYER_INITIAL_FRAME, this.zombies);
-      this.journals = new _JournalsManager2.default(this.game);
+
+      var style = { font: '24px Arial', fill: '#fff' };
+
+      this.messageText = this.game.add.text(0, 0, '', style);
+      this.messageText.x = 24;
+      this.messageText.y = this.game.height - 24 - 32;
+      this.messageText.fixedToCamera = true;
+
+      this.journals = new _JournalsManager2.default(this.game, this.messageText);
 
       this.playerCollisionGroup = this.game.physics.p2.createCollisionGroup(this.player);
       this.zombiesCollisionGroup = this.game.physics.p2.createCollisionGroup();
@@ -2975,6 +3025,7 @@ var Preload = function (_Phaser$State) {
       this.game.load.spritesheet('zombie', './assets/images/zombie-sheet.png', _ZombieConstants.ZOMBIE_WIDTH, _ZombieConstants.ZOMBIE_HEIGHT);
 
       this.game.load.image('computer', './assets/images/computer.png');
+      this.game.load.image('layer-background', './assets/images/bg-color.png');
     }
   }, {
     key: 'create',

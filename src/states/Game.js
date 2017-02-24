@@ -10,10 +10,19 @@ import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 
 export default class Game extends Phaser.State {
   create() {
+
     this.map = new TileMap( this.game, 'map', TILE_WIDTH, TILE_HEIGHT );
     this.zombies = new ZombiesManager( this.game, this.map.walls );
     this.player = new Player( this.game, 10 * TILE_WIDTH + TILE_WIDTH / 2, 2 * TILE_HEIGHT + TILE_HEIGHT / 2, 'player', PLAYER_INITIAL_FRAME, this.zombies );
-    this.journals = new JournalsManager( this.game );
+
+    const style = { font: '24px Arial', fill: '#fff' };
+
+    this.messageText = this.game.add.text( 0, 0, '', style );
+    this.messageText.x = 24;
+    this.messageText.y = this.game.height - 24 - 32;
+    this.messageText.fixedToCamera = true;
+
+    this.journals = new JournalsManager( this.game, this.messageText );
 
     this.playerCollisionGroup = this.game.physics.p2.createCollisionGroup( this.player );
     this.zombiesCollisionGroup = this.game.physics.p2.createCollisionGroup();

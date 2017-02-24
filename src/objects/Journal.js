@@ -26,5 +26,7 @@ export default class Journal extends Phaser.Sprite {
 
     const rectangleSensor = this.body.addRectangle( TILE_WIDTH, TILE_HEIGHT, sensorOffsetX, sensorOffsetY );
     rectangleSensor.sensor = true;
+
+    this.hasPlayerApproached = false;
   }
 }
