@@ -1,5 +1,3 @@
-import p2 from 'p2';
-
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 import { COMPUTER_WIDTH, COMPUTER_HEIGHT } from '../constants/ItemConstants';
 
@@ -17,18 +15,16 @@ export default class Journal extends Phaser.Sprite {
     this.game.physics.p2.enable( this );
     this.body.static = true;
 
+    let sensorOffsetX = ( TILE_WIDTH - COMPUTER_WIDTH ) / ( ( cornerX === 'WEST' ) ? 2 : -2 );
+    let sensorOffsetY = ( TILE_HEIGHT - COMPUTER_HEIGHT ) / ( ( cornerY === 'NORTH' ) ? 2 : -2 );
+
     if ( cornerY === 'SOUTH' ) {
       this.body.angle = 180;
+      sensorOffsetX += ( TILE_WIDTH - COMPUTER_WIDTH ) * ( ( sensorOffsetX < 0 ) ? 1 : -1 );
+      sensorOffsetY += ( TILE_HEIGHT - COMPUTER_HEIGHT ) * ( ( sensorOffsetY < 0 ) ? 1 : -1 );
     }
 
-    const pixelsToP2UnitsMultiplier = 1 / 20;
-
-    const rectangleSensor = new p2.Box( { width: TILE_WIDTH * pixelsToP2UnitsMultiplier, height: TILE_HEIGHT * pixelsToP2UnitsMultiplier } );
+    const rectangleSensor = this.body.addRectangle( TILE_WIDTH, TILE_HEIGHT, sensorOffsetX, sensorOffsetY );
     rectangleSensor.sensor = true;
-
-    const sensorOffsetX = ( TILE_WIDTH / 2 - COMPUTER_WIDTH ) * ( ( cornerX === 'WEST' ) ? 1 : -1 );
-    const sensorOffsetY = ( TILE_HEIGHT / 2 - COMPUTER_HEIGHT ) * ( ( cornerY === 'NORTH' ) ? 1 : -1 );
-
-    this.body.addShape( rectangleSensor, sensorOffsetX, sensorOffsetY );
   }
 }

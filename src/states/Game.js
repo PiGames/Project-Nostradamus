@@ -21,6 +21,7 @@ export default class Game extends Phaser.State {
     this.map.collides( [ this.playerCollisionGroup ] );
     this.player.body.collides( [ this.map.wallsCollisionGroup ] );
 
+
     // init zombies
     this.zombiesCollisionGroup = this.game.physics.p2.createCollisionGroup();
     for ( let i = 0; i < this.map.paths.length; i++ ) {
@@ -38,8 +39,9 @@ export default class Game extends Phaser.State {
     this.journalsCollisionGroup = this.game.physics.p2.createCollisionGroup();
 
     const journalsData = [ { x: 9, y: 1, cornerX: 'WEST', cornerY: 'NORTH' },
-     { x: 11, y: 1, cornerX: 'EAST', cornerY: 'NORTH' },
-     { x: 9, y: 3, cornerX: 'WEST', cornerY: 'SOUTH' } ];
+    { x: 22, y: 1, cornerX: 'EAST', cornerY: 'NORTH' },
+     { x: 9, y: 3, cornerX: 'WEST', cornerY: 'SOUTH' },
+     { x: 22, y: 3, cornerX: 'EAST', cornerY: 'SOUTH' } ];
 
     for ( let i = 0; i < journalsData.length; i++ ) {
       const newJournal = this.journals.add( new Journal( this.game, journalsData[ i ].x, journalsData[ i ].y, journalsData[ i ].cornerX, journalsData[ i ].cornerY, 'computer' ) );
@@ -50,8 +52,5 @@ export default class Game extends Phaser.State {
 
     this.player.body.onBeginContact.add( ( ...args ) => this.journals.onCollisionEnter( ...args ) );
     this.player.body.onEndContact.add( ( ...args ) => this.journals.onCollisionLeave( ...args ) );
-  }
-  update() {
-
   }
 }
