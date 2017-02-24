@@ -1791,6 +1791,9 @@ var JournalsManager = function (_Phaser$Group) {
   _createClass(JournalsManager, [{
     key: 'tryToShowJournal',
     value: function tryToShowJournal() {
+      if (this.isJournalOpened) {
+        return;
+      }
       var approachedJournals = this.children.filter(function (journal) {
         return journal.hasPlayerApproached;
       });

@@ -15,6 +15,9 @@ export default class JournalsManager extends Phaser.Group {
     this.isJournalOpened = false;
   }
   tryToShowJournal() {
+    if ( this.isJournalOpened ) {
+      return;
+    }
     const approachedJournals = this.children.filter( journal => journal.hasPlayerApproached );
     if ( approachedJournals.length > 0 ) {
       this.isJournalOpened = true;
