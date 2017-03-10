@@ -1,9 +1,10 @@
 import Entity from './Entity';
 import { PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, PLAYER_SNEAK_MULTIPLIER, PLAYER_SPRINT_MULTIPLIER, PLAYER_WALK_ANIMATION_FRAMERATE, PLAYER_FIGHT_ANIMATION_FRAMERATE, PLAYER_HAND_ATTACK_RANGE, PLAYER_HAND_ATTACK_ANGLE, PLAYER_HAND_ATTACK_DAMAGE } from '../constants/PlayerConstants';
+import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 
 export default class Player extends Entity {
   constructor( game, x, y, imageKey, frame, zombies ) {
-    super( game, x, y, imageKey, frame );
+    super( game, x + TILE_WIDTH / 2, y + TILE_HEIGHT / 2, imageKey, frame );
 
     this.width = PLAYER_WIDTH;
     this.height = PLAYER_HEIGHT;

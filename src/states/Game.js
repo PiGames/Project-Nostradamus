@@ -13,7 +13,8 @@ export default class Game extends Phaser.State {
 
     this.map = new TileMap( this.game, 'map', TILE_WIDTH, TILE_HEIGHT );
     this.zombies = new ZombiesManager( this.game, this.map.walls );
-    this.player = new Player( this.game, 10 * TILE_WIDTH + TILE_WIDTH / 2, 2 * TILE_HEIGHT + TILE_HEIGHT / 2, 'player', PLAYER_INITIAL_FRAME, this.zombies );
+    const playerPos = this.map.getPlayerInitialPosition();
+    this.player = new Player( this.game, playerPos.x, playerPos.y, 'player', PLAYER_INITIAL_FRAME, this.zombies );
 
     const style = { font: '24px Arial', fill: '#fff' };
 
