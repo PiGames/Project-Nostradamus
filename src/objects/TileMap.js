@@ -10,6 +10,7 @@ export default class TileMap extends Phaser.Tilemap {
     this.walls = this.createLayer( 'walls' );
 
     this.paths = [];
+    this.journals = [];
 
     this.setCollisionByExclusion( [], true, this.walls );
 
@@ -24,6 +25,7 @@ export default class TileMap extends Phaser.Tilemap {
     }
 
     this.createPathPoints();
+    this.createJournals();
   }
   collides( collisionGroup, callback ) {
     for ( const body of this.wallsBodiesArray ) {
@@ -41,6 +43,26 @@ export default class TileMap extends Phaser.Tilemap {
     } );
 
     this.normalizePaths();
+  }
+  createJournals() {
+    const allJournals = this.objects[ 'Journals' ];
+    allJournals.forEach( ( v ) => {
+      const props = v.properties;
+      console.log( v );
+      this.journals.push(
+        {
+          x: v.x,
+          y: v.y,
+          cornerX: props.cornerX,
+          cornerY: props.cornerY,
+          title: v.name,
+          content: props.content,
+        }
+      );
+    } );
+  }
+  getJournals() {
+    return this.journals;
   }
   normalizePaths() {
     this.paths.forEach( ( pathArr ) => {

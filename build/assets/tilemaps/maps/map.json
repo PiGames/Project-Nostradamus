@@ -24,7 +24,7 @@
         }, 
         {
          "draworder":"topdown",
-         "height":32,
+         "height":0,
          "name":"ZombiePaths",
          "objects":[
                 {
@@ -195,14 +195,128 @@
                  "x":576,
                  "y":576
                 }],
+         "offsetx":0,
+         "offsety":1,
          "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "width":0,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "height":32,
+         "name":"Journals",
+         "objects":[
+                {
+                 "height":64,
+                 "id":24,
+                 "name":"Test Journal #2",
+                 "properties":
+                    {
+                     "content":"ipsum",
+                     "cornerX":"WEST",
+                     "cornerY":"SOUTH"
+                    },
+                 "propertytypes":
+                    {
+                     "content":"string",
+                     "cornerX":"string",
+                     "cornerY":"string"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":576,
+                 "y":192
+                }, 
+                {
+                 "height":64,
+                 "id":26,
+                 "name":"Test Journal #1",
+                 "properties":
+                    {
+                     "content":"Lorem",
+                     "cornerX":"WEST",
+                     "cornerY":"NORTH"
+                    },
+                 "propertytypes":
+                    {
+                     "content":"string",
+                     "cornerX":"string",
+                     "cornerY":"string"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":576,
+                 "y":64
+                }, 
+                {
+                 "height":64,
+                 "id":27,
+                 "name":"Test Journal #4",
+                 "properties":
+                    {
+                     "content":"sit",
+                     "cornerX":"EAST",
+                     "cornerY":"SOUTH"
+                    },
+                 "propertytypes":
+                    {
+                     "content":"string",
+                     "cornerX":"string",
+                     "cornerY":"string"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":1408,
+                 "y":192
+                }, 
+                {
+                 "height":64,
+                 "id":28,
+                 "name":"Test Journal #3",
+                 "properties":
+                    {
+                     "content":"dolor",
+                     "cornerX":"EAST",
+                     "cornerY":"NORTH"
+                    },
+                 "propertytypes":
+                    {
+                     "content":"string",
+                     "cornerX":"string",
+                     "cornerY":"string"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":1408,
+                 "y":64
+                }],
+         "opacity":1,
+         "properties":
+            {
+             "journalTitle":"Test"
+            },
+         "propertytypes":
+            {
+             "journalTitle":"string"
+            },
          "type":"objectgroup",
          "visible":true,
          "width":32,
          "x":0,
          "y":0
         }],
- "nextobjectid":23,
+ "nextobjectid":29,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tileheight":64,
