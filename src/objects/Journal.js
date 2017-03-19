@@ -5,8 +5,10 @@ export default class Journal extends Phaser.Sprite {
   constructor( game, tileX, tileY, cornerX, cornerY, imageKey ) {
     const offsetX = ( cornerX === 'WEST' ) ? ( COMPUTER_WIDTH / 2 ) : TILE_WIDTH - ( COMPUTER_WIDTH / 2 );
     const offsetY = ( cornerY === 'NORTH' ) ? ( COMPUTER_HEIGHT / 2 ) : TILE_HEIGHT - ( COMPUTER_HEIGHT / 2 );
-    const x = tileX * TILE_WIDTH + offsetX;
-    const y = tileY * TILE_HEIGHT + offsetY;
+    // const x = tileX * TILE_WIDTH + offsetX;
+    // const y = tileY * TILE_HEIGHT + offsetY;
+    const x = tileX + offsetX;
+    const y = tileY + offsetY;
 
     super( game, x, y, imageKey );
 

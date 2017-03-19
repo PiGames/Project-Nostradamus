@@ -1700,8 +1700,10 @@ var Journal = function (_Phaser$Sprite) {
 
     var offsetX = cornerX === 'WEST' ? _ItemConstants.COMPUTER_WIDTH / 2 : _TileMapConstants.TILE_WIDTH - _ItemConstants.COMPUTER_WIDTH / 2;
     var offsetY = cornerY === 'NORTH' ? _ItemConstants.COMPUTER_HEIGHT / 2 : _TileMapConstants.TILE_HEIGHT - _ItemConstants.COMPUTER_HEIGHT / 2;
-    var x = tileX * _TileMapConstants.TILE_WIDTH + offsetX;
-    var y = tileY * _TileMapConstants.TILE_HEIGHT + offsetY;
+    // const x = tileX * TILE_WIDTH + offsetX;
+    // const y = tileY * TILE_HEIGHT + offsetY;
+    var x = tileX + offsetX;
+    var y = tileY + offsetY;
 
     var _this = _possibleConstructorReturn(this, (Journal.__proto__ || Object.getPrototypeOf(Journal)).call(this, game, x, y, imageKey));
 
@@ -1938,6 +1940,8 @@ var _Entity3 = _interopRequireDefault(_Entity2);
 
 var _PlayerConstants = require('../constants/PlayerConstants');
 
+var _TileMapConstants = require('../constants/TileMapConstants');
+
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : { default: obj };
 }
@@ -1966,7 +1970,7 @@ var Player = function (_Entity) {
   function Player(game, x, y, imageKey, frame, zombies) {
     _classCallCheck(this, Player);
 
-    var _this = _possibleConstructorReturn(this, (Player.__proto__ || Object.getPrototypeOf(Player)).call(this, game, x, y, imageKey, frame));
+    var _this = _possibleConstructorReturn(this, (Player.__proto__ || Object.getPrototypeOf(Player)).call(this, game, x + _TileMapConstants.TILE_WIDTH / 2, y + _TileMapConstants.TILE_HEIGHT / 2, imageKey, frame));
 
     _this.width = _PlayerConstants.PLAYER_WIDTH;
     _this.height = _PlayerConstants.PLAYER_HEIGHT;
@@ -2140,7 +2144,7 @@ var Player = function (_Entity) {
 
 exports.default = Player;
 
-},{"../constants/PlayerConstants":8,"./Entity":13}],19:[function(require,module,exports){
+},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"./Entity":13}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2191,6 +2195,7 @@ var TileMap = function (_Phaser$Tilemap) {
     _this.walls = _this.createLayer('walls');
 
     _this.paths = [];
+    _this.journals = [];
 
     _this.setCollisionByExclusion([], true, _this.walls);
 
@@ -2272,6 +2277,36 @@ var TileMap = function (_Phaser$Tilemap) {
       });
 
       this.normalizePaths();
+    }
+  }, {
+    key: 'getJournals',
+    value: function getJournals() {
+      var allJournals = this.objects['Journals'];
+      var journals = [];
+      allJournals.forEach(function (v) {
+        var props = v.properties;
+        console.log(v);
+        journals.push({
+          x: v.x,
+          y: v.y,
+          cornerX: props.cornerX,
+          cornerY: props.cornerY,
+          title: v.name,
+          content: props.content
+        });
+      });
+
+      return journals;
+    }
+  }, {
+    key: 'getPlayerInitialPosition',
+    value: function getPlayerInitialPosition() {
+      var player = this.objects['PlayerPos'][0];
+      var posObj = {
+        x: player.x,
+        y: player.y
+      };
+      return posObj;
     }
   }, {
     key: 'normalizePaths',
@@ -2852,7 +2887,8 @@ var Game = function (_Phaser$State) {
 
       this.map = new _TileMap2.default(this.game, 'map', _TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT);
       this.zombies = new _ZombiesManager2.default(this.game, this.map.walls);
-      this.player = new _Player2.default(this.game, 10 * _TileMapConstants.TILE_WIDTH + _TileMapConstants.TILE_WIDTH / 2, 2 * _TileMapConstants.TILE_HEIGHT + _TileMapConstants.TILE_HEIGHT / 2, 'player', _PlayerConstants.PLAYER_INITIAL_FRAME, this.zombies);
+      var playerPos = this.map.getPlayerInitialPosition();
+      this.player = new _Player2.default(this.game, playerPos.x, playerPos.y, 'player', _PlayerConstants.PLAYER_INITIAL_FRAME, this.zombies);
 
       var style = { font: '24px Arial', fill: '#fff' };
 
@@ -2890,7 +2926,11 @@ var Game = function (_Phaser$State) {
       this.map.collides([this.zombiesCollisionGroup]);
 
       // init journals
-      var journalsData = [{ x: 9, y: 1, cornerX: 'WEST', cornerY: 'NORTH' }, { x: 22, y: 1, cornerX: 'EAST', cornerY: 'NORTH' }, { x: 9, y: 3, cornerX: 'WEST', cornerY: 'SOUTH' }, { x: 22, y: 3, cornerX: 'EAST', cornerY: 'SOUTH' }];
+      var journalsData = this.map.getJournals();
+      // const journalsData = [ { x: 9, y: 1, cornerX: 'WEST', cornerY: 'NORTH' },
+      // { x: 22, y: 1, cornerX: 'WEST', cornerY: 'NORTH' },
+      //  { x: 9, y: 3, cornerX: 'WEST', cornerY: 'SOUTH' },
+      //  { x: 22, y: 3, cornerX: 'EAST', cornerY: 'SOUTH' } ];
 
       for (var _i = 0; _i < journalsData.length; _i++) {
         var newJournal = this.journals.add(new _Journal2.default(this.game, journalsData[_i].x, journalsData[_i].y, journalsData[_i].cornerX, journalsData[_i].cornerY, 'computer'));

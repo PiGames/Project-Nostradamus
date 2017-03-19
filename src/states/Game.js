@@ -13,7 +13,8 @@ export default class Game extends Phaser.State {
 
     this.map = new TileMap( this.game, 'map', TILE_WIDTH, TILE_HEIGHT );
     this.zombies = new ZombiesManager( this.game, this.map.walls );
-    this.player = new Player( this.game, 10 * TILE_WIDTH + TILE_WIDTH / 2, 2 * TILE_HEIGHT + TILE_HEIGHT / 2, 'player', PLAYER_INITIAL_FRAME, this.zombies );
+    const playerPos = this.map.getPlayerInitialPosition();
+    this.player = new Player( this.game, playerPos.x, playerPos.y, 'player', PLAYER_INITIAL_FRAME, this.zombies );
 
     const style = { font: '24px Arial', fill: '#fff' };
 
@@ -47,10 +48,11 @@ export default class Game extends Phaser.State {
     this.map.collides( [ this.zombiesCollisionGroup ] );
 
     // init journals
-    const journalsData = [ { x: 9, y: 1, cornerX: 'WEST', cornerY: 'NORTH' },
-    { x: 22, y: 1, cornerX: 'EAST', cornerY: 'NORTH' },
-     { x: 9, y: 3, cornerX: 'WEST', cornerY: 'SOUTH' },
-     { x: 22, y: 3, cornerX: 'EAST', cornerY: 'SOUTH' } ];
+    const journalsData = this.map.getJournals();
+    // const journalsData = [ { x: 9, y: 1, cornerX: 'WEST', cornerY: 'NORTH' },
+    // { x: 22, y: 1, cornerX: 'WEST', cornerY: 'NORTH' },
+    //  { x: 9, y: 3, cornerX: 'WEST', cornerY: 'SOUTH' },
+    //  { x: 22, y: 3, cornerX: 'EAST', cornerY: 'SOUTH' } ];
 
     for ( let i = 0; i < journalsData.length; i++ ) {
       const newJournal = this.journals.add( new Journal( this.game, journalsData[ i ].x, journalsData[ i ].y, journalsData[ i ].cornerX, journalsData[ i ].cornerY, 'computer' ) );
