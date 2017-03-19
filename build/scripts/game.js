@@ -1021,6 +1021,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 var COMPUTER_WIDTH = exports.COMPUTER_WIDTH = 32;
 var COMPUTER_HEIGHT = exports.COMPUTER_HEIGHT = 39;
+var JOURNAL_TEXT_FIELD_WIDTH = exports.JOURNAL_TEXT_FIELD_WIDTH = 544;
+var JOURNAL_TEXT_FIELD_HEIGHT = exports.JOURNAL_TEXT_FIELD_HEIGHT = 344;
 
 },{}],8:[function(require,module,exports){
 "use strict";
@@ -1700,8 +1702,7 @@ var Journal = function (_Phaser$Sprite) {
 
     var offsetX = cornerX === 'WEST' ? _ItemConstants.COMPUTER_WIDTH / 2 : _TileMapConstants.TILE_WIDTH - _ItemConstants.COMPUTER_WIDTH / 2;
     var offsetY = cornerY === 'NORTH' ? _ItemConstants.COMPUTER_HEIGHT / 2 : _TileMapConstants.TILE_HEIGHT - _ItemConstants.COMPUTER_HEIGHT / 2;
-    // const x = tileX * TILE_WIDTH + offsetX;
-    // const y = tileY * TILE_HEIGHT + offsetY;
+
     var x = tileX + offsetX;
     var y = tileY + offsetY;
 
@@ -1749,6 +1750,8 @@ var _createClass = function () {
     if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
   };
 }();
+
+var _ItemConstants = require('../constants/ItemConstants');
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -1809,12 +1812,28 @@ var JournalsManager = function (_Phaser$Group) {
   }, {
     key: 'showJournal',
     value: function showJournal() {
-      console.log(this.game.camera);
-      this.backgroundLayer = this.game.add.sprite(this.game.camera.x + this.game.camera.width / 2, this.game.camera.y + this.game.camera.height / 2, 'layer-background');
+      var screenCenterX = this.game.camera.x + this.game.camera.width / 2;
+      var screenCenterY = this.game.camera.y + this.game.camera.height / 2;
+      this.backgroundLayer = this.game.add.sprite(screenCenterX, screenCenterY, 'layer-background');
       this.backgroundLayer.width = this.game.width + 100;
       this.backgroundLayer.height = this.game.height + 100;
       this.backgroundLayer.anchor.setTo(0.5);
-      this.backgroundLayer.alpha = 0.4;
+      this.backgroundLayer.alpha = 0.2;
+
+      this.ui = this.game.add.sprite(screenCenterX, screenCenterY, 'journal-ui');
+      this.ui.anchor.setTo(0.5);
+
+      var textStyle = {
+        align: 'left',
+        fill: '#10aede',
+        font: 'bold 16px Arial'
+      };
+
+      // TODO make text an internal property of journal object
+      this.uiText = this.game.add.text(screenCenterX, screenCenterY, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis tristique libero, in facilisis libero elementum ac. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis blandit leo mauris, sit amet facilisis augue interdum non. Aliquam imperdiet sapien quis ante consequat tempor. Sed lectus purus, rhoncus a justo quis, tempor ullamcorper dui. Vivamus tortor nulla, ultricies quis leo et, interdum scelerisque lectus. Donec ornare volutpat nisl ac placerat. Curabitur efficitur elementum augue, a vehicula est convallis vitae. Suspendisse ut fermentum odio, vel tempor dui. Praesent id fermentum lorem. Etiam gravida risus ante, eget ornare libero luctus vel. Quisque sed mattis ex, id bibendum enim. Morbi vitae nulla eget ante egestas posuere.', textStyle);
+      this.uiText.wordWrap = true;
+      this.uiText.wordWrapWidth = _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH;
+      this.uiText.setTextBounds(-_ItemConstants.JOURNAL_TEXT_FIELD_WIDTH / 2, -_ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT / 2, _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH, _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT);
     }
   }, {
     key: 'tryToHideJournal',
@@ -1824,6 +1843,8 @@ var JournalsManager = function (_Phaser$Group) {
         this.game.paused = false;
         this.messageText.setText('Press \'E\' to open personal journal.');
         this.backgroundLayer.destroy();
+        this.ui.destroy();
+        this.uiText.destroy();
       }
     }
   }, {
@@ -1859,7 +1880,7 @@ var JournalsManager = function (_Phaser$Group) {
 
 exports.default = JournalsManager;
 
-},{}],17:[function(require,module,exports){
+},{"../constants/ItemConstants":7}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3075,6 +3096,7 @@ var Preload = function (_Phaser$State) {
 
       this.game.load.image('computer', './assets/images/computer.png');
       this.game.load.image('layer-background', './assets/images/bg-color.png');
+      this.game.load.image('journal-ui', './assets/images/journal-ui.png');
     }
   }, {
     key: 'create',
