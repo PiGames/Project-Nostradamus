@@ -1028,13 +1028,13 @@ var COMPUTER_HEIGHT = exports.COMPUTER_HEIGHT = 39;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var PLAYER_WIDTH = exports.PLAYER_WIDTH = 30;
-var PLAYER_HEIGHT = exports.PLAYER_HEIGHT = 24;
+var PLAYER_WIDTH = exports.PLAYER_WIDTH = 29;
+var PLAYER_HEIGHT = exports.PLAYER_HEIGHT = 31;
 var PLAYER_INITIAL_FRAME = exports.PLAYER_INITIAL_FRAME = 1;
 var PLAYER_SPEED = exports.PLAYER_SPEED = 120;
 var PLAYER_SNEAK_MULTIPLIER = exports.PLAYER_SNEAK_MULTIPLIER = 0.25;
 var PLAYER_SPRINT_MULTIPLIER = exports.PLAYER_SPRINT_MULTIPLIER = 1.5;
-var PLAYER_WALK_ANIMATION_FRAMERATE = exports.PLAYER_WALK_ANIMATION_FRAMERATE = 5;
+var PLAYER_WALK_ANIMATION_FRAMERATE = exports.PLAYER_WALK_ANIMATION_FRAMERATE = 7;
 var PLAYER_FIGHT_ANIMATION_FRAMERATE = exports.PLAYER_FIGHT_ANIMATION_FRAMERATE = 10;
 var PLAYER_HAND_ATTACK_RANGE = exports.PLAYER_HAND_ATTACK_RANGE = 50;
 var PLAYER_HAND_ATTACK_ANGLE = exports.PLAYER_HAND_ATTACK_ANGLE = 60;
@@ -2011,8 +2011,8 @@ var Player = function (_Entity) {
     _this.sprintText.y = _this.game.height - (_this.sprintText.height + 24 + 32 + _this.sneakText.height);
     _this.sprintText.fixedToCamera = true;
 
-    _this.animations.add('walk', [1, 2, 1, 0], 1);
-    _this.animations.add('fight', [3, 5, 4], 3);
+    _this.animations.add('walk', [0, 1, 2, 3, 4, 5]);
+    _this.animations.add('fight', [6, 7, 8, 9, 0]);
 
     _this.body.clearShapes();
     _this.body.addCircle(Math.min(_PlayerConstants.PLAYER_WIDTH, _PlayerConstants.PLAYER_HEIGHT));
@@ -2084,13 +2084,13 @@ var Player = function (_Entity) {
   }, {
     key: 'handleAnimation',
     value: function handleAnimation() {
-      if (this.body.velocity.x !== 0 || this.body.velocity.y !== 0) {
+      if (this.game.input.activePointer.leftButton.isDown) {
+        this.animations.play('fight', _PlayerConstants.PLAYER_FIGHT_ANIMATION_FRAMERATE, false);
+      }
+      if ((this.body.velocity.x !== 0 || this.body.velocity.y !== 0) && !this.animations.getAnimation('fight').isPlaying) {
         this.animations.play('walk', _PlayerConstants.PLAYER_WALK_ANIMATION_FRAMERATE, true);
       } else {
         this.animations.stop('walk', true);
-      }
-      if (this.game.input.activePointer.leftButton.isDown) {
-        this.animations.play('fight', _PlayerConstants.PLAYER_FIGHT_ANIMATION_FRAMERATE, false);
       }
     }
   }, {

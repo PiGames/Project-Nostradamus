@@ -45,8 +45,8 @@ export default class Player extends Entity {
     this.sprintText.y = this.game.height - ( this.sprintText.height + 24 + 32 + this.sneakText.height );
     this.sprintText.fixedToCamera = true;
 
-    this.animations.add( 'walk', [ 1, 2, 1, 0 ], 1 );
-    this.animations.add( 'fight', [ 3, 5, 4 ], 3 );
+    this.animations.add( 'walk', [ 0, 1, 2, 3, 4, 5 ] );
+    this.animations.add( 'fight', [ 6, 7, 8, 9, 0 ] );
 
     this.body.clearShapes();
     this.body.addCircle( Math.min( PLAYER_WIDTH, PLAYER_HEIGHT ) );
@@ -109,13 +109,13 @@ export default class Player extends Entity {
     this.body.velocity.y *= specialEffectMultiplier;
   }
   handleAnimation() {
-    if ( this.body.velocity.x !== 0 || this.body.velocity.y !== 0 ) {
+    if ( this.game.input.activePointer.leftButton.isDown ) {
+      this.animations.play( 'fight', PLAYER_FIGHT_ANIMATION_FRAMERATE, false );
+    }
+    if ( ( this.body.velocity.x !== 0 || this.body.velocity.y !== 0 ) && !this.animations.getAnimation( 'fight' ).isPlaying ) {
       this.animations.play( 'walk', PLAYER_WALK_ANIMATION_FRAMERATE, true );
     } else {
       this.animations.stop( 'walk', true );
-    }
-    if ( this.game.input.activePointer.leftButton.isDown ) {
-      this.animations.play( 'fight', PLAYER_FIGHT_ANIMATION_FRAMERATE, false );
     }
   }
 
