@@ -1057,13 +1057,13 @@ var MAP_HEIGHT = exports.MAP_HEIGHT = 32;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var ZOMBIE_WIDTH = exports.ZOMBIE_WIDTH = 30;
-var ZOMBIE_HEIGHT = exports.ZOMBIE_HEIGHT = 24;
+var ZOMBIE_WIDTH = exports.ZOMBIE_WIDTH = 36;
+var ZOMBIE_HEIGHT = exports.ZOMBIE_HEIGHT = 36;
 var ZOMBIE_INITIAL_FRAME = exports.ZOMBIE_INITIAL_FRAME = 1;
 var ZOMBIE_SPEED = exports.ZOMBIE_SPEED = 50;
 var ZOMBIE_SPEED_CHASING_MULTIPLIER = exports.ZOMBIE_SPEED_CHASING_MULTIPLIER = 2;
 var ZOMBIE_LOOKING_OFFSET = exports.ZOMBIE_LOOKING_OFFSET = 10;
-var ZOMBIE_WALK_ANIMATION_FRAMERATE = exports.ZOMBIE_WALK_ANIMATION_FRAMERATE = 5;
+var ZOMBIE_WALK_ANIMATION_FRAMERATE = exports.ZOMBIE_WALK_ANIMATION_FRAMERATE = 6;
 var ZOMBIE_FIGHT_ANIMATION_FRAMERATE = exports.ZOMBIE_FIGHT_ANIMATION_FRAMERATE = 10;
 var MIN_DISTANCE_TO_TARGET = exports.MIN_DISTANCE_TO_TARGET = 10;
 var ZOMBIE_SIGHT_ANGLE = exports.ZOMBIE_SIGHT_ANGLE = 45;
@@ -2546,6 +2546,9 @@ var Zombie = function (_EntityWalkingOnPath) {
     _this.canDealDamage = true;
 
     _this.damageTaken = _ZombieConstants.ZOMBIE_DAMAGE_TAKEN;
+
+    _this.animations.add('walk', [0, 1, 2, 3, 4, 5], 0);
+    _this.animations.play('walk', _ZombieConstants.ZOMBIE_WALK_ANIMATION_FRAMERATE, true);
     return _this;
   }
 

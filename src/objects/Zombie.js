@@ -1,5 +1,5 @@
 import EntityWalkingOnPath from './EntityWalkingOnPath';
-import { ZOMBIE_SPEED, MIN_DISTANCE_TO_TARGET, ZOMBIE_SPEED_CHASING_MULTIPLIER, ZOMBIE_SIGHT_ANGLE, ZOMBIE_SIGHT_RANGE, ZOMBIE_HEARING_RANGE, ZOMBIE_DAMAGE_TAKEN, ZOMBIE_DAMAGE_COOLDOWN, ZOMBIE_DAMAGE_MULTIPLIER } from '../constants/ZombieConstants';
+import { ZOMBIE_SPEED, MIN_DISTANCE_TO_TARGET, ZOMBIE_SPEED_CHASING_MULTIPLIER, ZOMBIE_SIGHT_ANGLE, ZOMBIE_SIGHT_RANGE, ZOMBIE_HEARING_RANGE, ZOMBIE_DAMAGE_TAKEN, ZOMBIE_DAMAGE_COOLDOWN, ZOMBIE_DAMAGE_MULTIPLIER, ZOMBIE_WALK_ANIMATION_FRAMERATE } from '../constants/ZombieConstants';
 import { pixelsToTile } from '../utils/MapUtils.js';
 
 export default class Zombie extends EntityWalkingOnPath {
@@ -15,6 +15,9 @@ export default class Zombie extends EntityWalkingOnPath {
     this.canDealDamage = true;
 
     this.damageTaken = ZOMBIE_DAMAGE_TAKEN;
+
+    this.animations.add( 'walk', [ 0, 1, 2, 3, 4, 5 ], 0 );
+    this.animations.play( 'walk', ZOMBIE_WALK_ANIMATION_FRAMERATE, true );
   }
   update() {
     if ( this.canSeePlayer() ) {
