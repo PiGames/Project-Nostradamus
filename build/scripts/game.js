@@ -2583,6 +2583,7 @@ var Zombie = function (_EntityWalkingOnPath) {
     _this.damageTaken = _ZombieConstants.ZOMBIE_DAMAGE_TAKEN;
 
     _this.animations.add('walk', [0, 1, 2, 3, 4, 5], 0);
+    _this.animations.add('attack', [6, 7, 8, 9], 6);
     _this.animations.play('walk', _ZombieConstants.ZOMBIE_WALK_ANIMATION_FRAMERATE, true);
     return _this;
   }
@@ -2593,8 +2594,8 @@ var Zombie = function (_EntityWalkingOnPath) {
       if (this.canSeePlayer()) {
         this.isChasing = true;
         this.lastKnownPlayerPosition = { x: this.player.x, y: this.player.y };
-        if (this.alive) {
-          this.dealDamage();
+        if (this.shouldAttack()) {
+          this.handleAttack();
         }
       }
 
@@ -2635,18 +2636,6 @@ var Zombie = function (_EntityWalkingOnPath) {
       }
     }
   }, {
-    key: 'dealDamage',
-    value: function dealDamage() {
-      if (this.canDealDamage) {
-        var distanceToPlayer = this.game.physics.arcade.distanceBetween(this, this.player);
-        if (distanceToPlayer < 50) {
-          this.player.takeDamage(0.1);
-          this.canDealDamage = false;
-          this.game.time.events.add(Phaser.Timer.SECOND * _ZombieConstants.ZOMBIE_DAMAGE_COOLDOWN, this.endCooldown, this);
-        }
-      }
-    }
-  }, {
     key: 'takeDamage',
     value: function takeDamage(damage) {
       this.damage(damage * _ZombieConstants.ZOMBIE_DAMAGE_MULTIPLIER);
@@ -2663,6 +2652,20 @@ var Zombie = function (_EntityWalkingOnPath) {
       this.body.velocity.y = 0;
       this.isChasing = false;
       this.changePathToTemporary((0, _MapUtils.pixelsToTile)(this));
+    }
+  }, {
+    key: 'shouldAttack',
+    value: function shouldAttack() {
+      return this.alive && this.canDealDamage && this.game.physics.arcade.distanceBetween(this, this.player) < 50;
+    }
+  }, {
+    key: 'handleAttack',
+    value: function handleAttack() {
+      this.animations.play('attack', _ZombieConstants.ZOMBIE_FIGHT_ANIMATION_FRAMERATE, false);
+      this.player.takeDamage(0.1);
+      this.canDealDamage = false;
+      this.game.time.events.add(Phaser.Timer.SECOND * _ZombieConstants.ZOMBIE_DAMAGE_COOLDOWN, this.endCooldown, this);
+      this.game.camera.shake(0.005, 100, false);
     }
   }]);
 
