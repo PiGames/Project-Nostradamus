@@ -59,7 +59,6 @@ export default class Player extends Entity {
     this.handleAnimation();
     this.lookAtMouse();
     this.handleAttack();
-    // console.log( this.zombies.children );
   }
   handleMovement() {
     this.resetVelocity();

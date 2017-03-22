@@ -49,10 +49,8 @@ export default class Game extends Phaser.State {
 
     // init journals
     const journalsData = this.map.getJournals();
-    // const journalsData = [ { x: 9, y: 1, cornerX: 'WEST', cornerY: 'NORTH' },
-    // { x: 22, y: 1, cornerX: 'WEST', cornerY: 'NORTH' },
-    //  { x: 9, y: 3, cornerX: 'WEST', cornerY: 'SOUTH' },
-    //  { x: 22, y: 3, cornerX: 'EAST', cornerY: 'SOUTH' } ];
+
+    this.game.input.mouse.mouseWheelCallback = () => this.journals.onMouseWheel();
 
     for ( let i = 0; i < journalsData.length; i++ ) {
       const newJournal = this.journals.add( new Journal( this.game, journalsData[ i ].x, journalsData[ i ].y, journalsData[ i ].cornerX, journalsData[ i ].cornerY, 'computer' ) );

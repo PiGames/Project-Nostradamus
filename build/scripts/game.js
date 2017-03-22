@@ -1023,6 +1023,8 @@ var COMPUTER_WIDTH = exports.COMPUTER_WIDTH = 32;
 var COMPUTER_HEIGHT = exports.COMPUTER_HEIGHT = 39;
 var JOURNAL_TEXT_FIELD_WIDTH = exports.JOURNAL_TEXT_FIELD_WIDTH = 544;
 var JOURNAL_TEXT_FIELD_HEIGHT = exports.JOURNAL_TEXT_FIELD_HEIGHT = 344;
+var JOURNAL_TEXT_SCROLL_STEP = exports.JOURNAL_TEXT_SCROLL_STEP = 32;
+var JOURNAL_TEXT_FONT_SIZE = exports.JOURNAL_TEXT_FONT_SIZE = 16;
 
 },{}],8:[function(require,module,exports){
 "use strict";
@@ -1814,6 +1816,7 @@ var JournalsManager = function (_Phaser$Group) {
     value: function showJournal() {
       var screenCenterX = this.game.camera.x + this.game.camera.width / 2;
       var screenCenterY = this.game.camera.y + this.game.camera.height / 2;
+
       this.backgroundLayer = this.game.add.sprite(screenCenterX, screenCenterY, 'layer-background');
       this.backgroundLayer.width = this.game.width + 100;
       this.backgroundLayer.height = this.game.height + 100;
@@ -1826,14 +1829,20 @@ var JournalsManager = function (_Phaser$Group) {
       var textStyle = {
         align: 'left',
         fill: '#10aede',
-        font: 'bold 16px Arial'
+        font: 'bold ' + _ItemConstants.JOURNAL_TEXT_FONT_SIZE + 'px Arial'
       };
 
       // TODO make text an internal property of journal object
-      this.uiText = this.game.add.text(screenCenterX, screenCenterY, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis tristique libero, in facilisis libero elementum ac. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis blandit leo mauris, sit amet facilisis augue interdum non. Aliquam imperdiet sapien quis ante consequat tempor. Sed lectus purus, rhoncus a justo quis, tempor ullamcorper dui. Vivamus tortor nulla, ultricies quis leo et, interdum scelerisque lectus. Donec ornare volutpat nisl ac placerat. Curabitur efficitur elementum augue, a vehicula est convallis vitae. Suspendisse ut fermentum odio, vel tempor dui. Praesent id fermentum lorem. Etiam gravida risus ante, eget ornare libero luctus vel. Quisque sed mattis ex, id bibendum enim. Morbi vitae nulla eget ante egestas posuere.', textStyle);
+      this.uiText = this.game.add.text(screenCenterX, screenCenterY, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis tristique libero, in facilisis libero elementum ac. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis blandit leo mauris, sit amet facilisis augue interdum non. Aliquam imperdiet sapien quis ante consequat tempor. Sed lectus purus, rhoncus a justo quis, tempor ullamcorper dui. Vivamus tortor nulla, ultricies quis leo et, interdum scelerisque lectus. Donec ornare volutpat nisl ac placerat. Curabitur efficitur elementum augue, a vehicula est convallis vitae. Suspendisse ut fermentum odio, vel tempor dui. Praesent id fermentum lorem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis tristique libero, in facilisis libero elementum ac. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis blandit leo mauris, sit amet facilisis augue interdum non. Aliquam imperdiet sapien quis ante consequat tempor. Sed lectus purus, rhoncus a justo quis, tempor ullamcorper dui. Vivamus tortor nulla, ultricies quis leo et, interdum scelerisque lectus. Donec ornare volutpat nisl ac placerat. Curabitur efficitur elementum augue, a vehicula est convallis vitae. Suspendisse ut fermentum odio, vel tempor dui. Praesent id fermentum lorem. Etiam gravida risus ante, eget ornare libero luctus vel. QuisqueEtiam gravida risus ante, eget ornare libero luctus vel. Quisque sed mattis ex, id bibendum enim. Morbi vitae nulla eget ante egestas posuere.', textStyle);
       this.uiText.wordWrap = true;
       this.uiText.wordWrapWidth = _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH;
       this.uiText.setTextBounds(-_ItemConstants.JOURNAL_TEXT_FIELD_WIDTH / 2, -_ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT / 2, _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH, _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT);
+
+      this.maskGraphics = this.game.add.graphics(0, 0);
+      this.maskGraphics.beginFill(0xffffff);
+      this.maskGraphics.drawRect(screenCenterX - _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH / 2, screenCenterY - _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT / 2, _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH, _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT);
+
+      this.uiText.mask = this.maskGraphics;
     }
   }, {
     key: 'tryToHideJournal',
@@ -1845,6 +1854,7 @@ var JournalsManager = function (_Phaser$Group) {
         this.backgroundLayer.destroy();
         this.ui.destroy();
         this.uiText.destroy();
+        this.maskGraphics.destroy();
       }
     }
   }, {
@@ -1872,6 +1882,20 @@ var JournalsManager = function (_Phaser$Group) {
       // for now this line assume that there is only one type of computer's textures
       // TODO enable different sprite key's handling
       return body.sprite.key === 'computer' && shape.sensor;
+    }
+  }, {
+    key: 'onMouseWheel',
+    value: function onMouseWheel() {
+      if (this.isJournalOpened === false) {
+        return;
+      }
+
+      var directionY = this.game.input.mouse.wheelDelta;
+      if (directionY === 1 && !(this.uiText.y >= this.game.camera.y + this.game.camera.height / 2)) {
+        this.uiText.y += _ItemConstants.JOURNAL_TEXT_SCROLL_STEP;
+      } else if (directionY === -1 && !(this.uiText.y <= this.game.camera.y + this.game.camera.height / 2 + _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT - this.uiText.height)) {
+        this.uiText.y -= _ItemConstants.JOURNAL_TEXT_SCROLL_STEP;
+      }
     }
   }]);
 
@@ -2049,7 +2073,6 @@ var Player = function (_Entity) {
       this.handleAnimation();
       this.lookAtMouse();
       this.handleAttack();
-      // console.log( this.zombies.children );
     }
   }, {
     key: 'handleMovement',
@@ -2306,7 +2329,6 @@ var TileMap = function (_Phaser$Tilemap) {
       var journals = [];
       allJournals.forEach(function (v) {
         var props = v.properties;
-        console.log(v);
         journals.push({
           x: v.x,
           y: v.y,
@@ -2951,10 +2973,10 @@ var Game = function (_Phaser$State) {
 
       // init journals
       var journalsData = this.map.getJournals();
-      // const journalsData = [ { x: 9, y: 1, cornerX: 'WEST', cornerY: 'NORTH' },
-      // { x: 22, y: 1, cornerX: 'WEST', cornerY: 'NORTH' },
-      //  { x: 9, y: 3, cornerX: 'WEST', cornerY: 'SOUTH' },
-      //  { x: 22, y: 3, cornerX: 'EAST', cornerY: 'SOUTH' } ];
+
+      this.game.input.mouse.mouseWheelCallback = function () {
+        return _this2.journals.onMouseWheel();
+      };
 
       for (var _i = 0; _i < journalsData.length; _i++) {
         var newJournal = this.journals.add(new _Journal2.default(this.game, journalsData[_i].x, journalsData[_i].y, journalsData[_i].cornerX, journalsData[_i].cornerY, 'computer'));

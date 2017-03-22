@@ -48,7 +48,6 @@ export default class TileMap extends Phaser.Tilemap {
     const journals = [];
     allJournals.forEach( ( v ) => {
       const props = v.properties;
-      console.log( v );
       journals.push(
         {
           x: v.x,

@@ -1,4 +1,4 @@
-import { JOURNAL_TEXT_FIELD_WIDTH, JOURNAL_TEXT_FIELD_HEIGHT } from '../constants/ItemConstants';
+import { JOURNAL_TEXT_FIELD_WIDTH, JOURNAL_TEXT_FIELD_HEIGHT, JOURNAL_TEXT_SCROLL_STEP, JOURNAL_TEXT_FONT_SIZE } from '../constants/ItemConstants';
 
 export default class JournalsManager extends Phaser.Group {
   constructor( game, messageText ) {
@@ -31,6 +31,7 @@ export default class JournalsManager extends Phaser.Group {
   showJournal( ) {
     const screenCenterX = this.game.camera.x + this.game.camera.width / 2;
     const screenCenterY = this.game.camera.y + this.game.camera.height / 2;
+
     this.backgroundLayer = this.game.add.sprite( screenCenterX, screenCenterY, 'layer-background' );
     this.backgroundLayer.width = this.game.width + 100;
     this.backgroundLayer.height = this.game.height + 100;
@@ -43,16 +44,22 @@ export default class JournalsManager extends Phaser.Group {
     const textStyle = {
       align: 'left',
       fill: '#10aede',
-      font: 'bold 16px Arial',
+      font: `bold ${JOURNAL_TEXT_FONT_SIZE}px Arial`,
     };
 
     // TODO make text an internal property of journal object
     this.uiText = this.game.add.text( screenCenterX, screenCenterY,
-       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis tristique libero, in facilisis libero elementum ac. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis blandit leo mauris, sit amet facilisis augue interdum non. Aliquam imperdiet sapien quis ante consequat tempor. Sed lectus purus, rhoncus a justo quis, tempor ullamcorper dui. Vivamus tortor nulla, ultricies quis leo et, interdum scelerisque lectus. Donec ornare volutpat nisl ac placerat. Curabitur efficitur elementum augue, a vehicula est convallis vitae. Suspendisse ut fermentum odio, vel tempor dui. Praesent id fermentum lorem. Etiam gravida risus ante, eget ornare libero luctus vel. Quisque sed mattis ex, id bibendum enim. Morbi vitae nulla eget ante egestas posuere.'
+       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis tristique libero, in facilisis libero elementum ac. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis blandit leo mauris, sit amet facilisis augue interdum non. Aliquam imperdiet sapien quis ante consequat tempor. Sed lectus purus, rhoncus a justo quis, tempor ullamcorper dui. Vivamus tortor nulla, ultricies quis leo et, interdum scelerisque lectus. Donec ornare volutpat nisl ac placerat. Curabitur efficitur elementum augue, a vehicula est convallis vitae. Suspendisse ut fermentum odio, vel tempor dui. Praesent id fermentum lorem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis tristique libero, in facilisis libero elementum ac. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis blandit leo mauris, sit amet facilisis augue interdum non. Aliquam imperdiet sapien quis ante consequat tempor. Sed lectus purus, rhoncus a justo quis, tempor ullamcorper dui. Vivamus tortor nulla, ultricies quis leo et, interdum scelerisque lectus. Donec ornare volutpat nisl ac placerat. Curabitur efficitur elementum augue, a vehicula est convallis vitae. Suspendisse ut fermentum odio, vel tempor dui. Praesent id fermentum lorem. Etiam gravida risus ante, eget ornare libero luctus vel. QuisqueEtiam gravida risus ante, eget ornare libero luctus vel. Quisque sed mattis ex, id bibendum enim. Morbi vitae nulla eget ante egestas posuere.'
     , textStyle );
     this.uiText.wordWrap = true;
     this.uiText.wordWrapWidth = JOURNAL_TEXT_FIELD_WIDTH;
     this.uiText.setTextBounds( -JOURNAL_TEXT_FIELD_WIDTH / 2, -JOURNAL_TEXT_FIELD_HEIGHT / 2, JOURNAL_TEXT_FIELD_WIDTH, JOURNAL_TEXT_FIELD_HEIGHT );
+
+    this.maskGraphics = this.game.add.graphics( 0, 0 );
+    this.maskGraphics.beginFill( 0xffffff );
+    this.maskGraphics.drawRect( screenCenterX - JOURNAL_TEXT_FIELD_WIDTH / 2, screenCenterY - JOURNAL_TEXT_FIELD_HEIGHT / 2, JOURNAL_TEXT_FIELD_WIDTH, JOURNAL_TEXT_FIELD_HEIGHT );
+
+    this.uiText.mask = this.maskGraphics;
   }
   tryToHideJournal() {
     if ( this.isJournalOpened && this.game.paused ) {
@@ -62,6 +69,7 @@ export default class JournalsManager extends Phaser.Group {
       this.backgroundLayer.destroy();
       this.ui.destroy();
       this.uiText.destroy();
+      this.maskGraphics.destroy();
     }
   }
   onCollisionEnter( bodyA, bodyB, shapeA, shapeB ) {
@@ -83,5 +91,17 @@ export default class JournalsManager extends Phaser.Group {
     // for now this line assume that there is only one type of computer's textures
     // TODO enable different sprite key's handling
     return body.sprite.key === 'computer' && shape.sensor;
+  }
+  onMouseWheel( ) {
+    if ( this.isJournalOpened === false ) {
+      return;
+    }
+
+    const directionY = this.game.input.mouse.wheelDelta;
+    if ( directionY === 1 && !( this.uiText.y >= this.game.camera.y + this.game.camera.height / 2 ) ) {
+      this.uiText.y += JOURNAL_TEXT_SCROLL_STEP;
+    } else if ( directionY === -1 && !( this.uiText.y <= this.game.camera.y + this.game.camera.height / 2 + JOURNAL_TEXT_FIELD_HEIGHT - this.uiText.height ) ) {
+      this.uiText.y -= JOURNAL_TEXT_SCROLL_STEP;
+    }
   }
 }
