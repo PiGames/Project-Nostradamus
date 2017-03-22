@@ -12,6 +12,7 @@ var exorcist = require('exorcist');
 var babelify = require('babelify');
 var browserify = require('browserify');
 var browserSync = require('browser-sync');
+var ghPages = require('gulp-gh-pages');
 
 /**
  * Using different folders/file names? Change these constants:
@@ -66,6 +67,8 @@ function cleanBuild() {
  * Check out README.md for more info on the '/static' folder.
  */
 function copyStatic() {
+    gulp.src('LICENSE.md')
+      .pipe(gulp.dest(BUILD_PATH));
     return gulp.src(STATIC_PATH + '/**/*')
         .pipe(gulp.dest(BUILD_PATH));
 }
@@ -150,7 +153,7 @@ function serve() {
             fn(snippet, match) { return snippet + match; }
           }
         },
-        open: true // Change it to true if you wish to allow Browsersync to open a browser window.
+        open: argv.open || argv.o // Change it to true if you wish to allow Browsersync to open a browser window.
     };
 
     options.snippetOptions.rule.fn = function() {
@@ -187,3 +190,23 @@ gulp.task('watch-static', ['copyPhaser'], browserSync.reload);
  * https://medium.com/@dave_lunny/task-dependencies-in-gulp-b885c1ab48f0
  */
 gulp.task('default', ['serve']);
+
+gulp.task( "deploy-for-testers", () => {
+  const msg = argv.message || argv.m || null;
+  const options = { remoteUrl: "https://github.com/PiGames/PN-for-testers.git", branch: "master", force: true };
+  if ( msg !== null ) {
+    options.message = msg;
+  }
+
+  return gulp.src( "./build/**/*" ).pipe( ghPages( options ) );
+} );
+
+gulp.task( "deploy", () => {
+  const msg = argv.message || argv.m || null;
+  const options = { force: true };
+  if ( msg !== null ) {
+    options.message = msg;
+  }
+
+  return gulp.src( "./build/**/*" ).pipe( ghPages( options ) );
+} );

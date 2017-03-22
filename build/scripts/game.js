@@ -2931,6 +2931,7 @@ var Game = function (_Phaser$State) {
     value: function create() {
       var _this2 = this;
 
+      console.log(123);
       this.map = new _TileMap2.default(this.game, 'map', _TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT);
       this.zombies = new _ZombiesManager2.default(this.game, this.map.walls);
       var playerPos = this.map.getPlayerInitialPosition();

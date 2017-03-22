@@ -122,5 +122,6 @@ $RECYCLE.BIN/
 *.lnk
 
 build
+.publish
 
 # End of https://www.gitignore.io/api/osx,macos,linux,node,windows
