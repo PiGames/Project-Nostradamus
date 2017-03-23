@@ -2,7 +2,7 @@ import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 import { COMPUTER_WIDTH, COMPUTER_HEIGHT } from '../constants/ItemConstants';
 
 export default class Journal extends Phaser.Sprite {
-  constructor( game, tileX, tileY, cornerX, cornerY, imageKey ) {
+  constructor( game, tileX, tileY, cornerX, cornerY, content, imageKey ) {
     const offsetX = ( cornerX === 'WEST' ) ? ( COMPUTER_WIDTH / 2 ) : TILE_WIDTH - ( COMPUTER_WIDTH / 2 );
     const offsetY = ( cornerY === 'NORTH' ) ? ( COMPUTER_HEIGHT / 2 ) : TILE_HEIGHT - ( COMPUTER_HEIGHT / 2 );
 
@@ -29,5 +29,7 @@ export default class Journal extends Phaser.Sprite {
     rectangleSensor.sensor = true;
 
     this.hasPlayerApproached = false;
+
+    this.content = content;
   }
 }

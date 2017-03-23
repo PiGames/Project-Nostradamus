@@ -206,7 +206,7 @@
         }, 
         {
          "draworder":"topdown",
-         "height":32,
+         "height":0,
          "name":"Journals",
          "objects":[
                 {
@@ -215,7 +215,7 @@
                  "name":"Test Journal #2",
                  "properties":
                     {
-                     "content":"ipsum",
+                     "content":"Arthur Jugnot (ur. 2 grudnia 1980 roku w Pary\u017cu), francuski aktor filmowy.\nSyn aktora i scenarzysty Gerarda Jugnota i C\u00e9cile Magnan, debiutowa\u0142 rol\u0105 \u017co\u0142nierza w kr\u00f3tkometra\u017cowym filmie wojennym Na \u015awi\u0119to Dzi\u0119kczynienia (Le Jour de gr\u00e2ce, 2000) oraz w kinowej komedii Najbardziej obiecuj\u0105ca kobieta (Meilleur espoir f\u00e9minin, 2000). Potem pojawi\u0142 si\u0119 w czarnej komedii Mistrz w stroju k\u0105pielowym (La Ma\u00eetresse en maillot de bain, 2002), dramacie Kawalkada (Cavalcade, 2005) u boku J\u00e9r\u00e9mie'go R\u00e9niera i dramacie Czerwone mr\u00f3wki (Les Fourmis Rouges, 2006).\n\nZa\u0142o\u017cy\u0142 firm\u0119 produkcyjn\u0105 LardEnfer i jest w\u0142a\u015bcicielem teatru Les B\u00e9liers w Awinionie, kt\u00f3ry oferuje wiele imprez w czasie trwania festiwalu.\n\nPary\u017c (fr. Paris i) \u2013 stolica i najwi\u0119ksze miasto Francji, po\u0142o\u017cona w centrum Basenu Paryskiego, nad Sekwan\u0105 (La Seine). Miasto stanowi centrum polityczne, ekonomiczne i kulturalne kraju.\n\nW granicach administracyjnych Pary\u017ca zamieszkuje ponad 2 mln os\u00f3b (wed\u0142ug danych z 2010 by\u0142o to 2 243 833[1]), w tzw. Wielkim Pary\u017cu ok. 10 mln, a w ca\u0142ym zespole miejskim ponad 12 mln (w 2007 parysk\u0105 przestrze\u0144 aglomeracji zamieszkiwa\u0142o 12 067 000 os\u00f3b). Aglomeracja paryska konkuruje tym samym pod wzgl\u0119dem liczby ludno\u015bci w Unii Europejskiej z Londynem.\n\nPary\u017c, kt\u00f3ry stanowi osobny departament o numerze 75, jest jednocze\u015bnie stolic\u0105 regionu administracyjnego \u00cele-de-France. Opr\u00f3cz departamentu paryskiego w jego sk\u0142ad wchodz\u0105 departamenty: Essonne (91), Hauts-de-Seine (92), Seine-Saint-Denis (93), Seine-et-Marne (77), Val-de-Marne (94), Val-d\u2019Oise (95) oraz Yvelines (78).\n\nMiasto ma uk\u0142ad koncentryczny z rozchodz\u0105cymi si\u0119 gwia\u017adzi\u015bcie bulwarami. Jego o\u015b stanowi wci\u0119ta dolina Sekwany, kt\u00f3ra dzieli Pary\u017c na dwie cz\u0119\u015bci: prawobrze\u017cn\u0105 (p\u00f3\u0142nocn\u0105) Rive Droite oraz lewobrze\u017cn\u0105 (po\u0142udniow\u0105) Rive Gauche.",
                      "cornerX":"WEST",
                      "cornerY":"SOUTH"
                     },
@@ -238,7 +238,7 @@
                  "name":"Test Journal #1",
                  "properties":
                     {
-                     "content":"Lorem",
+                     "content":"Purpurowa rewolucja \u2013 okre\u015blenie wydarze\u0144, kt\u00f3re mia\u0142y miejsce w Iraku po obaleniu dyktatury Saddama Husajna. Nazwa purpurowa rewolucja zosta\u0142a nadana po trendzie kolorowych rewolucji na nadawanie nazw dla przemian spo\u0142ecznych, na przyk\u0142ad w Gruzji (rewolucja r\u00f3\u017c), Ukrainie (pomara\u0144czowa rewolucja), Libanie (cedrowa rewolucja). Okre\u015blenie purpurowa pochodzi od koloru tuszu, jaki pozostawa\u0142 na kciukach Irakijczyk\u00f3w jako dow\u00f3d i\u017c brali oni udzia\u0142 w pierwszych demokratycznych wyborach parlamentarnych w Iraku w 2005 roku.\n\nTerminu \u201epurpurowa rewolucja\u201d po raz pierwszy u\u017cyto w styczniu 2005 roku. 24 lutego 2005 roku prezydent Stan\u00f3w Zjednoczonych George W. Bush, u\u017cy\u0142 tej nazwy w Bratys\u0142awie na S\u0142owacji podczas spotkania z prezydentem Rosji W\u0142adimirem Putinem.\n\nW\u0142adimir W\u0142adimirowicz Putin, ros. \u0412\u043b\u0430\u0434\u0438\u043c\u0438\u0440 \u0412\u043b\u0430\u0434\u0438\u043c\u0438\u0440\u043e\u0432\u0438\u0447 \u041f\u0443\u0442\u0438\u043d; [v\u026b\u0250\u02c8d\u02b2im\u02b2\u026ar v\u026b\u0250\u02c8d\u02b2im\u02b2\u026ar\u0259v\u02b2\u026at\u0255 \u02c8put\u02b2\u026an] i (ur. 7 pa\u017adziernika 1952 w Leningradzie, ob. Petersburg)[1] \u2013 rosyjski prawnik, dzia\u0142acz pa\u0144stwowy i polityk; funkcjonariusz KGB (1975\u20131990), pracownik administracji Petersburga (1990\u20131996), urz\u0119dnik administracji prezydenta Rosji Borysa Jelcyna (1996\u20131998), szef FSB (1998\u20131999), premier Rosji od 8 sierpnia 1999 do 7 maja 2000, pe\u0142ni\u0105cy obowi\u0105zki prezydenta Rosji po rezygnacji Jelcyna 31 grudnia 1999; 26 marca 2000 wybrany na prezydenta Rosji, 14 marca 2004 ponownie wybrany na to stanowisko. Urz\u0105d prezydenta pe\u0142ni\u0142 do 7 maja 2008, bowiem 8 maja 2008 roku obj\u0105\u0142 urz\u0105d premiera. 4 marca 2012 roku zosta\u0142 ponownie wybrany na prezydenta Federacji Rosyjskiej. 7 maja 2012 zosta\u0142 zaprzysi\u0119\u017cony i tym samym obj\u0105\u0142 urz\u0105d prezydenta[2].\n",
                      "cornerX":"WEST",
                      "cornerY":"NORTH"
                     },
@@ -261,7 +261,7 @@
                  "name":"Test Journal #4",
                  "properties":
                     {
-                     "content":"sit",
+                     "content":"Supergromada \u2013 zgrupowanie setek lub tysi\u0119cy grup i gromad galaktyk. Supergromady s\u0105 jednymi z najwi\u0119kszych znanych struktur we Wszech\u015bwiecie. Istnienie supergromad wskazuje na to, \u017ce galaktyki s\u0105 roz\u0142o\u017cone we Wszech\u015bwiecie nier\u00f3wnomiernie, nawet w du\u017cych skalach. Wi\u0119kszo\u015b\u0107 z nich \u0142\u0105czy si\u0119 w grupy i gromady, przy czym grupy zawieraj\u0105 do 50 galaktyk, a gromady do kilku tysi\u0119cy. Te grupy i gromady, a tak\u017ce dodatkowe odizolowane galaktyki, tworz\u0105 razem wi\u0119ksze struktury zwane w\u0142a\u015bnie supergromadami.\n\nSupergromady mog\u0105 mie\u0107 rozmiary rz\u0119du setek milion\u00f3w lat \u015bwietlnych. Nieznane s\u0105 \u201egromady supergromad\u201d, ale istnienie wi\u0119kszych struktur jest debatowane (zobacz w\u0142\u00f3kno). Supergromady wyst\u0119puj\u0105 najcz\u0119\u015bciej w \u201e\u015bcianach\u201d galaktyk, otaczaj\u0105cych pustki, w kt\u00f3rych znajduje si\u0119 jedynie niewielka liczba galaktyk. Uwa\u017ca si\u0119, \u017ce ca\u0142kowita liczba tego typu struktur w obserwowanym Wszech\u015bwiecie jest bliska 10 milionom.\n\nZgodnie z teoriami bazuj\u0105cymi na Wielkim Wybuchu, supergromady powsta\u0142y we wczesnym Wszech\u015bwiecie, gdy materia zacz\u0119\u0142a si\u0119 skupia\u0107 pod wp\u0142ywem grawitacji (teoria niestabilno\u015bci grawitacyjnej). Jednak supergromady nie s\u0105 strukturami zwi\u0105zanymi grawitacyjnie, gdy\u017c ze wzgl\u0119du na ich rozmiary, czas konieczny do relaksacji do r\u00f3wnowagi dynamicznej jest dla nich wi\u0119kszy, ni\u017c czas ich istnienia. Z fizycznego punktu widzenia tym w\u0142a\u015bnie r\u00f3\u017cni\u0105 si\u0119 supergromady od gromad.\n\nNiekt\u00f3re badania wskazuj\u0105, \u017ce supergromady mog\u0105 by\u0107 zorganizowane w regularn\u0105 siatk\u0119 o\u015bmio\u015bcian\u00f3w, po\u0142\u0105czonych wierzcho\u0142kami. Przyczyn\u0105 takiego stanu rzeczy mia\u0142oby by\u0107 oddzia\u0142ywanie p\u00f3l magnetycznych na materi\u0119 we wczesnym etapie ewolucji wszech\u015bwiata[1].\n\nZiemia znajduje si\u0119 w Uk\u0142adzie S\u0142onecznym, wchodz\u0105cym w sk\u0142ad galaktyki Droga Mleczna, kt\u00f3ra jest jedn\u0105 z ponad 30 galaktyk Grupy Lokalnej, kt\u00f3ra z kolei jest tylko jedn\u0105 z ponad 100 grup i gromad Supergromady Lokalnej (Supergromady w Pannie). Istniej\u0105 znacznie wi\u0119ksze od niej supergromady, np. Supergromada w Zegarze i Supergromada Shapleya.",
                      "cornerX":"EAST",
                      "cornerY":"SOUTH"
                     },
@@ -284,7 +284,7 @@
                  "name":"Test Journal #3",
                  "properties":
                     {
-                     "content":"dolor",
+                     "content":"Kaprun \u2013 gmina w Austrii, w kraju zwi\u0105zkowym Salzburg, w powiecie Zell am See, u st\u00f3p masywu Glocknergruppe.\n\nZnany kurort zimowy, u st\u00f3p lodowca Kitzsteinhorn. Ponad 13,5 tys \u0142\u00f3\u017cek hotelowych, co przek\u0142ada si\u0119 na ponad 2 miliony dni noclegowych.",
                      "cornerX":"EAST",
                      "cornerY":"NORTH"
                     },
@@ -312,13 +312,13 @@
             },
          "type":"objectgroup",
          "visible":true,
-         "width":32,
+         "width":0,
          "x":0,
          "y":0
         }, 
         {
          "draworder":"topdown",
-         "height":32,
+         "height":0,
          "name":"PlayerPos",
          "objects":[
                 {
@@ -335,7 +335,7 @@
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
-         "width":32,
+         "width":0,
          "x":0,
          "y":0
         }],

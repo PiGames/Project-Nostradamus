@@ -964,9 +964,9 @@ var _Menu = require('./states/Menu');
 
 var _Menu2 = _interopRequireDefault(_Menu);
 
-var _Game = require('./states/Game');
+var _Level = require('./levels/Level1');
 
-var _Game2 = _interopRequireDefault(_Game);
+var _Level2 = _interopRequireDefault(_Level);
 
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : { default: obj };
@@ -1002,7 +1002,8 @@ var ProjectNostradamus = function (_Phaser$Game) {
     _this.state.add('Boot', _Boot2.default);
     _this.state.add('Preload', _Preload2.default);
     _this.state.add('Menu', _Menu2.default);
-    _this.state.add('Game', _Game2.default);
+
+    _this.state.add('Level1', _Level2.default);
 
     _this.state.start('Boot');
     return _this;
@@ -1013,7 +1014,7 @@ var ProjectNostradamus = function (_Phaser$Game) {
 
 exports.default = ProjectNostradamus;
 
-},{"./states/Boot":23,"./states/Game":24,"./states/Menu":25,"./states/Preload":26}],7:[function(require,module,exports){
+},{"./levels/Level1":12,"./states/Boot":24,"./states/Menu":26,"./states/Preload":27}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1112,6 +1113,78 @@ document.onkeydown = ( e ) => {
 */
 
 },{"./ProjectNostradamus":6}],12:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
+
+var _Game2 = require('../states/Game.js');
+
+var _Game3 = _interopRequireDefault(_Game2);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+function _possibleConstructorReturn(self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }return call && (typeof call === "object" || typeof call === "function") ? call : self;
+}
+
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+}
+
+var Level1 = function (_Game) {
+  _inherits(Level1, _Game);
+
+  function Level1() {
+    _classCallCheck(this, Level1);
+
+    return _possibleConstructorReturn(this, (Level1.__proto__ || Object.getPrototypeOf(Level1)).apply(this, arguments));
+  }
+
+  _createClass(Level1, [{
+    key: 'preload',
+    value: function preload() {
+      _Game3.default.prototype.preload.call(this);
+
+      this.load.tilemap('map', 'assets/levels/level1/map.json', null, Phaser.Tilemap.TILED_JSON);
+    }
+  }, {
+    key: 'create',
+    value: function create() {
+      _Game3.default.prototype.create.call(this);
+      console.log('level1 loaded');
+    }
+  }]);
+
+  return Level1;
+}(_Game3.default);
+
+exports.default = Level1;
+
+},{"../states/Game.js":25}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1319,7 +1392,7 @@ var BoidsManager = function () {
 
 exports.default = BoidsManager;
 
-},{"../constants/TileMapConstants":9,"../utils/MapUtils.js":28}],13:[function(require,module,exports){
+},{"../constants/TileMapConstants":9,"../utils/MapUtils.js":29}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1418,7 +1491,7 @@ var Entity = function (_Phaser$Sprite) {
 
 exports.default = Entity;
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1667,7 +1740,7 @@ var EntityWalkingOnPath = function (_Entity) {
 
 exports.default = EntityWalkingOnPath;
 
-},{"../constants/TileMapConstants":9,"../constants/ZombieConstants":10,"../objects/PathFinder.js":17,"../utils/MapUtils.js":28,"./Entity":13}],15:[function(require,module,exports){
+},{"../constants/TileMapConstants":9,"../constants/ZombieConstants":10,"../objects/PathFinder.js":18,"../utils/MapUtils.js":29,"./Entity":14}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1699,7 +1772,7 @@ function _inherits(subClass, superClass) {
 var Journal = function (_Phaser$Sprite) {
   _inherits(Journal, _Phaser$Sprite);
 
-  function Journal(game, tileX, tileY, cornerX, cornerY, imageKey) {
+  function Journal(game, tileX, tileY, cornerX, cornerY, content, imageKey) {
     _classCallCheck(this, Journal);
 
     var offsetX = cornerX === 'WEST' ? _ItemConstants.COMPUTER_WIDTH / 2 : _TileMapConstants.TILE_WIDTH - _ItemConstants.COMPUTER_WIDTH / 2;
@@ -1728,6 +1801,8 @@ var Journal = function (_Phaser$Sprite) {
     rectangleSensor.sensor = true;
 
     _this.hasPlayerApproached = false;
+
+    _this.content = content;
     return _this;
   }
 
@@ -1736,7 +1811,7 @@ var Journal = function (_Phaser$Sprite) {
 
 exports.default = Journal;
 
-},{"../constants/ItemConstants":7,"../constants/TileMapConstants":9}],16:[function(require,module,exports){
+},{"../constants/ItemConstants":7,"../constants/TileMapConstants":9}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1813,7 +1888,7 @@ var JournalsManager = function (_Phaser$Group) {
     }
   }, {
     key: 'showJournal',
-    value: function showJournal() {
+    value: function showJournal(journalToShow) {
       var screenCenterX = this.game.camera.x + this.game.camera.width / 2;
       var screenCenterY = this.game.camera.y + this.game.camera.height / 2;
 
@@ -1833,7 +1908,7 @@ var JournalsManager = function (_Phaser$Group) {
       };
 
       // TODO make text an internal property of journal object
-      this.uiText = this.game.add.text(screenCenterX, screenCenterY, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis tristique libero, in facilisis libero elementum ac. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis blandit leo mauris, sit amet facilisis augue interdum non. Aliquam imperdiet sapien quis ante consequat tempor. Sed lectus purus, rhoncus a justo quis, tempor ullamcorper dui. Vivamus tortor nulla, ultricies quis leo et, interdum scelerisque lectus. Donec ornare volutpat nisl ac placerat. Curabitur efficitur elementum augue, a vehicula est convallis vitae. Suspendisse ut fermentum odio, vel tempor dui. Praesent id fermentum lorem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis tristique libero, in facilisis libero elementum ac. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis blandit leo mauris, sit amet facilisis augue interdum non. Aliquam imperdiet sapien quis ante consequat tempor. Sed lectus purus, rhoncus a justo quis, tempor ullamcorper dui. Vivamus tortor nulla, ultricies quis leo et, interdum scelerisque lectus. Donec ornare volutpat nisl ac placerat. Curabitur efficitur elementum augue, a vehicula est convallis vitae. Suspendisse ut fermentum odio, vel tempor dui. Praesent id fermentum lorem. Etiam gravida risus ante, eget ornare libero luctus vel. QuisqueEtiam gravida risus ante, eget ornare libero luctus vel. Quisque sed mattis ex, id bibendum enim. Morbi vitae nulla eget ante egestas posuere.', textStyle);
+      this.uiText = this.game.add.text(screenCenterX, screenCenterY, journalToShow.content, textStyle);
       this.uiText.wordWrap = true;
       this.uiText.wordWrapWidth = _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH;
       this.uiText.setTextBounds(-_ItemConstants.JOURNAL_TEXT_FIELD_WIDTH / 2, -_ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT / 2, _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH, _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT);
@@ -1904,7 +1979,7 @@ var JournalsManager = function (_Phaser$Group) {
 
 exports.default = JournalsManager;
 
-},{"../constants/ItemConstants":7}],17:[function(require,module,exports){
+},{"../constants/ItemConstants":7}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1962,7 +2037,7 @@ var PathFinder = function () {
 
 exports.default = PathFinder;
 
-},{"easystarjs":1}],18:[function(require,module,exports){
+},{"easystarjs":1}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2188,7 +2263,7 @@ var Player = function (_Entity) {
 
 exports.default = Player;
 
-},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"./Entity":13}],19:[function(require,module,exports){
+},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"./Entity":14}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2375,7 +2450,7 @@ var TileMap = function (_Phaser$Tilemap) {
 
 exports.default = TileMap;
 
-},{"../utils/MapUtils.js":28}],20:[function(require,module,exports){
+},{"../utils/MapUtils.js":29}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2560,7 +2635,7 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
 
 exports.default = WalkingEntitiesManager;
 
-},{"../constants/TileMapConstants":9,"../utils/EntityManagerUtils":27,"../utils/MapUtils.js":28,"./BoidsManager.js":12}],21:[function(require,module,exports){
+},{"../constants/TileMapConstants":9,"../utils/EntityManagerUtils":28,"../utils/MapUtils.js":29,"./BoidsManager.js":13}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2717,7 +2792,7 @@ var Zombie = function (_EntityWalkingOnPath) {
 
 exports.default = Zombie;
 
-},{"../constants/ZombieConstants":10,"../utils/MapUtils.js":28,"./EntityWalkingOnPath":14}],22:[function(require,module,exports){
+},{"../constants/ZombieConstants":10,"../utils/MapUtils.js":29,"./EntityWalkingOnPath":15}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2781,7 +2856,7 @@ var ZombieManager = function (_WalkingEntitiesManag) {
 
 exports.default = ZombieManager;
 
-},{"../objects/WalkingEntitiesManager":20}],23:[function(require,module,exports){
+},{"../objects/WalkingEntitiesManager":21}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2850,7 +2925,7 @@ var Boot = function (_Phaser$State) {
 
 exports.default = Boot;
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2931,7 +3006,6 @@ var Game = function (_Phaser$State) {
     value: function create() {
       var _this2 = this;
 
-      console.log(123);
       this.map = new _TileMap2.default(this.game, 'map', _TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT);
       this.zombies = new _ZombiesManager2.default(this.game, this.map.walls);
       var playerPos = this.map.getPlayerInitialPosition();
@@ -2980,7 +3054,8 @@ var Game = function (_Phaser$State) {
       };
 
       for (var _i = 0; _i < journalsData.length; _i++) {
-        var newJournal = this.journals.add(new _Journal2.default(this.game, journalsData[_i].x, journalsData[_i].y, journalsData[_i].cornerX, journalsData[_i].cornerY, 'computer'));
+        var newJournal = new _Journal2.default(this.game, journalsData[_i].x, journalsData[_i].y, journalsData[_i].cornerX, journalsData[_i].cornerY, journalsData[_i].content, 'computer');
+        this.journals.add(newJournal);
         newJournal.body.setCollisionGroup(this.journalsCollisionGroup);
         newJournal.body.collides([this.playerCollisionGroup, this.zombiesCollisionGroup]);
       }
@@ -3004,7 +3079,7 @@ var Game = function (_Phaser$State) {
 
 exports.default = Game;
 
-},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"../objects/Journal":15,"../objects/JournalsManager":16,"../objects/Player":18,"../objects/TileMap":19,"../objects/Zombie":21,"../objects/ZombiesManager":22}],25:[function(require,module,exports){
+},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"../objects/Journal":16,"../objects/JournalsManager":17,"../objects/Player":19,"../objects/TileMap":20,"../objects/Zombie":22,"../objects/ZombiesManager":23}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3051,7 +3126,7 @@ var Menu = function (_Phaser$State) {
   _createClass(Menu, [{
     key: 'create',
     value: function create() {
-      this.state.start('Game');
+      this.state.start('Level1');
     }
   }]);
 
@@ -3060,7 +3135,7 @@ var Menu = function (_Phaser$State) {
 
 exports.default = Menu;
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3111,8 +3186,7 @@ var Preload = function (_Phaser$State) {
   _createClass(Preload, [{
     key: 'preload',
     value: function preload() {
-      this.load.tilemap('map', 'assets/tilemaps/maps/map.json', null, Phaser.Tilemap.TILED_JSON);
-      this.load.image('tilemap', 'assets/tilemaps/tiles/tilemap.png');
+      this.load.image('tilemap', 'assets/images/tilemap.png');
 
       this.game.load.spritesheet('player', './assets/images/player-sheet.png', _PlayerConstants.PLAYER_WIDTH, _PlayerConstants.PLAYER_HEIGHT);
       this.game.load.spritesheet('zombie', './assets/images/zombie-sheet.png', _ZombieConstants.ZOMBIE_WIDTH, _ZombieConstants.ZOMBIE_HEIGHT);
@@ -3133,7 +3207,7 @@ var Preload = function (_Phaser$State) {
 
 exports.default = Preload;
 
-},{"../constants/PlayerConstants.js":8,"../constants/ZombieConstants.js":10}],27:[function(require,module,exports){
+},{"../constants/PlayerConstants.js":8,"../constants/ZombieConstants.js":10}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3320,7 +3394,7 @@ function getFreeTileExcludingEast(entityTile, mapGrid) {
   return freeTile;
 }
 
-},{"../utils/MapUtils":28}],28:[function(require,module,exports){
+},{"../utils/MapUtils":29}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

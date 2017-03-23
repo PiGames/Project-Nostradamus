@@ -28,7 +28,7 @@ export default class JournalsManager extends Phaser.Group {
       this.showJournal( approachedJournals[ 0 ] );
     }
   }
-  showJournal( ) {
+  showJournal( journalToShow ) {
     const screenCenterX = this.game.camera.x + this.game.camera.width / 2;
     const screenCenterY = this.game.camera.y + this.game.camera.height / 2;
 
@@ -48,9 +48,7 @@ export default class JournalsManager extends Phaser.Group {
     };
 
     // TODO make text an internal property of journal object
-    this.uiText = this.game.add.text( screenCenterX, screenCenterY,
-       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis tristique libero, in facilisis libero elementum ac. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis blandit leo mauris, sit amet facilisis augue interdum non. Aliquam imperdiet sapien quis ante consequat tempor. Sed lectus purus, rhoncus a justo quis, tempor ullamcorper dui. Vivamus tortor nulla, ultricies quis leo et, interdum scelerisque lectus. Donec ornare volutpat nisl ac placerat. Curabitur efficitur elementum augue, a vehicula est convallis vitae. Suspendisse ut fermentum odio, vel tempor dui. Praesent id fermentum lorem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis tristique libero, in facilisis libero elementum ac. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis blandit leo mauris, sit amet facilisis augue interdum non. Aliquam imperdiet sapien quis ante consequat tempor. Sed lectus purus, rhoncus a justo quis, tempor ullamcorper dui. Vivamus tortor nulla, ultricies quis leo et, interdum scelerisque lectus. Donec ornare volutpat nisl ac placerat. Curabitur efficitur elementum augue, a vehicula est convallis vitae. Suspendisse ut fermentum odio, vel tempor dui. Praesent id fermentum lorem. Etiam gravida risus ante, eget ornare libero luctus vel. QuisqueEtiam gravida risus ante, eget ornare libero luctus vel. Quisque sed mattis ex, id bibendum enim. Morbi vitae nulla eget ante egestas posuere.'
-    , textStyle );
+    this.uiText = this.game.add.text( screenCenterX, screenCenterY, journalToShow.content, textStyle );
     this.uiText.wordWrap = true;
     this.uiText.wordWrapWidth = JOURNAL_TEXT_FIELD_WIDTH;
     this.uiText.setTextBounds( -JOURNAL_TEXT_FIELD_WIDTH / 2, -JOURNAL_TEXT_FIELD_HEIGHT / 2, JOURNAL_TEXT_FIELD_WIDTH, JOURNAL_TEXT_FIELD_HEIGHT );

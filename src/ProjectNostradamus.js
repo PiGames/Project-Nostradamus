@@ -1,7 +1,7 @@
 import Boot from './states/Boot';
 import Preload from './states/Preload';
 import Menu from './states/Menu';
-import Game from './states/Game';
+import Level1 from './levels/Level1';
 
 class ProjectNostradamus extends Phaser.Game {
   constructor( width, height, renderer, parent ) {
@@ -10,7 +10,8 @@ class ProjectNostradamus extends Phaser.Game {
     this.state.add( 'Boot', Boot );
     this.state.add( 'Preload', Preload );
     this.state.add( 'Menu', Menu );
-    this.state.add( 'Game', Game );
+
+    this.state.add( 'Level1', Level1 );
 
     this.state.start( 'Boot' );
   }
