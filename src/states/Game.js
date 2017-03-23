@@ -39,6 +39,8 @@ export default class Game extends Phaser.State {
     for ( let i = 0; i < this.map.paths.length; i++ ) {
       const newZombie = this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, this.map.getPath( i ), this.map.walls, this.player ) );
 
+      this.player.body.onBeginContact.add( ( ...args ) => newZombie.onCollisionEnter( ...args ) );
+
       newZombie.body.setCollisionGroup( this.zombiesCollisionGroup );
       newZombie.body.collides( this.zombiesCollisionGroup, ( body1, body2 ) => this.zombies.onCollisionWihOtherEntity( body1.sprite, body2.sprite ) );
       newZombie.body.collides( this.map.wallsCollisionGroup, ( body, tileBody ) => this.zombies.onCollisionWithWalls( body.sprite, tileBody ) );

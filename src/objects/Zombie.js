@@ -10,6 +10,7 @@ export default class Zombie extends EntityWalkingOnPath {
     this.walls = walls;
     this.playerSeekingRay = new Phaser.Line();
     this.tileHits = [];
+    this.isPlayerInRange = false;
     this.isChasing = false;
     this.lastKnownPlayerPosition = { x: 1, y: 1 };
     this.canDealDamage = true;
@@ -19,13 +20,24 @@ export default class Zombie extends EntityWalkingOnPath {
     this.animations.add( 'walk', [ 0, 1, 2, 3, 4, 5 ], 0 );
     this.animations.add( 'attack', [ 6, 7, 8, 9 ], 6 );
     this.animations.play( 'walk', ZOMBIE_WALK_ANIMATION_FRAMERATE, true );
+
+    this.viewSensor = this.body.addCircle( ZOMBIE_SIGHT_RANGE );
+    this.viewSensor.sensor = true;
+
+    this.attackSensor = this.body.addCircle( 100 );
+    this.attackSensor.sensor = true;
+    this.attackSensor.asd = true;
   }
   update() {
-    if ( this.canSeePlayer() ) {
-      this.isChasing = true;
-      this.lastKnownPlayerPosition = { x: this.player.x, y: this.player.y };
-      if ( this.shouldAttack() ) {
-        this.handleAttack();
+    // this.game.debug.spriteBounds( this );
+
+    if ( this.isPlayerInRange ) {
+      if ( this.canSeePlayer() ) {
+        this.isChasing = true;
+        this.lastKnownPlayerPosition = { x: this.player.x, y: this.player.y };
+        if ( this.shouldAttack() ) {
+          this.handleAttack();
+        }
       }
     }
 
@@ -53,6 +65,27 @@ export default class Zombie extends EntityWalkingOnPath {
     return ( this.isInDegreeRange( this, this.player, ZOMBIE_SIGHT_ANGLE )
     && ( this.isChasing || this.playerSeekingRay.length < ZOMBIE_SIGHT_RANGE ) )
     || ( this.playerSeekingRay.length < ZOMBIE_HEARING_RANGE && !this.player.isSneaking && this.player.isMoving() );
+  }
+
+  onCollisionEnter( bodyA, bodyB, shapeA, shapeB ) {
+    if ( this.isItSensorArea( bodyA, shapeB ) ) {
+      this.isPlayerInRange = true;
+    }
+  }
+
+  onCollisionLeave( bodyA, bodyB, shapeA, shapeB ) {
+    if ( this.isItSensorArea( bodyA, shapeB ) ) {
+      this.isPlayerInRange = false;
+    }
+  }
+
+  isItSensorArea( body, shape ) {
+    if ( body.sprite == null || shape.sensor == null ) {
+      return false;
+    }
+    // for now this line assume that there is only one type of computer's textures
+    // TODO enable different sprite key's handling
+    return shape.sensor;
   }
 
   chasePlayer() {
