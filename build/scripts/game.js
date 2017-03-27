@@ -2800,7 +2800,9 @@ var Zombie = function (_EntityWalkingOnPath) {
     key: 'onPlayerDeath',
     value: function onPlayerDeath() {
       this.isPlayerDead = true;
-      this.stopChasingPlayer();
+      if (this.isChasing) {
+        this.stopChasingPlayer();
+      }
     }
   }]);
 

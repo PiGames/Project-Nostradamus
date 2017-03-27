@@ -96,6 +96,8 @@ export default class Zombie extends EntityWalkingOnPath {
   }
   onPlayerDeath() {
     this.isPlayerDead = true;
-    this.stopChasingPlayer();
+    if ( this.isChasing ) {
+      this.stopChasingPlayer();
+    }
   }
 }
