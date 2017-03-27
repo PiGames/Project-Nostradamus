@@ -202,11 +202,15 @@ gulp.task( "deploy-for-testers", () => {
 } );
 
 gulp.task( "deploy", () => {
-  const msg = argv.message || argv.m || null;
-  const options = { force: true };
-  if ( msg !== null ) {
-    options.message = msg;
-  }
+  if ( argv.confirm ) {
+    const msg = argv.message || argv.m || null;
+    const options = { force: true };
+    if ( msg !== null ) {
+      options.message = msg;
+    }
 
-  return gulp.src( "./build/**/*" ).pipe( ghPages( options ) );
+    return gulp.src( "./build/**/*" ).pipe( ghPages( options ) );
+  } else {
+    gutil.log( gutil.colors.red("To deploy to master on main repository confirm it with --confirm argument") );
+  }
 } );

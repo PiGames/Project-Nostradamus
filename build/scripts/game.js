@@ -2713,6 +2713,7 @@ var Zombie = function (_EntityWalkingOnPath) {
     _this.walls = walls;
     _this.playerSeekingRay = new Phaser.Line();
     _this.tileHits = [];
+    _this.isPlayerInRange = false;
     _this.isChasing = false;
     _this.lastKnownPlayerPosition = { x: 1, y: 1 };
     _this.canDealDamage = true;
@@ -2724,17 +2725,28 @@ var Zombie = function (_EntityWalkingOnPath) {
     _this.animations.play('walk', _ZombieConstants.ZOMBIE_WALK_ANIMATION_FRAMERATE, true);
 
     _this.isPlayerDead = false;
+
+    _this.viewSensor = _this.body.addCircle(_ZombieConstants.ZOMBIE_SIGHT_RANGE);
+    _this.viewSensor.sensor = true;
+
+    _this.attackSensor = _this.body.addCircle(100);
+    _this.attackSensor.sensor = true;
+    _this.attackSensor.asd = true;
     return _this;
   }
 
   _createClass(Zombie, [{
     key: 'update',
     value: function update() {
-      if (this.canSeePlayer()) {
-        this.isChasing = true;
-        this.lastKnownPlayerPosition = { x: this.player.x, y: this.player.y };
-        if (this.shouldAttack()) {
-          this.handleAttack();
+      // this.game.debug.spriteBounds( this );
+
+      if (this.isPlayerInRange) {
+        if (this.canSeePlayer()) {
+          this.isChasing = true;
+          this.lastKnownPlayerPosition = { x: this.player.x, y: this.player.y };
+          if (this.shouldAttack()) {
+            this.handleAttack();
+          }
         }
       }
 
@@ -2765,6 +2777,30 @@ var Zombie = function (_EntityWalkingOnPath) {
       }
 
       return this.isInDegreeRange(this, this.player, _ZombieConstants.ZOMBIE_SIGHT_ANGLE) && (this.isChasing || this.playerSeekingRay.length < _ZombieConstants.ZOMBIE_SIGHT_RANGE) || this.playerSeekingRay.length < _ZombieConstants.ZOMBIE_HEARING_RANGE && !this.player.isSneaking && this.player.isMoving();
+    }
+  }, {
+    key: 'onCollisionEnter',
+    value: function onCollisionEnter(bodyA, bodyB, shapeA, shapeB) {
+      if (this.isItSensorArea(bodyA, shapeB)) {
+        this.isPlayerInRange = true;
+      }
+    }
+  }, {
+    key: 'onCollisionLeave',
+    value: function onCollisionLeave(bodyA, bodyB, shapeA, shapeB) {
+      if (this.isItSensorArea(bodyA, shapeB)) {
+        this.isPlayerInRange = false;
+      }
+    }
+  }, {
+    key: 'isItSensorArea',
+    value: function isItSensorArea(body, shape) {
+      if (body.sprite == null || shape.sensor == null) {
+        return false;
+      }
+      // for now this line assume that there is only one type of computer's textures
+      // TODO enable different sprite key's handling
+      return shape.sensor;
     }
   }, {
     key: 'chasePlayer',
@@ -3070,6 +3106,10 @@ var Game = function (_Phaser$State) {
 
       var _loop = function _loop(i) {
         var newZombie = _this2.zombies.add(new _Zombie2.default(_this2.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, _this2.map.getPath(i), _this2.map.walls, _this2.player));
+
+        _this2.player.body.onBeginContact.add(function () {
+          return newZombie.onCollisionEnter.apply(newZombie, arguments);
+        });
 
         newZombie.body.setCollisionGroup(_this2.zombiesCollisionGroup);
         newZombie.body.collides(_this2.zombiesCollisionGroup, function (body1, body2) {
