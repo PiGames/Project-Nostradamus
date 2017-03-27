@@ -1,4 +1,5 @@
 import { JOURNAL_TEXT_FIELD_WIDTH, JOURNAL_TEXT_FIELD_HEIGHT, JOURNAL_TEXT_SCROLL_STEP, JOURNAL_TEXT_FONT_SIZE } from '../constants/ItemConstants';
+import { showBackgroundLayer, getScreenCenter } from '../utils/UserInterfaceUtils';
 
 export default class JournalsManager extends Phaser.Group {
   constructor( game, messageText ) {
@@ -29,16 +30,11 @@ export default class JournalsManager extends Phaser.Group {
     }
   }
   showJournal( journalToShow ) {
-    const screenCenterX = this.game.camera.x + this.game.camera.width / 2;
-    const screenCenterY = this.game.camera.y + this.game.camera.height / 2;
+    const screenCenter = getScreenCenter( this.game );
 
-    this.backgroundLayer = this.game.add.sprite( screenCenterX, screenCenterY, 'layer-background' );
-    this.backgroundLayer.width = this.game.width + 100;
-    this.backgroundLayer.height = this.game.height + 100;
-    this.backgroundLayer.anchor.setTo( 0.5 );
-    this.backgroundLayer.alpha = 0.2;
+    this.backgroundLayer = showBackgroundLayer( this.game );
 
-    this.ui = this.game.add.sprite( screenCenterX, screenCenterY, 'journal-ui' );
+    this.ui = this.game.add.sprite( screenCenter.x, screenCenter.y, 'journal-ui' );
     this.ui.anchor.setTo( 0.5 );
 
     const textStyle = {
@@ -48,14 +44,14 @@ export default class JournalsManager extends Phaser.Group {
     };
 
     // TODO make text an internal property of journal object
-    this.uiText = this.game.add.text( screenCenterX, screenCenterY, journalToShow.content, textStyle );
+    this.uiText = this.game.add.text( screenCenter.x, screenCenter.y, journalToShow.content, textStyle );
     this.uiText.wordWrap = true;
     this.uiText.wordWrapWidth = JOURNAL_TEXT_FIELD_WIDTH;
     this.uiText.setTextBounds( -JOURNAL_TEXT_FIELD_WIDTH / 2, -JOURNAL_TEXT_FIELD_HEIGHT / 2, JOURNAL_TEXT_FIELD_WIDTH, JOURNAL_TEXT_FIELD_HEIGHT );
 
     this.maskGraphics = this.game.add.graphics( 0, 0 );
     this.maskGraphics.beginFill( 0xffffff );
-    this.maskGraphics.drawRect( screenCenterX - JOURNAL_TEXT_FIELD_WIDTH / 2, screenCenterY - JOURNAL_TEXT_FIELD_HEIGHT / 2, JOURNAL_TEXT_FIELD_WIDTH, JOURNAL_TEXT_FIELD_HEIGHT );
+    this.maskGraphics.drawRect( screenCenter.x - JOURNAL_TEXT_FIELD_WIDTH / 2, screenCenter.y - JOURNAL_TEXT_FIELD_HEIGHT / 2, JOURNAL_TEXT_FIELD_WIDTH, JOURNAL_TEXT_FIELD_HEIGHT );
 
     this.uiText.mask = this.maskGraphics;
   }

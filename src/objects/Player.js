@@ -145,10 +145,16 @@ export default class Player extends Entity {
     this.drawHealthBar();
 
     if ( this.health <= 0 ) {
-      this.onDeath.dispatch();
+      this.handleDeath();
     }
   }
 
+  handleDeath() {
+    this.onDeath.dispatch();
+    this.healthbar.destroy();
+    this.sneakText.destroy();
+    this.sprintText.destroy();
+  }
   drawHealthBar() {
     const width = 300;
     const height = 32;

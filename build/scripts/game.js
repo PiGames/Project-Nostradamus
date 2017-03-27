@@ -1014,7 +1014,7 @@ var ProjectNostradamus = function (_Phaser$Game) {
 
 exports.default = ProjectNostradamus;
 
-},{"./levels/Level1":12,"./states/Boot":24,"./states/Menu":26,"./states/Preload":27}],7:[function(require,module,exports){
+},{"./levels/Level1":13,"./states/Boot":25,"./states/Menu":27,"./states/Preload":28}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1062,6 +1062,14 @@ var MAP_HEIGHT = exports.MAP_HEIGHT = 32;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+var END_SCREEN_FADE_IN_DURATION = exports.END_SCREEN_FADE_IN_DURATION = 2500;
+
+},{}],11:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 var ZOMBIE_WIDTH = exports.ZOMBIE_WIDTH = 36;
 var ZOMBIE_HEIGHT = exports.ZOMBIE_HEIGHT = 36;
 var ZOMBIE_INITIAL_FRAME = exports.ZOMBIE_INITIAL_FRAME = 1;
@@ -1078,7 +1086,7 @@ var ZOMBIE_ROTATING_SPEED = exports.ZOMBIE_ROTATING_SPEED = 50;
 var ZOMBIE_DAMAGE_MULTIPLIER = exports.ZOMBIE_DAMAGE_MULTIPLIER = 1;
 var ZOMBIE_DAMAGE_COOLDOWN = exports.ZOMBIE_DAMAGE_COOLDOWN = 0.2;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict';
 
 var _ProjectNostradamus = require('./ProjectNostradamus');
@@ -1112,7 +1120,7 @@ document.onkeydown = ( e ) => {
 };
 */
 
-},{"./ProjectNostradamus":6}],12:[function(require,module,exports){
+},{"./ProjectNostradamus":6}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1184,7 +1192,7 @@ var Level1 = function (_Game) {
 
 exports.default = Level1;
 
-},{"../states/Game.js":25}],13:[function(require,module,exports){
+},{"../states/Game.js":26}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1392,7 +1400,7 @@ var BoidsManager = function () {
 
 exports.default = BoidsManager;
 
-},{"../constants/TileMapConstants":9,"../utils/MapUtils.js":29}],14:[function(require,module,exports){
+},{"../constants/TileMapConstants":9,"../utils/MapUtils.js":30}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1491,7 +1499,7 @@ var Entity = function (_Phaser$Sprite) {
 
 exports.default = Entity;
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1740,7 +1748,7 @@ var EntityWalkingOnPath = function (_Entity) {
 
 exports.default = EntityWalkingOnPath;
 
-},{"../constants/TileMapConstants":9,"../constants/ZombieConstants":10,"../objects/PathFinder.js":18,"../utils/MapUtils.js":29,"./Entity":14}],16:[function(require,module,exports){
+},{"../constants/TileMapConstants":9,"../constants/ZombieConstants":11,"../objects/PathFinder.js":19,"../utils/MapUtils.js":30,"./Entity":15}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1811,7 +1819,7 @@ var Journal = function (_Phaser$Sprite) {
 
 exports.default = Journal;
 
-},{"../constants/ItemConstants":7,"../constants/TileMapConstants":9}],17:[function(require,module,exports){
+},{"../constants/ItemConstants":7,"../constants/TileMapConstants":9}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1829,6 +1837,8 @@ var _createClass = function () {
 }();
 
 var _ItemConstants = require('../constants/ItemConstants');
+
+var _UserInterfaceUtils = require('../utils/UserInterfaceUtils');
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -1889,16 +1899,11 @@ var JournalsManager = function (_Phaser$Group) {
   }, {
     key: 'showJournal',
     value: function showJournal(journalToShow) {
-      var screenCenterX = this.game.camera.x + this.game.camera.width / 2;
-      var screenCenterY = this.game.camera.y + this.game.camera.height / 2;
+      var screenCenter = (0, _UserInterfaceUtils.getScreenCenter)(this.game);
 
-      this.backgroundLayer = this.game.add.sprite(screenCenterX, screenCenterY, 'layer-background');
-      this.backgroundLayer.width = this.game.width + 100;
-      this.backgroundLayer.height = this.game.height + 100;
-      this.backgroundLayer.anchor.setTo(0.5);
-      this.backgroundLayer.alpha = 0.2;
+      this.backgroundLayer = (0, _UserInterfaceUtils.showBackgroundLayer)(this.game);
 
-      this.ui = this.game.add.sprite(screenCenterX, screenCenterY, 'journal-ui');
+      this.ui = this.game.add.sprite(screenCenter.x, screenCenter.y, 'journal-ui');
       this.ui.anchor.setTo(0.5);
 
       var textStyle = {
@@ -1908,14 +1913,14 @@ var JournalsManager = function (_Phaser$Group) {
       };
 
       // TODO make text an internal property of journal object
-      this.uiText = this.game.add.text(screenCenterX, screenCenterY, journalToShow.content, textStyle);
+      this.uiText = this.game.add.text(screenCenter.x, screenCenter.y, journalToShow.content, textStyle);
       this.uiText.wordWrap = true;
       this.uiText.wordWrapWidth = _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH;
       this.uiText.setTextBounds(-_ItemConstants.JOURNAL_TEXT_FIELD_WIDTH / 2, -_ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT / 2, _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH, _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT);
 
       this.maskGraphics = this.game.add.graphics(0, 0);
       this.maskGraphics.beginFill(0xffffff);
-      this.maskGraphics.drawRect(screenCenterX - _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH / 2, screenCenterY - _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT / 2, _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH, _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT);
+      this.maskGraphics.drawRect(screenCenter.x - _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH / 2, screenCenter.y - _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT / 2, _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH, _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT);
 
       this.uiText.mask = this.maskGraphics;
     }
@@ -1979,7 +1984,7 @@ var JournalsManager = function (_Phaser$Group) {
 
 exports.default = JournalsManager;
 
-},{"../constants/ItemConstants":7}],18:[function(require,module,exports){
+},{"../constants/ItemConstants":7,"../utils/UserInterfaceUtils":31}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2037,7 +2042,7 @@ var PathFinder = function () {
 
 exports.default = PathFinder;
 
-},{"easystarjs":1}],19:[function(require,module,exports){
+},{"easystarjs":1}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2245,8 +2250,16 @@ var Player = function (_Entity) {
       this.drawHealthBar();
 
       if (this.health <= 0) {
-        this.onDeath.dispatch();
+        this.handleDeath();
       }
+    }
+  }, {
+    key: 'handleDeath',
+    value: function handleDeath() {
+      this.onDeath.dispatch();
+      this.healthbar.destroy();
+      this.sneakText.destroy();
+      this.sprintText.destroy();
     }
   }, {
     key: 'drawHealthBar',
@@ -2269,7 +2282,7 @@ var Player = function (_Entity) {
 
 exports.default = Player;
 
-},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"./Entity":14}],20:[function(require,module,exports){
+},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"./Entity":15}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2456,7 +2469,7 @@ var TileMap = function (_Phaser$Tilemap) {
 
 exports.default = TileMap;
 
-},{"../utils/MapUtils.js":29}],21:[function(require,module,exports){
+},{"../utils/MapUtils.js":30}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2641,7 +2654,7 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
 
 exports.default = WalkingEntitiesManager;
 
-},{"../constants/TileMapConstants":9,"../utils/EntityManagerUtils":28,"../utils/MapUtils.js":29,"./BoidsManager.js":13}],22:[function(require,module,exports){
+},{"../constants/TileMapConstants":9,"../utils/EntityManagerUtils":29,"../utils/MapUtils.js":30,"./BoidsManager.js":14}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2811,7 +2824,7 @@ var Zombie = function (_EntityWalkingOnPath) {
 
 exports.default = Zombie;
 
-},{"../constants/ZombieConstants":10,"../utils/MapUtils.js":29,"./EntityWalkingOnPath":15}],23:[function(require,module,exports){
+},{"../constants/ZombieConstants":11,"../utils/MapUtils.js":30,"./EntityWalkingOnPath":16}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2875,7 +2888,7 @@ var ZombieManager = function (_WalkingEntitiesManag) {
 
 exports.default = ZombieManager;
 
-},{"../objects/WalkingEntitiesManager":21}],24:[function(require,module,exports){
+},{"../objects/WalkingEntitiesManager":22}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2944,7 +2957,7 @@ var Boot = function (_Phaser$State) {
 
 exports.default = Boot;
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2988,6 +3001,10 @@ var _Journal2 = _interopRequireDefault(_Journal);
 var _PlayerConstants = require('../constants/PlayerConstants');
 
 var _TileMapConstants = require('../constants/TileMapConstants');
+
+var _UserInterfaceConstants = require('../constants/UserInterfaceConstants');
+
+var _UserInterfaceUtils = require('../utils/UserInterfaceUtils');
 
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : { default: obj };
@@ -3098,6 +3115,63 @@ var Game = function (_Phaser$State) {
 
         return (_journals2 = _this2.journals).onCollisionLeave.apply(_journals2, arguments);
       });
+
+      this.player.onDeath.add(function () {
+        return _this2.handleGameEnd();
+      });
+    }
+  }, {
+    key: 'handleGameEnd',
+    value: function handleGameEnd() {
+      this.clearScreen();
+      this.showEndScreen();
+    }
+  }, {
+    key: 'clearScreen',
+    value: function clearScreen() {
+      this.messageText.destroy();
+    }
+  }, {
+    key: 'showEndScreen',
+    value: function showEndScreen() {
+      var _this3 = this;
+
+      var screenCenter = (0, _UserInterfaceUtils.getScreenCenter)(this.game);
+
+      this.backgroundLayer = (0, _UserInterfaceUtils.showBackgroundLayer)(this.game);
+      this.backgroundLayer.alpha = 0;
+      this.game.add.tween(this.backgroundLayer).to({ alpha: 0.5 }, _UserInterfaceConstants.END_SCREEN_FADE_IN_DURATION, 'Linear', true);
+
+      var textStyle = {
+        align: 'center',
+        fill: 'white',
+        font: 'bold 80px Arial'
+      };
+
+      var mainText = this.game.add.text(screenCenter.x, screenCenter.y, 'YOU DIED!', textStyle);
+      mainText.anchor.setTo(0.5);
+      mainText.alpha = 0;
+      var fadingInTween = this.game.add.tween(mainText).to({ alpha: 1 }, _UserInterfaceConstants.END_SCREEN_FADE_IN_DURATION, 'Linear', true);
+      fadingInTween.onComplete.add(function () {
+        return _this3.showEndScreenButtons();
+      });
+    }
+  }, {
+    key: 'showEndScreenButtons',
+    value: function showEndScreenButtons() {
+      var _this4 = this;
+
+      var mainMenuButton = this.game.add.button(this.game.camera.x + 100, this.game.camera.y + this.game.camera.height - 100, 'main-menu-btn');
+      mainMenuButton.anchor.setTo(0, 1);
+      mainMenuButton.onInputUp.add(function () {
+        return _this4.state.start('Menu');
+      });
+
+      var restartLevelButton = this.game.add.button(this.game.camera.x + this.game.camera.width - 100, this.game.camera.y + this.game.camera.height - 100, 'restart-btn');
+      restartLevelButton.anchor.setTo(1, 1);
+      restartLevelButton.onInputUp.add(function () {
+        return _this4.state.restart();
+      });
     }
   }]);
 
@@ -3106,7 +3180,7 @@ var Game = function (_Phaser$State) {
 
 exports.default = Game;
 
-},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"../objects/Journal":16,"../objects/JournalsManager":17,"../objects/Player":19,"../objects/TileMap":20,"../objects/Zombie":22,"../objects/ZombiesManager":23}],26:[function(require,module,exports){
+},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"../constants/UserInterfaceConstants":10,"../objects/Journal":17,"../objects/JournalsManager":18,"../objects/Player":20,"../objects/TileMap":21,"../objects/Zombie":23,"../objects/ZombiesManager":24,"../utils/UserInterfaceUtils":31}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3162,7 +3236,7 @@ var Menu = function (_Phaser$State) {
 
 exports.default = Menu;
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3221,6 +3295,9 @@ var Preload = function (_Phaser$State) {
       this.game.load.image('computer', './assets/images/computer.png');
       this.game.load.image('layer-background', './assets/images/bg-color.png');
       this.game.load.image('journal-ui', './assets/images/journal-ui.png');
+
+      this.game.load.image('main-menu-btn', './assets/images/main-menu-btn.png');
+      this.game.load.image('restart-btn', './assets/images/restart-btn.png');
     }
   }, {
     key: 'create',
@@ -3234,7 +3311,7 @@ var Preload = function (_Phaser$State) {
 
 exports.default = Preload;
 
-},{"../constants/PlayerConstants.js":8,"../constants/ZombieConstants.js":10}],28:[function(require,module,exports){
+},{"../constants/PlayerConstants.js":8,"../constants/ZombieConstants.js":11}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3421,7 +3498,7 @@ function getFreeTileExcludingEast(entityTile, mapGrid) {
   return freeTile;
 }
 
-},{"../utils/MapUtils":29}],29:[function(require,module,exports){
+},{"../utils/MapUtils":30}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3474,5 +3551,31 @@ var getWallsPostions = exports.getWallsPostions = function getWallsPostions(laye
   return wallsArr;
 };
 
-},{"../constants/TileMapConstants":9}]},{},[11])
+},{"../constants/TileMapConstants":9}],31:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.showBackgroundLayer = showBackgroundLayer;
+var getScreenCenter = exports.getScreenCenter = function getScreenCenter(game) {
+  return {
+    x: game.camera.x + game.camera.width / 2,
+    y: game.camera.y + game.camera.height / 2
+  };
+};
+
+function showBackgroundLayer(game) {
+  var screenCenter = getScreenCenter(game);
+
+  var backgroundLayer = game.add.sprite(screenCenter.x, screenCenter.y, 'layer-background');
+  backgroundLayer.width = game.width + 100;
+  backgroundLayer.height = game.height + 100;
+  backgroundLayer.anchor.setTo(0.5);
+  backgroundLayer.alpha = 0.2;
+
+  return backgroundLayer;
+}
+
+},{}]},{},[12])
 //# sourceMappingURL=game.js.map

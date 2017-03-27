@@ -1,0 +1,1 @@
+export const END_SCREEN_FADE_IN_DURATION = 2500;
