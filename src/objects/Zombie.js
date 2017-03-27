@@ -19,6 +19,8 @@ export default class Zombie extends EntityWalkingOnPath {
     this.animations.add( 'walk', [ 0, 1, 2, 3, 4, 5 ], 0 );
     this.animations.add( 'attack', [ 6, 7, 8, 9 ], 6 );
     this.animations.play( 'walk', ZOMBIE_WALK_ANIMATION_FRAMERATE, true );
+
+    this.isPlayerDead = false;
   }
   update() {
     if ( this.canSeePlayer() ) {
@@ -36,6 +38,9 @@ export default class Zombie extends EntityWalkingOnPath {
     }
   }
   canSeePlayer() {
+    if ( this.isPlayerDead ) {
+      return false;
+    }
     /** Draw line between player and zombie and check if it can see him. If yes, chase him. */
     this.playerSeekingRay.start.set( this.x, this.y );
     this.playerSeekingRay.end.set( this.player.x, this.player.y );
@@ -88,5 +93,9 @@ export default class Zombie extends EntityWalkingOnPath {
     this.canDealDamage = false;
     this.game.time.events.add( Phaser.Timer.SECOND * ZOMBIE_DAMAGE_COOLDOWN, this.endCooldown, this );
     this.game.camera.shake( 0.005, 100, false );
+  }
+  onPlayerDeath() {
+    this.isPlayerDead = true;
+    this.stopChasingPlayer();
   }
 }

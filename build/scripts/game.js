@@ -2138,6 +2138,8 @@ var Player = function (_Entity) {
     _this.body.addCircle(Math.min(_PlayerConstants.PLAYER_WIDTH, _PlayerConstants.PLAYER_HEIGHT));
 
     _this.drawHealthBar();
+
+    _this.onDeath = new Phaser.Signal();
     return _this;
   }
 
@@ -2241,6 +2243,10 @@ var Player = function (_Entity) {
     value: function takeDamage(damage) {
       this.damage(damage);
       this.drawHealthBar();
+
+      if (this.health <= 0) {
+        this.onDeath.dispatch();
+      }
     }
   }, {
     key: 'drawHealthBar',
@@ -2703,6 +2709,8 @@ var Zombie = function (_EntityWalkingOnPath) {
     _this.animations.add('walk', [0, 1, 2, 3, 4, 5], 0);
     _this.animations.add('attack', [6, 7, 8, 9], 6);
     _this.animations.play('walk', _ZombieConstants.ZOMBIE_WALK_ANIMATION_FRAMERATE, true);
+
+    _this.isPlayerDead = false;
     return _this;
   }
 
@@ -2726,6 +2734,9 @@ var Zombie = function (_EntityWalkingOnPath) {
   }, {
     key: 'canSeePlayer',
     value: function canSeePlayer() {
+      if (this.isPlayerDead) {
+        return false;
+      }
       /** Draw line between player and zombie and check if it can see him. If yes, chase him. */
       this.playerSeekingRay.start.set(this.x, this.y);
       this.playerSeekingRay.end.set(this.player.x, this.player.y);
@@ -2784,6 +2795,12 @@ var Zombie = function (_EntityWalkingOnPath) {
       this.canDealDamage = false;
       this.game.time.events.add(Phaser.Timer.SECOND * _ZombieConstants.ZOMBIE_DAMAGE_COOLDOWN, this.endCooldown, this);
       this.game.camera.shake(0.005, 100, false);
+    }
+  }, {
+    key: 'onPlayerDeath',
+    value: function onPlayerDeath() {
+      this.isPlayerDead = true;
+      this.stopChasingPlayer();
     }
   }]);
 
@@ -3031,17 +3048,25 @@ var Game = function (_Phaser$State) {
       this.player.body.collides([this.map.wallsCollisionGroup]);
 
       // init zombies
-      for (var i = 0; i < this.map.paths.length; i++) {
-        var newZombie = this.zombies.add(new _Zombie2.default(this.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, this.map.getPath(i), this.map.walls, this.player));
 
-        newZombie.body.setCollisionGroup(this.zombiesCollisionGroup);
-        newZombie.body.collides(this.zombiesCollisionGroup, function (body1, body2) {
+      var _loop = function _loop(i) {
+        var newZombie = _this2.zombies.add(new _Zombie2.default(_this2.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, _this2.map.getPath(i), _this2.map.walls, _this2.player));
+
+        newZombie.body.setCollisionGroup(_this2.zombiesCollisionGroup);
+        newZombie.body.collides(_this2.zombiesCollisionGroup, function (body1, body2) {
           return _this2.zombies.onCollisionWihOtherEntity(body1.sprite, body2.sprite);
         });
-        newZombie.body.collides(this.map.wallsCollisionGroup, function (body, tileBody) {
+        newZombie.body.collides(_this2.map.wallsCollisionGroup, function (body, tileBody) {
           return _this2.zombies.onCollisionWithWalls(body.sprite, tileBody);
         });
-        newZombie.body.collides([this.playerCollisionGroup, this.journalsCollisionGroup]);
+        newZombie.body.collides([_this2.playerCollisionGroup, _this2.journalsCollisionGroup]);
+        _this2.player.onDeath.add(function () {
+          return newZombie.onPlayerDeath();
+        });
+      };
+
+      for (var i = 0; i < this.map.paths.length; i++) {
+        _loop(i);
       }
       this.player.body.collides([this.zombiesCollisionGroup]);
       this.map.collides([this.zombiesCollisionGroup]);
@@ -3053,8 +3078,8 @@ var Game = function (_Phaser$State) {
         return _this2.journals.onMouseWheel();
       };
 
-      for (var _i = 0; _i < journalsData.length; _i++) {
-        var newJournal = new _Journal2.default(this.game, journalsData[_i].x, journalsData[_i].y, journalsData[_i].cornerX, journalsData[_i].cornerY, journalsData[_i].content, 'computer');
+      for (var i = 0; i < journalsData.length; i++) {
+        var newJournal = new _Journal2.default(this.game, journalsData[i].x, journalsData[i].y, journalsData[i].cornerX, journalsData[i].cornerY, journalsData[i].content, 'computer');
         this.journals.add(newJournal);
         newJournal.body.setCollisionGroup(this.journalsCollisionGroup);
         newJournal.body.collides([this.playerCollisionGroup, this.zombiesCollisionGroup]);

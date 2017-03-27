@@ -52,6 +52,8 @@ export default class Player extends Entity {
     this.body.addCircle( Math.min( PLAYER_WIDTH, PLAYER_HEIGHT ) );
 
     this.drawHealthBar();
+
+    this.onDeath = new Phaser.Signal();
   }
 
   update() {
@@ -141,6 +143,10 @@ export default class Player extends Entity {
   takeDamage( damage ) {
     this.damage( damage );
     this.drawHealthBar();
+
+    if ( this.health <= 0 ) {
+      this.onDeath.dispatch();
+    }
   }
 
   drawHealthBar() {

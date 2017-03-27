@@ -43,6 +43,7 @@ export default class Game extends Phaser.State {
       newZombie.body.collides( this.zombiesCollisionGroup, ( body1, body2 ) => this.zombies.onCollisionWihOtherEntity( body1.sprite, body2.sprite ) );
       newZombie.body.collides( this.map.wallsCollisionGroup, ( body, tileBody ) => this.zombies.onCollisionWithWalls( body.sprite, tileBody ) );
       newZombie.body.collides( [ this.playerCollisionGroup, this.journalsCollisionGroup ] );
+      this.player.onDeath.add( () => newZombie.onPlayerDeath() );
     }
     this.player.body.collides( [ this.zombiesCollisionGroup ] );
     this.map.collides( [ this.zombiesCollisionGroup ] );
