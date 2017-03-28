@@ -1755,6 +1755,16 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
+
 var _TileMapConstants = require('../constants/TileMapConstants');
 
 var _ItemConstants = require('../constants/ItemConstants');
@@ -1780,39 +1790,62 @@ function _inherits(subClass, superClass) {
 var Journal = function (_Phaser$Sprite) {
   _inherits(Journal, _Phaser$Sprite);
 
-  function Journal(game, tileX, tileY, cornerX, cornerY, content, imageKey) {
+  function Journal(game, content, imageKey) {
     _classCallCheck(this, Journal);
 
-    var offsetX = cornerX === 'WEST' ? _ItemConstants.COMPUTER_WIDTH / 2 : _TileMapConstants.TILE_WIDTH - _ItemConstants.COMPUTER_WIDTH / 2;
-    var offsetY = cornerY === 'NORTH' ? _ItemConstants.COMPUTER_HEIGHT / 2 : _TileMapConstants.TILE_HEIGHT - _ItemConstants.COMPUTER_HEIGHT / 2;
-
-    var x = tileX + offsetX;
-    var y = tileY + offsetY;
-
-    var _this = _possibleConstructorReturn(this, (Journal.__proto__ || Object.getPrototypeOf(Journal)).call(this, game, x, y, imageKey));
+    var _this = _possibleConstructorReturn(this, (Journal.__proto__ || Object.getPrototypeOf(Journal)).call(this, game, 0, 0, imageKey));
 
     _this.game.world.add(_this);
-
-    _this.game.physics.p2.enable(_this);
-    _this.body.static = true;
-
-    var sensorOffsetX = (_TileMapConstants.TILE_WIDTH - _ItemConstants.COMPUTER_WIDTH) / (cornerX === 'WEST' ? 2 : -2);
-    var sensorOffsetY = (_TileMapConstants.TILE_HEIGHT - _ItemConstants.COMPUTER_HEIGHT) / (cornerY === 'NORTH' ? 2 : -2);
-
-    if (cornerY === 'SOUTH') {
-      _this.body.angle = 180;
-      sensorOffsetX += (_TileMapConstants.TILE_WIDTH - _ItemConstants.COMPUTER_WIDTH) * (sensorOffsetX < 0 ? 1 : -1);
-      sensorOffsetY += (_TileMapConstants.TILE_HEIGHT - _ItemConstants.COMPUTER_HEIGHT) * (sensorOffsetY < 0 ? 1 : -1);
-    }
-
-    var rectangleSensor = _this.body.addRectangle(_TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT, sensorOffsetX, sensorOffsetY);
-    rectangleSensor.sensor = true;
 
     _this.hasPlayerApproached = false;
 
     _this.content = content;
     return _this;
   }
+
+  _createClass(Journal, [{
+    key: 'setCorner',
+    value: function setCorner(cornerX, cornerY) {
+      this.cornerX = cornerX;
+      this.cornerY = cornerY;
+    }
+  }, {
+    key: 'setPosition',
+    value: function setPosition(tileX, tileY) {
+      var cornerX = this.cornerX || 'WEST';
+      var cornerY = this.cornerY || 'NORTH';
+
+      var offsetX = cornerX === 'WEST' ? _ItemConstants.COMPUTER_WIDTH / 2 : _TileMapConstants.TILE_WIDTH - _ItemConstants.COMPUTER_WIDTH / 2;
+      var offsetY = cornerY === 'NORTH' ? _ItemConstants.COMPUTER_HEIGHT / 2 : _TileMapConstants.TILE_HEIGHT - _ItemConstants.COMPUTER_HEIGHT / 2;
+
+      var x = tileX + offsetX;
+      var y = tileY + offsetY;
+
+      this.x = x;
+      this.y = y;
+    }
+  }, {
+    key: 'enableJournal',
+    value: function enableJournal() {
+      var cornerX = this.cornerX || 'WEST';
+      var cornerY = this.cornerY || 'NORTH';
+
+      this.game.physics.p2.enable(this);
+      this.body.static = true;
+
+      var sensorOffsetX = (_TileMapConstants.TILE_WIDTH - _ItemConstants.COMPUTER_WIDTH) / (cornerX === 'WEST' ? 2 : -2);
+      var sensorOffsetY = (_TileMapConstants.TILE_HEIGHT - _ItemConstants.COMPUTER_HEIGHT) / (cornerY === 'NORTH' ? 2 : -2);
+
+      if (cornerY === 'SOUTH') {
+        this.body.angle = 180;
+        sensorOffsetX += (_TileMapConstants.TILE_WIDTH - _ItemConstants.COMPUTER_WIDTH) * (sensorOffsetX < 0 ? 1 : -1);
+        sensorOffsetY += (_TileMapConstants.TILE_HEIGHT - _ItemConstants.COMPUTER_HEIGHT) * (sensorOffsetY < 0 ? 1 : -1);
+      }
+
+      var rectangleSensor = this.body.addRectangle(_TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT, sensorOffsetX, sensorOffsetY);
+      rectangleSensor.sensor = true;
+    }
+  }]);
 
   return Journal;
 }(Phaser.Sprite);
@@ -3138,10 +3171,14 @@ var Game = function (_Phaser$State) {
       };
 
       for (var i = 0; i < journalsData.length; i++) {
-        var newJournal = new _Journal2.default(this.game, journalsData[i].x, journalsData[i].y, journalsData[i].cornerX, journalsData[i].cornerY, journalsData[i].content, 'computer');
-        this.journals.add(newJournal);
+        var newJournal = new _Journal2.default(this.game, journalsData[i].content, 'computer');
+        newJournal.setCorner(journalsData[i].cornerX, journalsData[i].cornerY);
+        newJournal.setPosition(journalsData[i].x, journalsData[i].y);
+        newJournal.enableJournal();
+
         newJournal.body.setCollisionGroup(this.journalsCollisionGroup);
         newJournal.body.collides([this.playerCollisionGroup, this.zombiesCollisionGroup]);
+        this.journals.add(newJournal);
       }
       this.player.body.collides(this.journalsCollisionGroup);
 

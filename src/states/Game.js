@@ -59,10 +59,15 @@ export default class Game extends Phaser.State {
     this.game.input.mouse.mouseWheelCallback = () => this.journals.onMouseWheel();
 
     for ( let i = 0; i < journalsData.length; i++ ) {
-      const newJournal = new Journal( this.game, journalsData[ i ].x, journalsData[ i ].y, journalsData[ i ].cornerX, journalsData[ i ].cornerY, journalsData[ i ].content, 'computer' );
-      this.journals.add( newJournal );
+      const newJournal = new Journal( this.game, journalsData[ i ].content, 'computer' );
+      newJournal.setCorner( journalsData[ i ].cornerX, journalsData[ i ].cornerY );
+      newJournal.setPosition( journalsData[ i ].x, journalsData[ i ].y );
+      newJournal.enableJournal();
+
       newJournal.body.setCollisionGroup( this.journalsCollisionGroup );
       newJournal.body.collides( [ this.playerCollisionGroup, this.zombiesCollisionGroup ] );
+
+      this.journals.add( newJournal );
     }
     this.player.body.collides( this.journalsCollisionGroup );
 

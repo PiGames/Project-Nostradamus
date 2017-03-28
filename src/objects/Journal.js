@@ -2,16 +2,36 @@ import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 import { COMPUTER_WIDTH, COMPUTER_HEIGHT } from '../constants/ItemConstants';
 
 export default class Journal extends Phaser.Sprite {
-  constructor( game, tileX, tileY, cornerX, cornerY, content, imageKey ) {
+  constructor( game, content, imageKey ) {
+
+    super( game, 0, 0, imageKey );
+
+    this.game.world.add( this );
+
+    this.hasPlayerApproached = false;
+
+    this.content = content;
+  }
+  setCorner( cornerX, cornerY ) {
+    this.cornerX = cornerX;
+    this.cornerY = cornerY;
+  }
+  setPosition( tileX, tileY ) {
+    const cornerX = this.cornerX || 'WEST';
+    const cornerY = this.cornerY || 'NORTH';
+
     const offsetX = ( cornerX === 'WEST' ) ? ( COMPUTER_WIDTH / 2 ) : TILE_WIDTH - ( COMPUTER_WIDTH / 2 );
     const offsetY = ( cornerY === 'NORTH' ) ? ( COMPUTER_HEIGHT / 2 ) : TILE_HEIGHT - ( COMPUTER_HEIGHT / 2 );
 
     const x = tileX + offsetX;
     const y = tileY + offsetY;
 
-    super( game, x, y, imageKey );
-
-    this.game.world.add( this );
+    this.x = x;
+    this.y = y;
+  }
+  enableJournal() {
+    const cornerX = this.cornerX || 'WEST';
+    const cornerY = this.cornerY || 'NORTH';
 
     this.game.physics.p2.enable( this );
     this.body.static = true;
@@ -27,9 +47,5 @@ export default class Journal extends Phaser.Sprite {
 
     const rectangleSensor = this.body.addRectangle( TILE_WIDTH, TILE_HEIGHT, sensorOffsetX, sensorOffsetY );
     rectangleSensor.sensor = true;
-
-    this.hasPlayerApproached = false;
-
-    this.content = content;
   }
 }
