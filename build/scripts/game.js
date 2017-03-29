@@ -2855,6 +2855,7 @@ var Zombie = function (_EntityWalkingOnPath) {
     key: 'endCooldown',
     value: function endCooldown() {
       this.canDealDamage = true;
+      this.animations.play('walk', _ZombieConstants.ZOMBIE_WALK_ANIMATION_FRAMERATE, true);
     }
   }, {
     key: 'stopChasingPlayer',
@@ -3178,6 +3179,7 @@ var Game = function (_Phaser$State) {
 
         newJournal.body.setCollisionGroup(this.journalsCollisionGroup);
         newJournal.body.collides([this.playerCollisionGroup, this.zombiesCollisionGroup]);
+
         this.journals.add(newJournal);
       }
       this.player.body.collides(this.journalsCollisionGroup);

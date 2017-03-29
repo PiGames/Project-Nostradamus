@@ -109,6 +109,7 @@ export default class Zombie extends EntityWalkingOnPath {
 
   endCooldown() {
     this.canDealDamage = true;
+    this.animations.play( 'walk', ZOMBIE_WALK_ANIMATION_FRAMERATE, true );
   }
 
   stopChasingPlayer() {
