@@ -1,5 +1,5 @@
 import EntityWalkingOnPath from './EntityWalkingOnPath';
-import { ZOMBIE_SPEED, MIN_DISTANCE_TO_TARGET, ZOMBIE_SPEED_CHASING_MULTIPLIER, ZOMBIE_SIGHT_ANGLE, ZOMBIE_SIGHT_RANGE, ZOMBIE_HEARING_RANGE, ZOMBIE_DAMAGE_TAKEN, ZOMBIE_DAMAGE_COOLDOWN, ZOMBIE_DAMAGE_MULTIPLIER, ZOMBIE_WALK_ANIMATION_FRAMERATE, ZOMBIE_FIGHT_ANIMATION_FRAMERATE } from '../constants/ZombieConstants';
+import { ZOMBIE_WIDTH, ZOMBIE_HEIGHT, ZOMBIE_SPEED, MIN_DISTANCE_TO_TARGET, ZOMBIE_SPEED_CHASING_MULTIPLIER, ZOMBIE_SIGHT_ANGLE, ZOMBIE_SIGHT_RANGE, ZOMBIE_HEARING_RANGE, ZOMBIE_DAMAGE_TAKEN, ZOMBIE_DAMAGE_COOLDOWN, ZOMBIE_DAMAGE_MULTIPLIER, ZOMBIE_WALK_ANIMATION_FRAMERATE, ZOMBIE_FIGHT_ANIMATION_FRAMERATE } from '../constants/ZombieConstants';
 import { pixelsToTile } from '../utils/MapUtils.js';
 
 export default class Zombie extends EntityWalkingOnPath {
@@ -23,16 +23,19 @@ export default class Zombie extends EntityWalkingOnPath {
 
     this.isPlayerDead = false;
 
+    this.body.clearShapes();
+
     this.viewSensor = this.body.addCircle( ZOMBIE_SIGHT_RANGE );
     this.viewSensor.sensor = true;
 
     this.attackSensor = this.body.addCircle( 100 );
     this.attackSensor.sensor = true;
     this.attackSensor.asd = true;
+
+    // this is a little bit hard coded so if it works don't bother but if it doesn't, well try changing this line
+    this.body.addCapsule( ZOMBIE_WIDTH / 4, ZOMBIE_HEIGHT / 2 );
   }
   update() {
-    // this.game.debug.spriteBounds( this );
-
     if ( this.isPlayerInRange ) {
       if ( this.canSeePlayer() ) {
         this.isChasing = true;

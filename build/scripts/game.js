@@ -2759,20 +2759,23 @@ var Zombie = function (_EntityWalkingOnPath) {
 
     _this.isPlayerDead = false;
 
+    _this.body.clearShapes();
+
     _this.viewSensor = _this.body.addCircle(_ZombieConstants.ZOMBIE_SIGHT_RANGE);
     _this.viewSensor.sensor = true;
 
     _this.attackSensor = _this.body.addCircle(100);
     _this.attackSensor.sensor = true;
     _this.attackSensor.asd = true;
+
+    // this is a little bit hard coded so if it works don't bother but if it doesn't, well try changing this line
+    _this.body.addCapsule(_ZombieConstants.ZOMBIE_WIDTH / 4, _ZombieConstants.ZOMBIE_HEIGHT / 2);
     return _this;
   }
 
   _createClass(Zombie, [{
     key: 'update',
     value: function update() {
-      // this.game.debug.spriteBounds( this );
-
       if (this.isPlayerInRange) {
         if (this.canSeePlayer()) {
           this.isChasing = true;
