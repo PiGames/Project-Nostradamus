@@ -5,6 +5,7 @@ export default class Level1 extends Game {
     Game.prototype.preload.call( this );
 
     this.load.tilemap( 'map', 'assets/levels/level1/map.json', null, Phaser.Tilemap.TILED_JSON );
+    this.load.json( 'journals', 'assets/levels/level1/journals.json' );
   }
   create() {
     Game.prototype.create.call( this );

@@ -54,7 +54,7 @@ export default class TileMap extends Phaser.Tilemap {
           y: v.y,
           cornerX: props.cornerX,
           cornerY: props.cornerY,
-          title: v.name,
+          name: v.name,
           content: props.content,
         }
       );

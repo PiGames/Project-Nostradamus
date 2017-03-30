@@ -1178,6 +1178,7 @@ var Level1 = function (_Game) {
       _Game3.default.prototype.preload.call(this);
 
       this.load.tilemap('map', 'assets/levels/level1/map.json', null, Phaser.Tilemap.TILED_JSON);
+      this.load.json('journals', 'assets/levels/level1/journals.json');
     }
   }, {
     key: 'create',
@@ -2461,7 +2462,7 @@ var TileMap = function (_Phaser$Tilemap) {
           y: v.y,
           cornerX: props.cornerX,
           cornerY: props.cornerY,
-          title: v.name,
+          name: v.name,
           content: props.content
         });
       });
@@ -3169,13 +3170,15 @@ var Game = function (_Phaser$State) {
 
       // init journals
       var journalsData = this.map.getJournals();
+      var journalsContent = this.game.cache.getJSON('journals');
 
       this.game.input.mouse.mouseWheelCallback = function () {
         return _this2.journals.onMouseWheel();
       };
 
       for (var i = 0; i < journalsData.length; i++) {
-        var newJournal = new _Journal2.default(this.game, journalsData[i].content, 'computer');
+        var content = journalsContent[journalsData[i].name];
+        var newJournal = new _Journal2.default(this.game, content, 'computer');
         newJournal.setCorner(journalsData[i].cornerX, journalsData[i].cornerY);
         newJournal.setPosition(journalsData[i].x, journalsData[i].y);
         newJournal.enableJournal();
