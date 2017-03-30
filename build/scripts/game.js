@@ -1023,9 +1023,11 @@ Object.defineProperty(exports, "__esModule", {
 var COMPUTER_WIDTH = exports.COMPUTER_WIDTH = 32;
 var COMPUTER_HEIGHT = exports.COMPUTER_HEIGHT = 39;
 var JOURNAL_TEXT_FIELD_WIDTH = exports.JOURNAL_TEXT_FIELD_WIDTH = 544;
-var JOURNAL_TEXT_FIELD_HEIGHT = exports.JOURNAL_TEXT_FIELD_HEIGHT = 344;
+var JOURNAL_TEXT_FIELD_HEIGHT = exports.JOURNAL_TEXT_FIELD_HEIGHT = 350;
 var JOURNAL_TEXT_SCROLL_STEP = exports.JOURNAL_TEXT_SCROLL_STEP = 32;
 var JOURNAL_TEXT_FONT_SIZE = exports.JOURNAL_TEXT_FONT_SIZE = 16;
+var JOURNAL_SCROLL_BAR_WIDTH = exports.JOURNAL_SCROLL_BAR_WIDTH = 8;
+var MAGIC_OFFSET_FIXING_VALUE = exports.MAGIC_OFFSET_FIXING_VALUE = 7;
 
 },{}],8:[function(require,module,exports){
 "use strict";
@@ -1937,26 +1939,34 @@ var JournalsManager = function (_Phaser$Group) {
 
       this.backgroundLayer = (0, _UserInterfaceUtils.showBackgroundLayer)(this.game);
 
-      this.ui = this.game.add.sprite(screenCenter.x, screenCenter.y, 'journal-ui');
+      this.ui = this.game.add.sprite(screenCenter.x, screenCenter.y + _ItemConstants.MAGIC_OFFSET_FIXING_VALUE, 'journal-ui');
       this.ui.anchor.setTo(0.5);
 
       var textStyle = {
         align: 'left',
         fill: '#10aede',
-        font: 'bold ' + _ItemConstants.JOURNAL_TEXT_FONT_SIZE + 'px Arial'
+        font: 'bold ' + _ItemConstants.JOURNAL_TEXT_FONT_SIZE + 'px Arial',
+        padding: '0',
+        margin: '0'
       };
 
-      // TODO make text an internal property of journal object
-      this.uiText = this.game.add.text(screenCenter.x, screenCenter.y, journalToShow.content, textStyle);
+      this.uiText = this.game.add.text(screenCenter.x - _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH / 2, screenCenter.y - _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT / 2, journalToShow.content, textStyle);
       this.uiText.wordWrap = true;
       this.uiText.wordWrapWidth = _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH;
-      this.uiText.setTextBounds(-_ItemConstants.JOURNAL_TEXT_FIELD_WIDTH / 2, -_ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT / 2, _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH, _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT);
 
       this.maskGraphics = this.game.add.graphics(0, 0);
       this.maskGraphics.beginFill(0xffffff);
-      this.maskGraphics.drawRect(screenCenter.x - _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH / 2, screenCenter.y - _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT / 2, _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH, _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT);
+      this.maskGraphics.drawRect(screenCenter.x - _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH / 2, this.uiText.y, _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH, _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT);
 
       this.uiText.mask = this.maskGraphics;
+
+      this.scrollBar = this.game.add.graphics(screenCenter.x + _ItemConstants.JOURNAL_TEXT_FIELD_WIDTH / 2, this.uiText.y);
+      this.scrollBar.alpha = 0.5;
+      this.scrollBarHeight = this.uiText.height > _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT ? Math.pow(_ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT, 2) / this.uiText.height : _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT;
+      this.scrollBarOffset = 0;
+      this.scrollBarStep = _ItemConstants.JOURNAL_TEXT_SCROLL_STEP / this.uiText.height * _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT;
+
+      this.drawScrollBar();
     }
   }, {
     key: 'tryToHideJournal',
@@ -1969,6 +1979,7 @@ var JournalsManager = function (_Phaser$Group) {
         this.ui.destroy();
         this.uiText.destroy();
         this.maskGraphics.destroy();
+        this.scrollBar.destroy();
       }
     }
   }, {
@@ -2003,13 +2014,26 @@ var JournalsManager = function (_Phaser$Group) {
       if (this.isJournalOpened === false) {
         return;
       }
-
       var directionY = this.game.input.mouse.wheelDelta;
-      if (directionY === 1 && !(this.uiText.y >= this.game.camera.y + this.game.camera.height / 2)) {
+
+      if (directionY === 1 && this.uiText.y < this.game.camera.y + this.game.camera.height / 2 - _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT / 2) {
         this.uiText.y += _ItemConstants.JOURNAL_TEXT_SCROLL_STEP;
-      } else if (directionY === -1 && !(this.uiText.y <= this.game.camera.y + this.game.camera.height / 2 + _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT - this.uiText.height)) {
+        this.drawScrollBar(-this.scrollBarStep);
+      } else if (directionY === -1 && this.uiText.y > this.game.camera.y + this.game.camera.height / 2 + _ItemConstants.JOURNAL_TEXT_FIELD_HEIGHT / 2 - this.uiText.height) {
         this.uiText.y -= _ItemConstants.JOURNAL_TEXT_SCROLL_STEP;
+        this.drawScrollBar(this.scrollBarStep);
       }
+    }
+  }, {
+    key: 'drawScrollBar',
+    value: function drawScrollBar() {
+      var y = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
+      this.scrollBarOffset += y;
+      this.scrollBar.clear();
+      this.scrollBar.beginFill(0xffffff);
+      this.scrollBar.drawRect(0, this.scrollBarOffset, _ItemConstants.JOURNAL_SCROLL_BAR_WIDTH, this.scrollBarHeight);
+      this.scrollBar.endFill();
     }
   }]);
 

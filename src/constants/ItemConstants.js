@@ -1,6 +1,8 @@
 export const COMPUTER_WIDTH = 32;
 export const COMPUTER_HEIGHT = 39;
 export const JOURNAL_TEXT_FIELD_WIDTH = 544;
-export const JOURNAL_TEXT_FIELD_HEIGHT = 344;
+export const JOURNAL_TEXT_FIELD_HEIGHT = 350;
 export const JOURNAL_TEXT_SCROLL_STEP = 32;
 export const JOURNAL_TEXT_FONT_SIZE = 16;
+export const JOURNAL_SCROLL_BAR_WIDTH = 8;
+export const MAGIC_OFFSET_FIXING_VALUE = 7;

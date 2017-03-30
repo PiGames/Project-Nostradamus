@@ -1,4 +1,4 @@
-import { JOURNAL_TEXT_FIELD_WIDTH, JOURNAL_TEXT_FIELD_HEIGHT, JOURNAL_TEXT_SCROLL_STEP, JOURNAL_TEXT_FONT_SIZE } from '../constants/ItemConstants';
+import { JOURNAL_TEXT_FIELD_WIDTH, JOURNAL_TEXT_FIELD_HEIGHT, JOURNAL_TEXT_SCROLL_STEP, JOURNAL_TEXT_FONT_SIZE, JOURNAL_SCROLL_BAR_WIDTH, MAGIC_OFFSET_FIXING_VALUE } from '../constants/ItemConstants';
 import { showBackgroundLayer, getScreenCenter } from '../utils/UserInterfaceUtils';
 
 export default class JournalsManager extends Phaser.Group {
@@ -34,26 +34,34 @@ export default class JournalsManager extends Phaser.Group {
 
     this.backgroundLayer = showBackgroundLayer( this.game );
 
-    this.ui = this.game.add.sprite( screenCenter.x, screenCenter.y, 'journal-ui' );
+    this.ui = this.game.add.sprite( screenCenter.x, screenCenter.y + MAGIC_OFFSET_FIXING_VALUE, 'journal-ui' );
     this.ui.anchor.setTo( 0.5 );
 
     const textStyle = {
       align: 'left',
       fill: '#10aede',
       font: `bold ${JOURNAL_TEXT_FONT_SIZE}px Arial`,
+      padding: '0',
+      margin: '0',
     };
 
-    // TODO make text an internal property of journal object
-    this.uiText = this.game.add.text( screenCenter.x, screenCenter.y, journalToShow.content, textStyle );
+    this.uiText = this.game.add.text( screenCenter.x - JOURNAL_TEXT_FIELD_WIDTH / 2, screenCenter.y - JOURNAL_TEXT_FIELD_HEIGHT / 2, journalToShow.content, textStyle );
     this.uiText.wordWrap = true;
     this.uiText.wordWrapWidth = JOURNAL_TEXT_FIELD_WIDTH;
-    this.uiText.setTextBounds( -JOURNAL_TEXT_FIELD_WIDTH / 2, -JOURNAL_TEXT_FIELD_HEIGHT / 2, JOURNAL_TEXT_FIELD_WIDTH, JOURNAL_TEXT_FIELD_HEIGHT );
 
     this.maskGraphics = this.game.add.graphics( 0, 0 );
     this.maskGraphics.beginFill( 0xffffff );
-    this.maskGraphics.drawRect( screenCenter.x - JOURNAL_TEXT_FIELD_WIDTH / 2, screenCenter.y - JOURNAL_TEXT_FIELD_HEIGHT / 2, JOURNAL_TEXT_FIELD_WIDTH, JOURNAL_TEXT_FIELD_HEIGHT );
+    this.maskGraphics.drawRect( screenCenter.x - JOURNAL_TEXT_FIELD_WIDTH / 2, this.uiText.y, JOURNAL_TEXT_FIELD_WIDTH, JOURNAL_TEXT_FIELD_HEIGHT );
 
     this.uiText.mask = this.maskGraphics;
+
+    this.scrollBar = this.game.add.graphics( screenCenter.x + JOURNAL_TEXT_FIELD_WIDTH / 2, this.uiText.y );
+    this.scrollBar.alpha = 0.5;
+    this.scrollBarHeight = ( this.uiText.height > JOURNAL_TEXT_FIELD_HEIGHT ) ? Math.pow( JOURNAL_TEXT_FIELD_HEIGHT, 2 ) / this.uiText.height : JOURNAL_TEXT_FIELD_HEIGHT;
+    this.scrollBarOffset = 0;
+    this.scrollBarStep = ( JOURNAL_TEXT_SCROLL_STEP / this.uiText.height ) * JOURNAL_TEXT_FIELD_HEIGHT;
+
+    this.drawScrollBar();
   }
   tryToHideJournal() {
     if ( this.isJournalOpened && this.game.paused ) {
@@ -64,6 +72,7 @@ export default class JournalsManager extends Phaser.Group {
       this.ui.destroy();
       this.uiText.destroy();
       this.maskGraphics.destroy();
+      this.scrollBar.destroy();
     }
   }
   onCollisionEnter( bodyA, bodyB, shapeA, shapeB ) {
@@ -90,12 +99,21 @@ export default class JournalsManager extends Phaser.Group {
     if ( this.isJournalOpened === false ) {
       return;
     }
-
     const directionY = this.game.input.mouse.wheelDelta;
-    if ( directionY === 1 && !( this.uiText.y >= this.game.camera.y + this.game.camera.height / 2 ) ) {
+
+    if ( directionY === 1 && this.uiText.y < this.game.camera.y + this.game.camera.height / 2 - JOURNAL_TEXT_FIELD_HEIGHT / 2 ) {
       this.uiText.y += JOURNAL_TEXT_SCROLL_STEP;
-    } else if ( directionY === -1 && !( this.uiText.y <= this.game.camera.y + this.game.camera.height / 2 + JOURNAL_TEXT_FIELD_HEIGHT - this.uiText.height ) ) {
+      this.drawScrollBar( -this.scrollBarStep );
+    } else if ( directionY === -1 && this.uiText.y > this.game.camera.y + this.game.camera.height / 2 + JOURNAL_TEXT_FIELD_HEIGHT / 2 - this.uiText.height ) {
       this.uiText.y -= JOURNAL_TEXT_SCROLL_STEP;
+      this.drawScrollBar( this.scrollBarStep );
     }
+  }
+  drawScrollBar( y = 0 ) {
+    this.scrollBarOffset += y;
+    this.scrollBar.clear();
+    this.scrollBar.beginFill( 0xffffff );
+    this.scrollBar.drawRect( 0, this.scrollBarOffset, JOURNAL_SCROLL_BAR_WIDTH, this.scrollBarHeight );
+    this.scrollBar.endFill();
   }
 }
