@@ -7,7 +7,7 @@
     "start": "gulp",
     "production": "gulp --production",
     "deploy": "gulp deploy",
-    "deploy-for-testers": "gulp deploy-for-testers",
+    "deploy-for-testers": "gulp deploy-for-testers --ssh",
     "document": "jsdoc -d docs src/ src/**"
   },
   "repository": {
