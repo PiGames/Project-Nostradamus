@@ -3582,7 +3582,7 @@ var Menu = function (_Phaser$State) {
     value: function create() {
       var _this2 = this;
 
-      this.state.start(this.levels[1]);
+      this.state.start(this.levels[0]);
 
       window.goToLevel = function (n) {
         if (_this2.levels[n - 1]) {
