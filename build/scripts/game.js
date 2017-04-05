@@ -968,6 +968,10 @@ var _Level = require('./levels/Level1');
 
 var _Level2 = _interopRequireDefault(_Level);
 
+var _Level3 = require('./levels/Level2');
+
+var _Level4 = _interopRequireDefault(_Level3);
+
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : { default: obj };
 }
@@ -1004,6 +1008,7 @@ var ProjectNostradamus = function (_Phaser$Game) {
     _this.state.add('Menu', _Menu2.default);
 
     _this.state.add('Level1', _Level2.default);
+    _this.state.add('Level2', _Level4.default);
 
     _this.state.start('Boot');
     return _this;
@@ -1014,7 +1019,7 @@ var ProjectNostradamus = function (_Phaser$Game) {
 
 exports.default = ProjectNostradamus;
 
-},{"./levels/Level1":13,"./states/Boot":25,"./states/Menu":27,"./states/Preload":28}],7:[function(require,module,exports){
+},{"./levels/Level1":13,"./levels/Level2":14,"./states/Boot":26,"./states/Menu":28,"./states/Preload":29}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1039,13 +1044,14 @@ var PLAYER_WIDTH = exports.PLAYER_WIDTH = 29;
 var PLAYER_HEIGHT = exports.PLAYER_HEIGHT = 31;
 var PLAYER_INITIAL_FRAME = exports.PLAYER_INITIAL_FRAME = 1;
 var PLAYER_SPEED = exports.PLAYER_SPEED = 120;
-var PLAYER_SNEAK_MULTIPLIER = exports.PLAYER_SNEAK_MULTIPLIER = 0.25;
+var PLAYER_SNEAK_MULTIPLIER = exports.PLAYER_SNEAK_MULTIPLIER = 0.75;
 var PLAYER_SPRINT_MULTIPLIER = exports.PLAYER_SPRINT_MULTIPLIER = 1.5;
 var PLAYER_WALK_ANIMATION_FRAMERATE = exports.PLAYER_WALK_ANIMATION_FRAMERATE = 7;
 var PLAYER_FIGHT_ANIMATION_FRAMERATE = exports.PLAYER_FIGHT_ANIMATION_FRAMERATE = 10;
-var PLAYER_HAND_ATTACK_RANGE = exports.PLAYER_HAND_ATTACK_RANGE = 50;
+var PLAYER_HAND_ATTACK_RANGE = exports.PLAYER_HAND_ATTACK_RANGE = 60;
 var PLAYER_HAND_ATTACK_ANGLE = exports.PLAYER_HAND_ATTACK_ANGLE = 60;
 var PLAYER_HAND_ATTACK_DAMAGE = exports.PLAYER_HAND_ATTACK_DAMAGE = 0.2;
+var PLAYER_DAMAGE_COOLDOWN = exports.PLAYER_DAMAGE_COOLDOWN = 0.1;
 
 },{}],9:[function(require,module,exports){
 "use strict";
@@ -1087,6 +1093,7 @@ var ZOMBIE_HEARING_RANGE = exports.ZOMBIE_HEARING_RANGE = 100;
 var ZOMBIE_ROTATING_SPEED = exports.ZOMBIE_ROTATING_SPEED = 50;
 var ZOMBIE_DAMAGE_MULTIPLIER = exports.ZOMBIE_DAMAGE_MULTIPLIER = 1;
 var ZOMBIE_DAMAGE_COOLDOWN = exports.ZOMBIE_DAMAGE_COOLDOWN = 0.2;
+var ZOMBIE_WARN_RANGE = exports.ZOMBIE_WARN_RANGE = 500;
 
 },{}],12:[function(require,module,exports){
 'use strict';
@@ -1195,7 +1202,80 @@ var Level1 = function (_Game) {
 
 exports.default = Level1;
 
-},{"../states/Game.js":26}],14:[function(require,module,exports){
+},{"../states/Game.js":27}],14:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
+
+var _Game2 = require('../states/Game.js');
+
+var _Game3 = _interopRequireDefault(_Game2);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+function _possibleConstructorReturn(self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }return call && (typeof call === "object" || typeof call === "function") ? call : self;
+}
+
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+}
+
+var Level2 = function (_Game) {
+  _inherits(Level2, _Game);
+
+  function Level2() {
+    _classCallCheck(this, Level2);
+
+    return _possibleConstructorReturn(this, (Level2.__proto__ || Object.getPrototypeOf(Level2)).apply(this, arguments));
+  }
+
+  _createClass(Level2, [{
+    key: 'preload',
+    value: function preload() {
+      _Game3.default.prototype.preload.call(this);
+
+      this.load.tilemap('map', 'assets/levels/level2/map2.json', null, Phaser.Tilemap.TILED_JSON);
+      this.load.json('journals', 'assets/levels/level1/journals.json');
+    }
+  }, {
+    key: 'create',
+    value: function create() {
+      _Game3.default.prototype.create.call(this);
+      console.log('level2 loaded');
+    }
+  }]);
+
+  return Level2;
+}(_Game3.default);
+
+exports.default = Level2;
+
+},{"../states/Game.js":27}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1403,7 +1483,7 @@ var BoidsManager = function () {
 
 exports.default = BoidsManager;
 
-},{"../constants/TileMapConstants":9,"../utils/MapUtils.js":30}],15:[function(require,module,exports){
+},{"../constants/TileMapConstants":9,"../utils/MapUtils.js":31}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1502,7 +1582,7 @@ var Entity = function (_Phaser$Sprite) {
 
 exports.default = Entity;
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1710,7 +1790,14 @@ var EntityWalkingOnPath = function (_Entity) {
     value: function changePathToTemporary(start) {
       var _this3 = this;
 
-      var currentTarget = this.pathsBetweenPathTargets[this.currentPathIndex].target;
+      var newTarget = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+      var currentTarget = {};
+      if (newTarget === false) {
+        currentTarget = this.pathsBetweenPathTargets[this.currentPathIndex].target;
+      } else {
+        currentTarget = newTarget;
+      }
 
       this.canMove = false;
       this.calculateTemporaryPath(start, currentTarget, function (path) {
@@ -1751,7 +1838,7 @@ var EntityWalkingOnPath = function (_Entity) {
 
 exports.default = EntityWalkingOnPath;
 
-},{"../constants/TileMapConstants":9,"../constants/ZombieConstants":11,"../objects/PathFinder.js":19,"../utils/MapUtils.js":30,"./Entity":15}],17:[function(require,module,exports){
+},{"../constants/TileMapConstants":9,"../constants/ZombieConstants":11,"../objects/PathFinder.js":20,"../utils/MapUtils.js":31,"./Entity":16}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1855,7 +1942,7 @@ var Journal = function (_Phaser$Sprite) {
 
 exports.default = Journal;
 
-},{"../constants/ItemConstants":7,"../constants/TileMapConstants":9}],18:[function(require,module,exports){
+},{"../constants/ItemConstants":7,"../constants/TileMapConstants":9}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2042,7 +2129,7 @@ var JournalsManager = function (_Phaser$Group) {
 
 exports.default = JournalsManager;
 
-},{"../constants/ItemConstants":7,"../utils/UserInterfaceUtils":31}],19:[function(require,module,exports){
+},{"../constants/ItemConstants":7,"../utils/UserInterfaceUtils":32}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2100,7 +2187,7 @@ var PathFinder = function () {
 
 exports.default = PathFinder;
 
-},{"easystarjs":1}],20:[function(require,module,exports){
+},{"easystarjs":1}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2160,23 +2247,35 @@ var Player = function (_Entity) {
 
     _this.zombies = zombies.children;
 
+    _this.godMode = false;
+    // this.godMode = true;
+
     _this.isSneaking = false;
     _this.isSprinting = false;
 
     _this.attackRange = _PlayerConstants.PLAYER_HAND_ATTACK_RANGE;
     _this.dealingDamage = _PlayerConstants.PLAYER_HAND_ATTACK_DAMAGE;
 
+    _this.canDealDamage = true;
+
     _this.healthbar = _this.game.add.graphics(0, 0);
     _this.healthbar.anchor.x = 1;
     _this.healthbar.anchor.y = 1;
     _this.healthbar.fixedToCamera = true;
+
+    _this.zombiesInAttackRange = [];
+
+    _this.attackSensor = _this.body.addCircle(_PlayerConstants.PLAYER_HAND_ATTACK_RANGE);
+    _this.attackSensor.sensor = true;
+    _this.attackSensor.sensorType = 'attack';
 
     _this.cursors = {
       up: _this.game.input.keyboard.addKey(Phaser.Keyboard.W),
       down: _this.game.input.keyboard.addKey(Phaser.Keyboard.S),
       left: _this.game.input.keyboard.addKey(Phaser.Keyboard.A),
       right: _this.game.input.keyboard.addKey(Phaser.Keyboard.D),
-      sneak: _this.game.input.keyboard.addKey(Phaser.Keyboard.CAPS_LOCK),
+      sneakToggle: _this.game.input.keyboard.addKey(Phaser.Keyboard.CAPS_LOCK),
+      sneak: _this.game.input.keyboard.addKey(Phaser.Keyboard.ALT),
       sprint: _this.game.input.keyboard.addKey(Phaser.Keyboard.SHIFT)
     };
 
@@ -2188,11 +2287,15 @@ var Player = function (_Entity) {
     _this.sneakText.x = _this.game.width - (_this.sneakText.width + 24);
     _this.sneakText.y = _this.game.height - (_this.sneakText.height + 24 + 32);
     _this.sneakText.fixedToCamera = true;
+    _this.sneakText.stroke = '#000';
+    _this.sneakText.strokeThickness = 3;
 
     _this.sprintText = _this.game.add.text(0, 0, 'Sprinting: off', style);
     _this.sprintText.x = _this.game.width - (_this.sprintText.width + 24);
     _this.sprintText.y = _this.game.height - (_this.sprintText.height + 24 + 32 + _this.sneakText.height);
     _this.sprintText.fixedToCamera = true;
+    _this.sprintText.stroke = '#000';
+    _this.sprintText.strokeThickness = 3;
 
     _this.animations.add('walk', [0, 1, 2, 3, 4, 5]);
     _this.animations.add('fight', [6, 7, 8, 9, 0]);
@@ -2241,13 +2344,7 @@ var Player = function (_Entity) {
       var specialEffectMultiplier = 1;
 
       this.isSprinting = false;
-
-      if (this.cursors.sneak.isDown) {
-        this.isSneakPressed = true;
-      } else if (this.isSneakPressed) {
-        this.isSneaking = !this.isSneaking;
-        this.isSneakPressed = false;
-      }
+      this.isSneaking = false;
 
       if (this.cursors.sprint.isDown) {
         this.isSprinting = true;
@@ -2255,8 +2352,9 @@ var Player = function (_Entity) {
         specialEffectMultiplier = _PlayerConstants.PLAYER_SPRINT_MULTIPLIER;
       }
 
-      if (this.isSneaking) {
+      if (this.cursors.sneak.isDown || this.cursors.sneakToggle.isDown) {
         specialEffectMultiplier = _PlayerConstants.PLAYER_SNEAK_MULTIPLIER;
+        this.isSneaking = true;
       }
 
       this.sneakText.setText('Sneaking: ' + (this.isSneaking ? 'on' : 'off'));
@@ -2264,6 +2362,35 @@ var Player = function (_Entity) {
 
       this.body.velocity.x *= specialEffectMultiplier;
       this.body.velocity.y *= specialEffectMultiplier;
+    }
+  }, {
+    key: 'onCollisionEnter',
+    value: function onCollisionEnter(bodyA, bodyB, shapeA, shapeB) {
+      if (this.isItSensorArea(bodyA, shapeB)) {
+        if (shapeB.sensorType === 'attack' && bodyA.sprite.key === 'zombie') {
+          this.zombiesInAttackRange.push(bodyA.sprite);
+        }
+      }
+    }
+  }, {
+    key: 'onCollisionLeave',
+    value: function onCollisionLeave(bodyA, bodyB, shapeA, shapeB) {
+      if (this.isItSensorArea(bodyA, shapeB)) {
+        if (shapeB.sensorType === 'attack' && bodyA.sprite.key === 'zombie') {
+          this.zombiesInAttackRange = this.zombiesInAttackRange.filter(function (v) {
+            return v !== bodyA.sprite;
+          });
+        }
+      }
+    }
+  }, {
+    key: 'isItSensorArea',
+    value: function isItSensorArea(body, shape) {
+      if (body.sprite == null || shape.sensor == null) {
+        return false;
+      }
+
+      return shape.sensor;
     }
   }, {
     key: 'handleAnimation',
@@ -2278,6 +2405,12 @@ var Player = function (_Entity) {
       }
     }
   }, {
+    key: 'endCooldown',
+    value: function endCooldown() {
+      this.canDealDamage = true;
+      // this.animations.play( 'walk', ZOMBIE_WALK_ANIMATION_FRAMERATE, true );
+    }
+  }, {
     key: 'lookAtMouse',
     value: function lookAtMouse() {
       var mouseX = this.game.input.mousePointer.worldX;
@@ -2290,21 +2423,30 @@ var Player = function (_Entity) {
     value: function handleAttack() {
       var _this2 = this;
 
-      if (this.game.input.activePointer.leftButton.isDown) {
-        this.zombies.forEach(function (v) {
+      var didDealDamage = false;
+      if (this.game.input.activePointer.leftButton.isDown && this.canDealDamage) {
+        this.zombiesInAttackRange.forEach(function (v) {
           if (v.alive) {
-            var distanceToZombie = _this2.game.physics.arcade.distanceBetween(_this2, v);
-            if (distanceToZombie < _this2.attackRange && _this2.isInDegreeRange(_this2, v, _PlayerConstants.PLAYER_HAND_ATTACK_ANGLE)) {
+            if (_this2.isInDegreeRange(_this2, v, _PlayerConstants.PLAYER_HAND_ATTACK_ANGLE)) {
               v.takeDamage(_this2.dealingDamage);
+              didDealDamage = true;
             }
           }
         });
+
+        if (didDealDamage) {
+          this.canDealDamage = false;
+          this.game.time.events.add(Phaser.Timer.SECOND * _PlayerConstants.PLAYER_DAMAGE_COOLDOWN, this.endCooldown, this);
+        }
       }
     }
   }, {
     key: 'takeDamage',
     value: function takeDamage(damage) {
-      this.damage(damage);
+      if (!this.godMode) {
+        this.damage(damage);
+        this.health = Math.floor(this.health * 100) / 100;
+      }
       this.drawHealthBar();
 
       if (this.health <= 0) {
@@ -2326,10 +2468,18 @@ var Player = function (_Entity) {
       var height = 32;
 
       this.healthbar.clear();
-      this.healthbar.beginFill(0xFF0000, 0.85);
+      if (this.godMode) {
+        this.healthbar.beginFill(0xFFD700, 0.85);
+      } else {
+        this.healthbar.beginFill(0xFF0000, 0.85);
+      }
       this.healthbar.drawRect(this.game.width - (width + 24), this.game.height - (height + 24), width * Math.max(this.health, 0), height);
       this.healthbar.endFill();
-      this.healthbar.lineStyle(2, 0x880000, 1);
+      if (this.godMode) {
+        this.healthbar.lineStyle(2, 0xCEAD00, 1);
+      } else {
+        this.healthbar.lineStyle(2, 0x880000, 1);
+      }
       this.healthbar.drawRect(this.game.width - (width + 24), this.game.height - (height + 24), width, height);
       this.healthbar.lineStyle(0);
     }
@@ -2340,7 +2490,7 @@ var Player = function (_Entity) {
 
 exports.default = Player;
 
-},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"./Entity":15}],21:[function(require,module,exports){
+},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"./Entity":16}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2385,7 +2535,8 @@ var TileMap = function (_Phaser$Tilemap) {
 
     var _this = _possibleConstructorReturn(this, (TileMap.__proto__ || Object.getPrototypeOf(TileMap)).call(this, game, key, tileWidth, tileHeight));
 
-    _this.addTilesetImage('tilemap');
+    _this.addTilesetImage('tilemap_floor');
+    _this.addTilesetImage('tilemap_walls');
 
     _this.ground = _this.createLayer('background');
     _this.walls = _this.createLayer('walls');
@@ -2527,7 +2678,7 @@ var TileMap = function (_Phaser$Tilemap) {
 
 exports.default = TileMap;
 
-},{"../utils/MapUtils.js":30}],22:[function(require,module,exports){
+},{"../utils/MapUtils.js":31}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2712,7 +2863,7 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
 
 exports.default = WalkingEntitiesManager;
 
-},{"../constants/TileMapConstants":9,"../utils/EntityManagerUtils":29,"../utils/MapUtils.js":30,"./BoidsManager.js":14}],23:[function(require,module,exports){
+},{"../constants/TileMapConstants":9,"../utils/EntityManagerUtils":30,"../utils/MapUtils.js":31,"./BoidsManager.js":15}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2769,12 +2920,14 @@ var Zombie = function (_EntityWalkingOnPath) {
 
     _this.player = player;
     _this.walls = walls;
-    _this.playerSeekingRay = new Phaser.Line();
-    _this.tileHits = [];
-    _this.isPlayerInRange = false;
+    _this.isPlayerInViewRange = false;
+    _this.isPlayerInHearingRange = false;
+    _this.isInAttackRange = false;
     _this.isChasing = false;
     _this.lastKnownPlayerPosition = { x: 1, y: 1 };
     _this.canDealDamage = true;
+    _this.zombiesInShoutRange = [];
+    _this.foundOnHisOwn = false;
 
     _this.damageTaken = _ZombieConstants.ZOMBIE_DAMAGE_TAKEN;
 
@@ -2786,71 +2939,144 @@ var Zombie = function (_EntityWalkingOnPath) {
 
     _this.body.clearShapes();
 
+    _this.warnSensor = _this.body.addCircle(_ZombieConstants.ZOMBIE_WARN_RANGE);
+    _this.warnSensor.sensor = true;
+    _this.warnSensor.sensorType = 'warn';
+
     _this.viewSensor = _this.body.addCircle(_ZombieConstants.ZOMBIE_SIGHT_RANGE);
     _this.viewSensor.sensor = true;
+    _this.viewSensor.sensorType = 'view';
 
-    _this.attackSensor = _this.body.addCircle(100);
+    _this.viewSensor = _this.body.addCircle(_ZombieConstants.ZOMBIE_HEARING_RANGE);
+    _this.viewSensor.sensor = true;
+    _this.viewSensor.sensorType = 'hear';
+
+    _this.attackSensor = _this.body.addCircle(50);
     _this.attackSensor.sensor = true;
-    _this.attackSensor.asd = true;
+    _this.attackSensor.sensorType = 'attack';
 
     // this is a little bit hard coded so if it works don't bother but if it doesn't, well try changing this line
     _this.body.addCapsule(_ZombieConstants.ZOMBIE_WIDTH / 4, _ZombieConstants.ZOMBIE_HEIGHT / 2);
+
+    // this.body.debug = true;
     return _this;
   }
 
   _createClass(Zombie, [{
     key: 'update',
     value: function update() {
-      if (this.isPlayerInRange) {
-        if (this.canSeePlayer()) {
-          this.isChasing = true;
-          this.lastKnownPlayerPosition = { x: this.player.x, y: this.player.y };
-          if (this.shouldAttack()) {
-            this.handleAttack();
-          }
+      if (this.canDetectPlayer()) {
+        this.warnZombies();
+        this.foundOnHisOwn = true;
+        this.isChasing = true;
+        this.lastKnownPlayerPosition = { x: this.player.x, y: this.player.y };
+        if (this.shouldAttack()) {
+          this.handleAttack();
         }
       }
 
-      if (!this.isChasing) {
-        _EntityWalkingOnPath3.default.prototype.update.call(this);
-      } else {
+      if (this.isChasing) {
         this.chasePlayer();
+      } else {
+        _EntityWalkingOnPath3.default.prototype.update.call(this);
       }
     }
   }, {
-    key: 'canSeePlayer',
-    value: function canSeePlayer() {
+    key: 'warnZombies',
+    value: function warnZombies() {
+      var _this2 = this;
+
+      this.zombiesInShoutRange.forEach(function (zombie) {
+        if (!zombie.canDetectPlayer() && _this2.canWarnZombie(zombie)) {
+          zombie.isChasing = true;
+          zombie.lastKnownPlayerPosition = Object.assign({}, _this2.lastKnownPlayerPosition);
+          // zombie.changePathToTemporary( pixelsToTile( zombie ), pixelsToTile( zombie.lastKnownPlayerPosition ) );
+        }
+      });
+    }
+  }, {
+    key: 'canDetectPlayer',
+    value: function canDetectPlayer() {
       if (this.isPlayerDead) {
         return false;
       }
+
       /** Draw line between player and zombie and check if it can see him. If yes, chase him. */
-      this.playerSeekingRay.start.set(this.x, this.y);
-      this.playerSeekingRay.end.set(this.player.x, this.player.y);
+      var playerSeekingRay = new Phaser.Line();
+      playerSeekingRay.start.set(this.x, this.y);
+      playerSeekingRay.end.set(this.player.x, this.player.y);
 
-      this.tileHits = this.walls.getRayCastTiles(this.playerSeekingRay, 0, false, false);
+      var tileHits = this.walls.getRayCastTiles(playerSeekingRay, 0, false, false);
 
-      if (this.tileHits.length > 0) {
-        for (var i = 0; i < this.tileHits.length; i++) {
-          if (this.tileHits[i].index >= 0) {
+      if (tileHits.length > 0) {
+        for (var i = 0; i < tileHits.length; i++) {
+          if (tileHits[i].index >= 0) {
             return false;
           }
         }
       }
 
-      return this.isInDegreeRange(this, this.player, _ZombieConstants.ZOMBIE_SIGHT_ANGLE) && (this.isChasing || this.playerSeekingRay.length < _ZombieConstants.ZOMBIE_SIGHT_RANGE) || this.playerSeekingRay.length < _ZombieConstants.ZOMBIE_HEARING_RANGE && !this.player.isSneaking && this.player.isMoving();
+      return this.canSeePlayer() || this.canHearPlayer();
+    }
+  }, {
+    key: 'canWarnZombie',
+    value: function canWarnZombie(zombie) {
+      var zombieRay = new Phaser.Line();
+      zombieRay.start.set(this.x, this.y);
+      zombieRay.end.set(zombie.x, zombie.y);
+
+      var tileHits = this.walls.getRayCastTiles(zombieRay, 0, false, false);
+
+      if (tileHits.length > 0) {
+        for (var i = 0; i < tileHits.length; i++) {
+          if (tileHits[i].index >= 0) {
+            return false;
+          }
+        }
+      }
+
+      return true;
+    }
+  }, {
+    key: 'canSeePlayer',
+    value: function canSeePlayer() {
+      return this.isPlayerInViewRange && this.isInDegreeRange(this, this.player, _ZombieConstants.ZOMBIE_SIGHT_ANGLE);
+    }
+  }, {
+    key: 'canHearPlayer',
+    value: function canHearPlayer() {
+      return this.isPlayerInHearingRange && !this.player.isSneaking && this.player.isMoving();
     }
   }, {
     key: 'onCollisionEnter',
-    value: function onCollisionEnter(bodyA, bodyB, shapeA, shapeB) {
-      if (this.isItSensorArea(bodyA, shapeB)) {
-        this.isPlayerInRange = true;
+    value: function onCollisionEnter(bodyA, bodyB, shapeA) {
+      if (this.isItSensorArea(bodyA, shapeA)) {
+        if (shapeA.sensorType === 'view' && bodyA.sprite.key === 'player') {
+          this.isPlayerInViewRange = true;
+        } else if (shapeA.sensorType === 'hear' && bodyA.sprite.key === 'player') {
+          this.isPlayerInHearingRange = true;
+        } else if (shapeA.sensorType === 'attack' && bodyA.sprite.key === 'player') {
+          this.isInAttackRange = true;
+        } else if (shapeA.sensorType === 'warn' && bodyA.sprite.key === 'zombie') {
+          this.zombiesInShoutRange.push(bodyA.sprite);
+        }
       }
     }
   }, {
     key: 'onCollisionLeave',
-    value: function onCollisionLeave(bodyA, bodyB, shapeA, shapeB) {
-      if (this.isItSensorArea(bodyA, shapeB)) {
-        this.isPlayerInRange = false;
+    value: function onCollisionLeave(bodyA, bodyB, shapeA) {
+      if (this.isItSensorArea(bodyA, shapeA)) {
+        if (shapeA.sensorType === 'view' && bodyA.sprite.key === 'player') {
+          this.isPlayerInViewRange = false;
+        } else if (shapeA.sensorType === 'hear' && bodyA.sprite.key === 'player') {
+          this.isPlayerInHearingRange = false;
+        } else if (shapeA.sensorType === 'attack' && bodyA.sprite.key === 'player') {
+          this.isInAttackRange = false;
+        } else if (shapeA.sensorType === 'warn' && bodyA.sprite.key === 'zombie') {
+          this.zombiesInShoutRange = this.zombiesInShoutRange.filter(function (v) {
+            return v !== bodyA.sprite;
+          });
+        }
       }
     }
   }, {
@@ -2859,8 +3085,7 @@ var Zombie = function (_EntityWalkingOnPath) {
       if (body.sprite == null || shape.sensor == null) {
         return false;
       }
-      // for now this line assume that there is only one type of computer's textures
-      // TODO enable different sprite key's handling
+
       return shape.sensor;
     }
   }, {
@@ -2870,7 +3095,7 @@ var Zombie = function (_EntityWalkingOnPath) {
       this.lookAt(this.lastKnownPlayerPosition.x, this.lastKnownPlayerPosition.y);
 
       var distanceToTarget = this.game.physics.arcade.distanceBetween(this, this.lastKnownPlayerPosition);
-      if (!this.canSeePlayer() && distanceToTarget <= _ZombieConstants.MIN_DISTANCE_TO_TARGET) {
+      if (!this.canDetectPlayer() && distanceToTarget <= _ZombieConstants.MIN_DISTANCE_TO_TARGET) {
         this.stopChasingPlayer();
       }
     }
@@ -2878,6 +3103,7 @@ var Zombie = function (_EntityWalkingOnPath) {
     key: 'takeDamage',
     value: function takeDamage(damage) {
       this.damage(damage * _ZombieConstants.ZOMBIE_DAMAGE_MULTIPLIER);
+      this.health = Math.floor(this.health * 100) / 100;
     }
   }, {
     key: 'endCooldown',
@@ -2891,12 +3117,13 @@ var Zombie = function (_EntityWalkingOnPath) {
       this.body.velocity.x = 0;
       this.body.velocity.y = 0;
       this.isChasing = false;
+      this.foundOnHisOwn = false;
       this.changePathToTemporary((0, _MapUtils.pixelsToTile)(this));
     }
   }, {
     key: 'shouldAttack',
     value: function shouldAttack() {
-      return this.alive && this.canDealDamage && this.game.physics.arcade.distanceBetween(this, this.player) < 50;
+      return this.alive && this.canDealDamage && this.isInAttackRange;
     }
   }, {
     key: 'handleAttack',
@@ -2922,7 +3149,7 @@ var Zombie = function (_EntityWalkingOnPath) {
 
 exports.default = Zombie;
 
-},{"../constants/ZombieConstants":11,"../utils/MapUtils.js":30,"./EntityWalkingOnPath":16}],24:[function(require,module,exports){
+},{"../constants/ZombieConstants":11,"../utils/MapUtils.js":31,"./EntityWalkingOnPath":17}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2986,7 +3213,7 @@ var ZombieManager = function (_WalkingEntitiesManag) {
 
 exports.default = ZombieManager;
 
-},{"../objects/WalkingEntitiesManager":22}],25:[function(require,module,exports){
+},{"../objects/WalkingEntitiesManager":23}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3055,7 +3282,7 @@ var Boot = function (_Phaser$State) {
 
 exports.default = Boot;
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3169,8 +3396,11 @@ var Game = function (_Phaser$State) {
       var _loop = function _loop(i) {
         var newZombie = _this2.zombies.add(new _Zombie2.default(_this2.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, _this2.map.getPath(i), _this2.map.walls, _this2.player));
 
-        _this2.player.body.onBeginContact.add(function () {
+        newZombie.body.onBeginContact.add(function () {
           return newZombie.onCollisionEnter.apply(newZombie, arguments);
+        });
+        newZombie.body.onEndContact.add(function () {
+          return newZombie.onCollisionLeave.apply(newZombie, arguments);
         });
 
         newZombie.body.setCollisionGroup(_this2.zombiesCollisionGroup);
@@ -3223,6 +3453,17 @@ var Game = function (_Phaser$State) {
         var _journals2;
 
         return (_journals2 = _this2.journals).onCollisionLeave.apply(_journals2, arguments);
+      });
+
+      this.player.body.onBeginContact.add(function () {
+        var _player;
+
+        return (_player = _this2.player).onCollisionEnter.apply(_player, arguments);
+      });
+      this.player.body.onEndContact.add(function () {
+        var _player2;
+
+        return (_player2 = _this2.player).onCollisionLeave.apply(_player2, arguments);
       });
 
       this.player.onDeath.add(function () {
@@ -3289,7 +3530,7 @@ var Game = function (_Phaser$State) {
 
 exports.default = Game;
 
-},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"../constants/UserInterfaceConstants":10,"../objects/Journal":17,"../objects/JournalsManager":18,"../objects/Player":20,"../objects/TileMap":21,"../objects/Zombie":23,"../objects/ZombiesManager":24,"../utils/UserInterfaceUtils":31}],27:[function(require,module,exports){
+},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"../constants/UserInterfaceConstants":10,"../objects/Journal":18,"../objects/JournalsManager":19,"../objects/Player":21,"../objects/TileMap":22,"../objects/Zombie":24,"../objects/ZombiesManager":25,"../utils/UserInterfaceUtils":32}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3330,13 +3571,26 @@ var Menu = function (_Phaser$State) {
   function Menu() {
     _classCallCheck(this, Menu);
 
-    return _possibleConstructorReturn(this, (Menu.__proto__ || Object.getPrototypeOf(Menu)).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, (Menu.__proto__ || Object.getPrototypeOf(Menu)).call(this));
+
+    _this.levels = ['Level1', 'Level2'];
+    return _this;
   }
 
   _createClass(Menu, [{
     key: 'create',
     value: function create() {
-      this.state.start('Level1');
+      var _this2 = this;
+
+      this.state.start(this.levels[1]);
+
+      window.goToLevel = function (n) {
+        if (_this2.levels[n - 1]) {
+          _this2.state.start(_this2.levels[n - 1]);
+        } else {
+          return 'Level not found!';
+        }
+      };
     }
   }]);
 
@@ -3345,7 +3599,7 @@ var Menu = function (_Phaser$State) {
 
 exports.default = Menu;
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3396,7 +3650,8 @@ var Preload = function (_Phaser$State) {
   _createClass(Preload, [{
     key: 'preload',
     value: function preload() {
-      this.load.image('tilemap', 'assets/images/tilemap.png');
+      this.load.image('tilemap_floor', 'assets/tilemaps/tilemap_floor.png');
+      this.load.image('tilemap_walls', 'assets/tilemaps/tilemap_walls.png');
 
       this.game.load.spritesheet('player', './assets/images/player-sheet.png', _PlayerConstants.PLAYER_WIDTH, _PlayerConstants.PLAYER_HEIGHT);
       this.game.load.spritesheet('zombie', './assets/images/zombie-sheet.png', _ZombieConstants.ZOMBIE_WIDTH, _ZombieConstants.ZOMBIE_HEIGHT);
@@ -3420,7 +3675,7 @@ var Preload = function (_Phaser$State) {
 
 exports.default = Preload;
 
-},{"../constants/PlayerConstants.js":8,"../constants/ZombieConstants.js":11}],29:[function(require,module,exports){
+},{"../constants/PlayerConstants.js":8,"../constants/ZombieConstants.js":11}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3607,7 +3862,7 @@ function getFreeTileExcludingEast(entityTile, mapGrid) {
   return freeTile;
 }
 
-},{"../utils/MapUtils":30}],30:[function(require,module,exports){
+},{"../utils/MapUtils":31}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3660,7 +3915,7 @@ var getWallsPostions = exports.getWallsPostions = function getWallsPostions(laye
   return wallsArr;
 };
 
-},{"../constants/TileMapConstants":9}],31:[function(require,module,exports){
+},{"../constants/TileMapConstants":9}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

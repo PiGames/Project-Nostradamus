@@ -3,7 +3,8 @@ import { ZOMBIE_WIDTH, ZOMBIE_HEIGHT } from '../constants/ZombieConstants.js';
 
 class Preload extends Phaser.State {
   preload() {
-    this.load.image( 'tilemap', 'assets/images/tilemap.png' );
+    this.load.image( 'tilemap_floor', 'assets/tilemaps/tilemap_floor.png' );
+    this.load.image( 'tilemap_walls', 'assets/tilemaps/tilemap_walls.png' );
 
     this.game.load.spritesheet( 'player', './assets/images/player-sheet.png', PLAYER_WIDTH, PLAYER_HEIGHT );
     this.game.load.spritesheet( 'zombie', './assets/images/zombie-sheet.png', ZOMBIE_WIDTH, ZOMBIE_HEIGHT );
