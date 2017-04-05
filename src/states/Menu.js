@@ -9,7 +9,7 @@ class Menu extends Phaser.State {
   }
 
   create() {
-    this.state.start( this.levels[ 1 ] );
+    this.state.start( this.levels[ 0 ] );
 
     window.goToLevel = ( n ) => {
       if ( this.levels[ n - 1 ] ) {
