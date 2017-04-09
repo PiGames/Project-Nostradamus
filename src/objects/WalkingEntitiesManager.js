@@ -39,11 +39,8 @@ export default class WalkingEntitiesManager extends Phaser.Group {
     }
   }
   onCollisionWihOtherEntity( entity1, entity2 ) {
-    const freeTile1 = getFreeTileAroundEntityExcludingOtherEntity( entity1, entity2, this.mapGrid );
-    const freeTile2 = getFreeTileAroundEntityExcludingOtherEntity( entity2, entity1, this.mapGrid );
-
-    entity1.changePathToTemporary( freeTile1 );
-    entity1.changePathToTemporary( freeTile2 );
+    const freeTile = getFreeTileAroundEntityExcludingOtherEntity( entity1, entity2, this.mapGrid );
+    entity1.changePathToTemporary( freeTile );
   }
   onCollisionWithWalls( entity, tileBody ) {
     if ( entity.isChasing === false ) {

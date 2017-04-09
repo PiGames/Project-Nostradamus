@@ -2625,11 +2625,8 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
   }, {
     key: 'onCollisionWihOtherEntity',
     value: function onCollisionWihOtherEntity(entity1, entity2) {
-      var freeTile1 = (0, _EntityManagerUtils.getFreeTileAroundEntityExcludingOtherEntity)(entity1, entity2, this.mapGrid);
-      var freeTile2 = (0, _EntityManagerUtils.getFreeTileAroundEntityExcludingOtherEntity)(entity2, entity1, this.mapGrid);
-
-      entity1.changePathToTemporary(freeTile1);
-      entity1.changePathToTemporary(freeTile2);
+      var freeTile = (0, _EntityManagerUtils.getFreeTileAroundEntityExcludingOtherEntity)(entity1, entity2, this.mapGrid);
+      entity1.changePathToTemporary(freeTile);
     }
   }, {
     key: 'onCollisionWithWalls',
