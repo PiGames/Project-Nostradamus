@@ -193,7 +193,13 @@ gulp.task('default', ['serve']);
 
 gulp.task( "deploy-for-testers", () => {
   const msg = argv.message || argv.m || null;
-  const options = { remoteUrl: "git@github.com:PiGames/PN-for-testers.git", branch: "master", force: true };
+  let options = {};
+  if ( argv.ssh ) {
+    options = { remoteUrl: "git@github.com:PiGames/PN-for-testers.git", branch: "master", force: true };
+  } else {
+    options = { remoteUrl: "https://github.com/PiGames/PN-for-testers.git", branch: "master", force: true };
+  }
+
   if ( msg !== null ) {
     options.message = msg;
   }

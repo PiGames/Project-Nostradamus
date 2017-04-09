@@ -1,5 +1,5 @@
 import Entity from './Entity';
-import { PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, PLAYER_SNEAK_MULTIPLIER, PLAYER_SPRINT_MULTIPLIER, PLAYER_WALK_ANIMATION_FRAMERATE, PLAYER_FIGHT_ANIMATION_FRAMERATE, PLAYER_HAND_ATTACK_RANGE, PLAYER_HAND_ATTACK_ANGLE, PLAYER_HAND_ATTACK_DAMAGE } from '../constants/PlayerConstants';
+import { PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, PLAYER_SNEAK_MULTIPLIER, PLAYER_SPRINT_MULTIPLIER, PLAYER_WALK_ANIMATION_FRAMERATE, PLAYER_FIGHT_ANIMATION_FRAMERATE, PLAYER_HAND_ATTACK_RANGE, PLAYER_HAND_ATTACK_ANGLE, PLAYER_HAND_ATTACK_DAMAGE, PLAYER_DAMAGE_COOLDOWN } from '../constants/PlayerConstants';
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 
 export default class Player extends Entity {
@@ -11,23 +11,35 @@ export default class Player extends Entity {
 
     this.zombies = zombies.children;
 
+    this.godMode = false;
+    // this.godMode = true;
+
     this.isSneaking = false;
     this.isSprinting = false;
 
     this.attackRange = PLAYER_HAND_ATTACK_RANGE;
     this.dealingDamage = PLAYER_HAND_ATTACK_DAMAGE;
 
+    this.canDealDamage = true;
+
     this.healthbar = this.game.add.graphics( 0, 0 );
     this.healthbar.anchor.x = 1;
     this.healthbar.anchor.y = 1;
     this.healthbar.fixedToCamera = true;
+
+    this.zombiesInAttackRange = [];
+
+    this.attackSensor = this.body.addCircle( PLAYER_HAND_ATTACK_RANGE );
+    this.attackSensor.sensor = true;
+    this.attackSensor.sensorType = 'attack';
 
     this.cursors = {
       up: this.game.input.keyboard.addKey( Phaser.Keyboard.W ),
       down: this.game.input.keyboard.addKey( Phaser.Keyboard.S ),
       left: this.game.input.keyboard.addKey( Phaser.Keyboard.A ),
       right: this.game.input.keyboard.addKey( Phaser.Keyboard.D ),
-      sneak: this.game.input.keyboard.addKey( Phaser.Keyboard.CAPS_LOCK ),
+      sneakToggle: this.game.input.keyboard.addKey( Phaser.Keyboard.CAPS_LOCK ),
+      sneak: this.game.input.keyboard.addKey( Phaser.Keyboard.ALT ),
       sprint: this.game.input.keyboard.addKey( Phaser.Keyboard.SHIFT ),
     };
 
@@ -35,15 +47,20 @@ export default class Player extends Entity {
 
     const style = { font: '16px Arial', fill: '#fff' };
 
+
     this.sneakText = this.game.add.text( 0, 0, 'Sneaking: off', style );
     this.sneakText.x = this.game.width - ( this.sneakText.width + 24 );
     this.sneakText.y = this.game.height - ( this.sneakText.height + 24 + 32 );
     this.sneakText.fixedToCamera = true;
+    this.sneakText.stroke = '#000';
+    this.sneakText.strokeThickness = 3;
 
     this.sprintText = this.game.add.text( 0, 0, 'Sprinting: off', style );
     this.sprintText.x = this.game.width - ( this.sprintText.width + 24 );
     this.sprintText.y = this.game.height - ( this.sprintText.height + 24 + 32 + this.sneakText.height );
     this.sprintText.fixedToCamera = true;
+    this.sprintText.stroke = '#000';
+    this.sprintText.strokeThickness = 3;
 
     this.animations.add( 'walk', [ 0, 1, 2, 3, 4, 5 ] );
     this.animations.add( 'fight', [ 6, 7, 8, 9, 0 ] );
@@ -62,6 +79,7 @@ export default class Player extends Entity {
     this.lookAtMouse();
     this.handleAttack();
   }
+
   handleMovement() {
     this.resetVelocity();
 
@@ -81,17 +99,12 @@ export default class Player extends Entity {
 
     this.normalizeVelocity();
   }
+
   handleMovementSpecialModes() {
     let specialEffectMultiplier = 1;
 
     this.isSprinting = false;
-
-    if ( this.cursors.sneak.isDown ) {
-      this.isSneakPressed = true;
-    } else if ( this.isSneakPressed ) {
-      this.isSneaking = !this.isSneaking;
-      this.isSneakPressed = false;
-    }
+    this.isSneaking = false;
 
     if ( this.cursors.sprint.isDown ) {
       this.isSprinting = true;
@@ -99,8 +112,9 @@ export default class Player extends Entity {
       specialEffectMultiplier = PLAYER_SPRINT_MULTIPLIER;
     }
 
-    if ( this.isSneaking ) {
+    if ( this.cursors.sneak.isDown || this.cursors.sneakToggle.isDown ) {
       specialEffectMultiplier = PLAYER_SNEAK_MULTIPLIER;
+      this.isSneaking = true;
     }
 
     this.sneakText.setText( 'Sneaking: ' + ( ( this.isSneaking ) ? 'on' : 'off' ) );
@@ -109,6 +123,33 @@ export default class Player extends Entity {
     this.body.velocity.x *= specialEffectMultiplier;
     this.body.velocity.y *= specialEffectMultiplier;
   }
+
+  onCollisionEnter( bodyA, bodyB, shapeA, shapeB ) {
+    if ( this.isItSensorArea( bodyA, shapeB ) ) {
+      if ( shapeB.sensorType === 'attack' && bodyA.sprite.key === 'zombie' ) {
+        this.zombiesInAttackRange.push( bodyA.sprite );
+      }
+    }
+  }
+
+  onCollisionLeave( bodyA, bodyB, shapeA, shapeB ) {
+    if ( this.isItSensorArea( bodyA, shapeB ) ) {
+      if ( shapeB.sensorType === 'attack' && bodyA.sprite.key === 'zombie' ) {
+        this.zombiesInAttackRange = this.zombiesInAttackRange.filter( ( v ) => {
+          return ( v !== bodyA.sprite );
+        } );
+      }
+    }
+  }
+
+  isItSensorArea( body, shape ) {
+    if ( body.sprite == null || shape.sensor == null ) {
+      return false;
+    }
+
+    return shape.sensor;
+  }
+
   handleAnimation() {
     if ( this.game.input.activePointer.leftButton.isDown ) {
       this.animations.play( 'fight', PLAYER_FIGHT_ANIMATION_FRAMERATE, false );
@@ -120,6 +161,11 @@ export default class Player extends Entity {
     }
   }
 
+  endCooldown() {
+    this.canDealDamage = true;
+    // this.animations.play( 'walk', ZOMBIE_WALK_ANIMATION_FRAMERATE, true );
+  }
+
   lookAtMouse() {
     const mouseX = this.game.input.mousePointer.worldX;
     const mouseY = this.game.input.mousePointer.worldY;
@@ -128,20 +174,29 @@ export default class Player extends Entity {
   }
 
   handleAttack() {
-    if ( this.game.input.activePointer.leftButton.isDown ) {
-      this.zombies.forEach( ( v ) => {
+    let didDealDamage = false;
+    if ( this.game.input.activePointer.leftButton.isDown && this.canDealDamage ) {
+      this.zombiesInAttackRange.forEach( ( v ) => {
         if ( v.alive ) {
-          const distanceToZombie = this.game.physics.arcade.distanceBetween( this, v );
-          if ( distanceToZombie < this.attackRange && this.isInDegreeRange( this, v, PLAYER_HAND_ATTACK_ANGLE ) ) {
+          if ( this.isInDegreeRange( this, v, PLAYER_HAND_ATTACK_ANGLE ) ) {
             v.takeDamage( this.dealingDamage );
+            didDealDamage = true;
           }
         }
       } );
+
+      if ( didDealDamage ) {
+        this.canDealDamage = false;
+        this.game.time.events.add( Phaser.Timer.SECOND * PLAYER_DAMAGE_COOLDOWN, this.endCooldown, this );
+      }
     }
   }
 
   takeDamage( damage ) {
-    this.damage( damage );
+    if ( !this.godMode ) {
+      this.damage( damage );
+      this.health = Math.floor( this.health * 100 ) / 100;
+    }
     this.drawHealthBar();
 
     if ( this.health <= 0 ) {
@@ -155,15 +210,24 @@ export default class Player extends Entity {
     this.sneakText.destroy();
     this.sprintText.destroy();
   }
+
   drawHealthBar() {
     const width = 300;
     const height = 32;
 
     this.healthbar.clear();
-    this.healthbar.beginFill( 0xFF0000, 0.85 );
+    if ( this.godMode ) {
+      this.healthbar.beginFill( 0xFFD700, 0.85 );
+    } else {
+      this.healthbar.beginFill( 0xFF0000, 0.85 );
+    }
     this.healthbar.drawRect( this.game.width - ( width + 24 ), this.game.height - ( height + 24 ), width * Math.max( this.health, 0 ), height );
     this.healthbar.endFill();
-    this.healthbar.lineStyle( 2, 0x880000, 1 );
+    if ( this.godMode ) {
+      this.healthbar.lineStyle( 2, 0xCEAD00, 1 );
+    } else {
+      this.healthbar.lineStyle( 2, 0x880000, 1 );
+    }
     this.healthbar.drawRect( this.game.width - ( width + 24 ), this.game.height - ( height + 24 ), width, height );
     this.healthbar.lineStyle( 0 );
   }
