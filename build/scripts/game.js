@@ -1801,15 +1801,17 @@ var EntityWalkingOnPath = function (_Entity) {
 
       this.canMove = false;
       this.calculateTemporaryPath(start, currentTarget, function (path) {
-        if (path.length === 0) {
-          _this3.changePathToStandard();
-          return;
+        if (path) {
+          if (path.length === 0) {
+            _this3.changePathToStandard();
+            return;
+          }
+          _this3.temporaryPath = path;
+          _this3.temporaryStepIndex = 0;
+          _this3.stepTarget = path[_this3.temporaryStepIndex];
+          _this3.isOnStandardPath = false;
+          _this3.canMove = true;
         }
-        _this3.temporaryPath = path;
-        _this3.temporaryStepIndex = 0;
-        _this3.stepTarget = path[_this3.temporaryStepIndex];
-        _this3.isOnStandardPath = false;
-        _this3.canMove = true;
       });
     }
   }, {
@@ -2269,7 +2271,7 @@ var Player = function (_Entity) {
     _this.zombies = zombies.children;
 
     _this.godMode = false;
-    // this.godMode = true;
+    _this.godMode = true;
 
     _this.isSneaking = false;
     _this.isSprinting = false;
@@ -2993,7 +2995,7 @@ var Zombie = function (_EntityWalkingOnPath) {
         }
       }
 
-      if (this.isChasing) {
+      if (this.isChasing && this.foundOnHisOwn) {
         this.chasePlayer();
       } else {
         _EntityWalkingOnPath3.default.prototype.update.call(this);
@@ -3008,7 +3010,7 @@ var Zombie = function (_EntityWalkingOnPath) {
         if (!zombie.canDetectPlayer() && _this2.canWarnZombie(zombie)) {
           zombie.isChasing = true;
           zombie.lastKnownPlayerPosition = Object.assign({}, _this2.lastKnownPlayerPosition);
-          // zombie.changePathToTemporary( pixelsToTile( zombie ), pixelsToTile( zombie.lastKnownPlayerPosition ) );
+          zombie.changePathToTemporary((0, _MapUtils.pixelsToTile)(zombie), (0, _MapUtils.pixelsToTile)(zombie.lastKnownPlayerPosition));
         }
       });
     }

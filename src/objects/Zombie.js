@@ -59,7 +59,7 @@ export default class Zombie extends EntityWalkingOnPath {
       }
     }
 
-    if ( this.isChasing ) {
+    if ( this.isChasing && this.foundOnHisOwn ) {
       this.chasePlayer();
     } else {
       EntityWalkingOnPath.prototype.update.call( this );
@@ -71,7 +71,7 @@ export default class Zombie extends EntityWalkingOnPath {
       if ( !zombie.canDetectPlayer() && this.canWarnZombie( zombie ) ) {
         zombie.isChasing = true;
         zombie.lastKnownPlayerPosition = Object.assign( {}, this.lastKnownPlayerPosition );
-        // zombie.changePathToTemporary( pixelsToTile( zombie ), pixelsToTile( zombie.lastKnownPlayerPosition ) );
+        zombie.changePathToTemporary( pixelsToTile( zombie ), pixelsToTile( zombie.lastKnownPlayerPosition ) );
       }
     } );
   }

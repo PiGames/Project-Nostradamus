@@ -138,15 +138,17 @@ export default class EntityWalkingOnPath extends Entity {
 
     this.canMove = false;
     this.calculateTemporaryPath( start, currentTarget, ( path ) => {
-      if ( path.length === 0 ) {
-        this.changePathToStandard();
-        return;
+      if ( path ) {
+        if ( path.length === 0 ) {
+          this.changePathToStandard();
+          return;
+        }
+        this.temporaryPath = path;
+        this.temporaryStepIndex = 0;
+        this.stepTarget = path[ this.temporaryStepIndex ];
+        this.isOnStandardPath = false;
+        this.canMove = true;
       }
-      this.temporaryPath = path;
-      this.temporaryStepIndex = 0;
-      this.stepTarget = path[ this.temporaryStepIndex ];
-      this.isOnStandardPath = false;
-      this.canMove = true;
     } );
   }
   changePathToStandard() {
