@@ -1934,6 +1934,8 @@ var Journal = function (_Phaser$Sprite) {
 
       var rectangleSensor = this.body.addRectangle(_TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT, sensorOffsetX, sensorOffsetY);
       rectangleSensor.sensor = true;
+
+      this.anchor.setTo(0.5);
     }
   }]);
 
@@ -1984,12 +1986,13 @@ function _inherits(subClass, superClass) {
 var JournalsManager = function (_Phaser$Group) {
   _inherits(JournalsManager, _Phaser$Group);
 
-  function JournalsManager(game, messageText) {
+  function JournalsManager(game, messageText, player) {
     _classCallCheck(this, JournalsManager);
 
     var _this = _possibleConstructorReturn(this, (JournalsManager.__proto__ || Object.getPrototypeOf(JournalsManager)).call(this, game));
 
     _this.messageText = messageText;
+    _this.player = player;
 
     _this.activateKey = _this.game.input.keyboard.addKey(Phaser.Keyboard.E);
     _this.activateKey.onDown.add(_this.tryToShowJournal, _this);
@@ -2000,6 +2003,7 @@ var JournalsManager = function (_Phaser$Group) {
     _this.game.input.keyboard.removeKeyCapture(Phaser.Keyboard.ESC);
 
     _this.isJournalOpened = false;
+    console.log(_this.children);
     return _this;
   }
 
@@ -2016,8 +2020,25 @@ var JournalsManager = function (_Phaser$Group) {
         this.isJournalOpened = true;
         this.game.paused = true;
         this.messageText.setText('Press \'ESC\' to close personal journal.');
-        this.showJournal(approachedJournals[0]);
+
+        var nearestJournal = this.getJournalNearestToPlayer(approachedJournals);
+        this.showJournal(nearestJournal);
       }
+    }
+  }, {
+    key: 'getJournalNearestToPlayer',
+    value: function getJournalNearestToPlayer(journals) {
+      var _this2 = this;
+
+      var nearestJournal = journals[0];
+
+      journals.forEach(function (journal) {
+        if (Phaser.Math.distance(_this2.player.x, _this2.player.y, journal.x, journal.y) < Phaser.Math.distance(_this2.player.x, _this2.player.y, nearestJournal.x, nearestJournal.y)) {
+          nearestJournal = journal;
+        }
+      });
+
+      return nearestJournal;
     }
   }, {
     key: 'showJournal',
@@ -3376,7 +3397,7 @@ var Game = function (_Phaser$State) {
       this.messageText.y = this.game.height - 24 - 32;
       this.messageText.fixedToCamera = true;
 
-      this.journals = new _JournalsManager2.default(this.game, this.messageText);
+      this.journals = new _JournalsManager2.default(this.game, this.messageText, this.player);
 
       this.playerCollisionGroup = this.game.physics.p2.createCollisionGroup(this.player);
       this.zombiesCollisionGroup = this.game.physics.p2.createCollisionGroup();

@@ -2,10 +2,11 @@ import { JOURNAL_TEXT_FIELD_WIDTH, JOURNAL_TEXT_FIELD_HEIGHT, JOURNAL_TEXT_SCROL
 import { showBackgroundLayer, getScreenCenter } from '../utils/UserInterfaceUtils';
 
 export default class JournalsManager extends Phaser.Group {
-  constructor( game, messageText ) {
+  constructor( game, messageText, player ) {
     super( game );
 
     this.messageText = messageText;
+    this.player = player;
 
     this.activateKey = this.game.input.keyboard.addKey( Phaser.Keyboard.E );
     this.activateKey.onDown.add( this.tryToShowJournal, this );
@@ -16,6 +17,7 @@ export default class JournalsManager extends Phaser.Group {
     this.game.input.keyboard.removeKeyCapture( Phaser.Keyboard.ESC );
 
     this.isJournalOpened = false;
+    console.log( this.children );
   }
   tryToShowJournal() {
     if ( this.isJournalOpened ) {
@@ -26,8 +28,22 @@ export default class JournalsManager extends Phaser.Group {
       this.isJournalOpened = true;
       this.game.paused = true;
       this.messageText.setText( 'Press \'ESC\' to close personal journal.' );
-      this.showJournal( approachedJournals[ 0 ] );
+
+      const nearestJournal = this.getJournalNearestToPlayer( approachedJournals );
+      this.showJournal( nearestJournal );
     }
+  }
+  getJournalNearestToPlayer( journals ) {
+    let nearestJournal = journals[ 0 ];
+
+    journals.forEach( ( journal ) => {
+      if ( Phaser.Math.distance( this.player.x, this.player.y, journal.x, journal.y )
+      < Phaser.Math.distance( this.player.x, this.player.y, nearestJournal.x, nearestJournal.y ) ) {
+        nearestJournal = journal;
+      }
+    } );
+
+    return nearestJournal;
   }
   showJournal( journalToShow ) {
     const screenCenter = getScreenCenter( this.game );

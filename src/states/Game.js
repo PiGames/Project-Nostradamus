@@ -26,7 +26,7 @@ export default class Game extends Phaser.State {
     this.messageText.y = this.game.height - 24 - 32;
     this.messageText.fixedToCamera = true;
 
-    this.journals = new JournalsManager( this.game, this.messageText );
+    this.journals = new JournalsManager( this.game, this.messageText, this.player );
 
     this.playerCollisionGroup = this.game.physics.p2.createCollisionGroup( this.player );
     this.zombiesCollisionGroup = this.game.physics.p2.createCollisionGroup();
