@@ -11,7 +11,7 @@ export default class BoidsManager {
   }
   update() {
     for ( const boid of this.entities ) {
-      if ( boid.isChasing === false ) {
+      if ( boid.isChasing === false || ( boid.isChasing === true && boid.foundOnHisOwn === false ) ) {
         continue;
       }
       const velocity1 = this.flyTowardsMassCenterRule( boid );
