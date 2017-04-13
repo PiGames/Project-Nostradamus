@@ -128,13 +128,8 @@ export default class EntityWalkingOnPath extends Entity {
   * Change path to temporary and automatically get back to standard path, after reaching temporary target.
   * @param {tile} start - start tile coordinates, if this tile is different that entity's tile then it goes straight to this tile.
   */
-  changePathToTemporary( start, newTarget = false ) {
-    let currentTarget = {};
-    if ( newTarget === false ) {
-      currentTarget = this.pathsBetweenPathTargets[ this.currentPathIndex ].target;
-    } else {
-      currentTarget = newTarget;
-    }
+  changePathToTemporary( start ) {
+    const currentTarget = this.pathsBetweenPathTargets[ this.currentPathIndex ].target;
 
     this.canMove = false;
     this.calculateTemporaryPath( start, currentTarget, ( path ) => {

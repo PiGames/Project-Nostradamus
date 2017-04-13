@@ -1,5 +1,5 @@
 import EntityWalkingOnPath from './EntityWalkingOnPath';
-import { ZOMBIE_WIDTH, ZOMBIE_HEIGHT, ZOMBIE_SPEED, MIN_DISTANCE_TO_TARGET, ZOMBIE_SPEED_CHASING_MULTIPLIER, ZOMBIE_SIGHT_ANGLE, ZOMBIE_SIGHT_RANGE, ZOMBIE_HEARING_RANGE, ZOMBIE_DAMAGE_TAKEN, ZOMBIE_DAMAGE_COOLDOWN, ZOMBIE_DAMAGE_MULTIPLIER, ZOMBIE_WALK_ANIMATION_FRAMERATE, ZOMBIE_FIGHT_ANIMATION_FRAMERATE, ZOMBIE_WARN_RANGE } from '../constants/ZombieConstants';
+import { ZOMBIE_WIDTH, ZOMBIE_HEIGHT, ZOMBIE_SPEED, MIN_DISTANCE_TO_TARGET, ZOMBIE_SPEED_CHASING_MULTIPLIER, ZOMBIE_SIGHT_ANGLE, ZOMBIE_SIGHT_RANGE, ZOMBIE_HEARING_RANGE, ZOMBIE_DAMAGE_TAKEN, ZOMBIE_DAMAGE_COOLDOWN, ZOMBIE_DAMAGE_MULTIPLIER, ZOMBIE_WALK_ANIMATION_FRAMERATE, ZOMBIE_FIGHT_ANIMATION_FRAMERATE } from '../constants/ZombieConstants';
 import { pixelsToTile } from '../utils/MapUtils.js';
 
 export default class Zombie extends EntityWalkingOnPath {
@@ -27,10 +27,6 @@ export default class Zombie extends EntityWalkingOnPath {
 
     this.body.clearShapes();
 
-    this.warnSensor = this.body.addCircle( ZOMBIE_WARN_RANGE );
-    this.warnSensor.sensor = true;
-    this.warnSensor.sensorType = 'warn';
-
     this.viewSensor = this.body.addCircle( ZOMBIE_SIGHT_RANGE );
     this.viewSensor.sensor = true;
     this.viewSensor.sensorType = 'view';
@@ -45,13 +41,9 @@ export default class Zombie extends EntityWalkingOnPath {
 
     // this is a little bit hard coded so if it works don't bother but if it doesn't, well try changing this line
     this.body.addCapsule( ZOMBIE_WIDTH / 4, ZOMBIE_HEIGHT / 2 );
-
-    // this.body.debug = true;
   }
   update() {
     if ( this.canDetectPlayer() ) {
-      this.warnZombies();
-      this.foundOnHisOwn = true;
       this.isChasing = true;
       this.lastKnownPlayerPosition = { x: this.player.x, y: this.player.y };
       if ( this.shouldAttack() ) {
@@ -59,21 +51,11 @@ export default class Zombie extends EntityWalkingOnPath {
       }
     }
 
-    if ( this.isChasing && this.foundOnHisOwn ) {
+    if ( this.isChasing ) {
       this.chasePlayer();
     } else {
       EntityWalkingOnPath.prototype.update.call( this );
     }
-  }
-
-  warnZombies() {
-    this.zombiesInShoutRange.forEach( ( zombie ) => {
-      if ( !zombie.canDetectPlayer() && this.canWarnZombie( zombie ) ) {
-        zombie.isChasing = true;
-        zombie.lastKnownPlayerPosition = Object.assign( {}, this.lastKnownPlayerPosition );
-        zombie.changePathToTemporary( pixelsToTile( zombie ), pixelsToTile( zombie.lastKnownPlayerPosition ) );
-      }
-    } );
   }
 
   canDetectPlayer() {
@@ -99,24 +81,6 @@ export default class Zombie extends EntityWalkingOnPath {
     return this.canSeePlayer() || this.canHearPlayer();
   }
 
-  canWarnZombie( zombie ) {
-    const zombieRay = new Phaser.Line();
-    zombieRay.start.set( this.x, this.y );
-    zombieRay.end.set( zombie.x, zombie.y );
-
-    const tileHits = this.walls.getRayCastTiles( zombieRay, 0, false, false );
-
-    if ( tileHits.length > 0 ) {
-      for ( let i = 0; i < tileHits.length; i++ ) {
-        if ( tileHits[ i ].index >= 0 ) {
-          return false;
-        }
-      }
-    }
-
-    return true;
-  }
-
   canSeePlayer() {
     return ( this.isPlayerInViewRange && this.isInDegreeRange( this, this.player, ZOMBIE_SIGHT_ANGLE ) );
   }
@@ -133,8 +97,6 @@ export default class Zombie extends EntityWalkingOnPath {
         this.isPlayerInHearingRange = true;
       } else if ( shapeA.sensorType === 'attack' && bodyA.sprite.key === 'player' ) {
         this.isInAttackRange = true;
-      } else if ( shapeA.sensorType === 'warn' && bodyA.sprite.key === 'zombie' ) {
-        this.zombiesInShoutRange.push( bodyA.sprite );
       }
     }
   }
@@ -147,10 +109,6 @@ export default class Zombie extends EntityWalkingOnPath {
         this.isPlayerInHearingRange = false;
       } else if ( shapeA.sensorType === 'attack' && bodyA.sprite.key === 'player' ) {
         this.isInAttackRange = false;
-      } else if ( shapeA.sensorType === 'warn' && bodyA.sprite.key === 'zombie' ) {
-        this.zombiesInShoutRange = this.zombiesInShoutRange.filter( ( v ) => {
-          return ( v !== bodyA.sprite );
-        } );
       }
     }
   }

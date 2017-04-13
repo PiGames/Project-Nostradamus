@@ -1790,14 +1790,7 @@ var EntityWalkingOnPath = function (_Entity) {
     value: function changePathToTemporary(start) {
       var _this3 = this;
 
-      var newTarget = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-      var currentTarget = {};
-      if (newTarget === false) {
-        currentTarget = this.pathsBetweenPathTargets[this.currentPathIndex].target;
-      } else {
-        currentTarget = newTarget;
-      }
+      var currentTarget = this.pathsBetweenPathTargets[this.currentPathIndex].target;
 
       this.canMove = false;
       this.calculateTemporaryPath(start, currentTarget, function (path) {
@@ -2959,10 +2952,6 @@ var Zombie = function (_EntityWalkingOnPath) {
 
     _this.body.clearShapes();
 
-    _this.warnSensor = _this.body.addCircle(_ZombieConstants.ZOMBIE_WARN_RANGE);
-    _this.warnSensor.sensor = true;
-    _this.warnSensor.sensorType = 'warn';
-
     _this.viewSensor = _this.body.addCircle(_ZombieConstants.ZOMBIE_SIGHT_RANGE);
     _this.viewSensor.sensor = true;
     _this.viewSensor.sensorType = 'view';
@@ -2977,8 +2966,6 @@ var Zombie = function (_EntityWalkingOnPath) {
 
     // this is a little bit hard coded so if it works don't bother but if it doesn't, well try changing this line
     _this.body.addCapsule(_ZombieConstants.ZOMBIE_WIDTH / 4, _ZombieConstants.ZOMBIE_HEIGHT / 2);
-
-    // this.body.debug = true;
     return _this;
   }
 
@@ -2986,8 +2973,6 @@ var Zombie = function (_EntityWalkingOnPath) {
     key: 'update',
     value: function update() {
       if (this.canDetectPlayer()) {
-        this.warnZombies();
-        this.foundOnHisOwn = true;
         this.isChasing = true;
         this.lastKnownPlayerPosition = { x: this.player.x, y: this.player.y };
         if (this.shouldAttack()) {
@@ -2995,24 +2980,11 @@ var Zombie = function (_EntityWalkingOnPath) {
         }
       }
 
-      if (this.isChasing && this.foundOnHisOwn) {
+      if (this.isChasing) {
         this.chasePlayer();
       } else {
         _EntityWalkingOnPath3.default.prototype.update.call(this);
       }
-    }
-  }, {
-    key: 'warnZombies',
-    value: function warnZombies() {
-      var _this2 = this;
-
-      this.zombiesInShoutRange.forEach(function (zombie) {
-        if (!zombie.canDetectPlayer() && _this2.canWarnZombie(zombie)) {
-          zombie.isChasing = true;
-          zombie.lastKnownPlayerPosition = Object.assign({}, _this2.lastKnownPlayerPosition);
-          zombie.changePathToTemporary((0, _MapUtils.pixelsToTile)(zombie), (0, _MapUtils.pixelsToTile)(zombie.lastKnownPlayerPosition));
-        }
-      });
     }
   }, {
     key: 'canDetectPlayer',
@@ -3039,25 +3011,6 @@ var Zombie = function (_EntityWalkingOnPath) {
       return this.canSeePlayer() || this.canHearPlayer();
     }
   }, {
-    key: 'canWarnZombie',
-    value: function canWarnZombie(zombie) {
-      var zombieRay = new Phaser.Line();
-      zombieRay.start.set(this.x, this.y);
-      zombieRay.end.set(zombie.x, zombie.y);
-
-      var tileHits = this.walls.getRayCastTiles(zombieRay, 0, false, false);
-
-      if (tileHits.length > 0) {
-        for (var i = 0; i < tileHits.length; i++) {
-          if (tileHits[i].index >= 0) {
-            return false;
-          }
-        }
-      }
-
-      return true;
-    }
-  }, {
     key: 'canSeePlayer',
     value: function canSeePlayer() {
       return this.isPlayerInViewRange && this.isInDegreeRange(this, this.player, _ZombieConstants.ZOMBIE_SIGHT_ANGLE);
@@ -3077,8 +3030,6 @@ var Zombie = function (_EntityWalkingOnPath) {
           this.isPlayerInHearingRange = true;
         } else if (shapeA.sensorType === 'attack' && bodyA.sprite.key === 'player') {
           this.isInAttackRange = true;
-        } else if (shapeA.sensorType === 'warn' && bodyA.sprite.key === 'zombie') {
-          this.zombiesInShoutRange.push(bodyA.sprite);
         }
       }
     }
@@ -3092,10 +3043,6 @@ var Zombie = function (_EntityWalkingOnPath) {
           this.isPlayerInHearingRange = false;
         } else if (shapeA.sensorType === 'attack' && bodyA.sprite.key === 'player') {
           this.isInAttackRange = false;
-        } else if (shapeA.sensorType === 'warn' && bodyA.sprite.key === 'zombie') {
-          this.zombiesInShoutRange = this.zombiesInShoutRange.filter(function (v) {
-            return v !== bodyA.sprite;
-          });
         }
       }
     }
