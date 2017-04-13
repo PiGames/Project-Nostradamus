@@ -2271,7 +2271,7 @@ var Player = function (_Entity) {
     _this.zombies = zombies.children;
 
     _this.godMode = false;
-    _this.godMode = true;
+    // this.godMode = true;
 
     _this.isSneaking = false;
     _this.isSprinting = false;
@@ -2762,7 +2762,6 @@ var WalkingEntitiesManager = function (_Phaser$Group) {
     _this.allEntitiesInitialized = false;
 
     _this.boidsManager = new _BoidsManager2.default(_this.game, _this.children, _this.mapGrid);
-    // this.boidsManager = { update: () => {} };
     return _this;
   }
 
