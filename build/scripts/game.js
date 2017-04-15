@@ -2392,13 +2392,20 @@ var ZombiePathManager = function () {
 
     this.temporaryPath = [];
     this.temporaryStepIndex = 0;
+
+    this.state = 'not-started';
   }
 
   _createClass(ZombiePathManager, [{
     key: 'start',
     value: function start(callback) {
+      var _this = this;
+
       // for now it assumes that zombie is placed on first path target
-      this.calculatePathsBetweenTargets(callback);
+      this.calculatePathsBetweenTargets(function () {
+        _this.state = 'on-standard-path';
+        callback();
+      });
     }
     // Recursive function that calculates standard paths and save them into pathsBetweenPathTargets container.
     // Recurse approach is used to handle asynchronous nature of findPath method.
@@ -2406,7 +2413,7 @@ var ZombiePathManager = function () {
   }, {
     key: 'calculatePathsBetweenTargets',
     value: function calculatePathsBetweenTargets(doneCallback) {
-      var _this = this;
+      var _this2 = this;
 
       var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
@@ -2419,13 +2426,29 @@ var ZombiePathManager = function () {
       var target = index === this.targets.length - 1 ? this.targets[0] : this.targets[index + 1];
 
       this.pathFinder.findPath(start.x, start.y, target.x, target.y, function (path) {
-        _this.pathsBetweenTargets.push({ path: path, start: start, target: target });
-        _this.calculatePathsBetweenTargets(doneCallback, index + 1);
+        _this2.pathsBetweenTargets.push({ path: path, start: start, target: target });
+        _this2.calculatePathsBetweenTargets(doneCallback, index + 1);
       });
     }
   }, {
     key: 'update',
     value: function update() {
+      switch (this.state) {
+        case 'on-standard-path':
+          this.moveOnStandardPath();
+          break;
+        case 'on-temporary-path':
+          this.moveOnTemporaryPath();
+          break;
+        case 'calculating-temporary-path':
+          this.zombie.velocity.x = 0;
+          this.zombie.velocity.y = 0;
+          break;
+      }
+    }
+  }, {
+    key: 'moveOnStandardPath',
+    value: function moveOnStandardPath() {
       var stepTarget = this.getCurrentStepTarget();
 
       if (this.isReached(stepTarget)) {
@@ -2457,6 +2480,55 @@ var ZombiePathManager = function () {
     key: 'getCurrentStepTarget',
     value: function getCurrentStepTarget() {
       return this.pathsBetweenTargets[this.currentPathIndex].path[this.currentStepIndex];
+    }
+  }, {
+    key: 'changePathToTemporary',
+    value: function changePathToTemporary(startTile) {
+      var _this3 = this;
+
+      this.state = 'calculating-temporary-path';
+
+      var currentTarget = this.pathsBetweenTargets[this.currentPathIndex].target;
+
+      this.pathFinder.findPath(startTile.x, startTile.y, currentTarget.x, currentTarget.y, function (path) {
+        if (path.length === 0) {
+          _this3.changePathToStandard();
+          return;
+        }
+        _this3.temporaryPath = path;
+        _this3.temporaryStepIndex = 0;
+
+        _this3.state = 'on-temporary-path';
+      });
+    }
+  }, {
+    key: 'getTemporaryStepTarget',
+    value: function getTemporaryStepTarget() {
+      return this.temporaryPath[this.temporaryStepIndex];
+    }
+  }, {
+    key: 'changePathToStandard',
+    value: function changePathToStandard() {
+      this.currentPathIndex = this.currentPathIndex + 1 === this.pathsBetweenTargets.length ? 0 : this.currentPathIndex + 1;
+      this.currentStepIndex = 0;
+      this.state = 'on-standard-path';
+    }
+  }, {
+    key: 'moveOnTemporaryPath',
+    value: function moveOnTemporaryPath() {
+      var temporaryStepTarget = this.getTemporaryStepTarget();
+      if (this.isReached(temporaryStepTarget)) {
+        this.onTemporaryStepTargetReach();
+      }
+      this.zombie.game.physics.arcade.moveToObject(this.zombie, (0, _MapUtils.tileToPixels)(temporaryStepTarget));
+    }
+  }, {
+    key: 'onTemporaryStepTargetReach',
+    value: function onTemporaryStepTargetReach() {
+      this.temporaryStepIndex++;
+      if (this.temporaryStepIndex === this.temporaryPath.length) {
+        this.changePathToStandard();
+      }
     }
   }]);
 

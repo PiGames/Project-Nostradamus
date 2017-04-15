@@ -18,10 +18,15 @@ export default class ZombiePathManager {
 
     this.temporaryPath = [];
     this.temporaryStepIndex = 0;
+
+    this.state = 'not-started';
   }
   start( callback ) {
     // for now it assumes that zombie is placed on first path target
-    this.calculatePathsBetweenTargets( callback );
+    this.calculatePathsBetweenTargets( () => {
+      this.state = 'on-standard-path';
+      callback();
+    } );
   }
   // Recursive function that calculates standard paths and save them into pathsBetweenPathTargets container.
   // Recurse approach is used to handle asynchronous nature of findPath method.
@@ -40,6 +45,20 @@ export default class ZombiePathManager {
     } );
   }
   update() {
+    switch ( this.state ) {
+    case 'on-standard-path':
+      this.moveOnStandardPath();
+      break;
+    case 'on-temporary-path':
+      this.moveOnTemporaryPath();
+      break;
+    case 'calculating-temporary-path':
+      this.zombie.velocity.x = 0;
+      this.zombie.velocity.y = 0;
+      break;
+    }
+  }
+  moveOnStandardPath() {
     const stepTarget = this.getCurrentStepTarget();
 
     if ( this.isReached( stepTarget ) ) {
@@ -65,5 +84,42 @@ export default class ZombiePathManager {
   }
   getCurrentStepTarget() {
     return this.pathsBetweenTargets[ this.currentPathIndex ].path[ this.currentStepIndex ];
+  }
+  changePathToTemporary( startTile ) {
+    this.state = 'calculating-temporary-path';
+
+    const currentTarget = this.pathsBetweenTargets[ this.currentPathIndex ].target;
+
+    this.pathFinder.findPath( startTile.x, startTile.y, currentTarget.x, currentTarget.y, ( path ) => {
+      if ( path.length === 0 ) {
+        this.changePathToStandard();
+        return;
+      }
+      this.temporaryPath = path;
+      this.temporaryStepIndex = 0;
+
+      this.state = 'on-temporary-path';
+    } );
+  }
+  getTemporaryStepTarget() {
+    return this.temporaryPath[ this.temporaryStepIndex ];
+  }
+  changePathToStandard() {
+    this.currentPathIndex = ( this.currentPathIndex + 1 === this.pathsBetweenTargets.length ) ? 0 : this.currentPathIndex + 1;
+    this.currentStepIndex = 0;
+    this.state = 'on-standard-path';
+  }
+  moveOnTemporaryPath() {
+    const temporaryStepTarget = this.getTemporaryStepTarget();
+    if ( this.isReached( temporaryStepTarget ) ) {
+      this.onTemporaryStepTargetReach();
+    }
+    this.zombie.game.physics.arcade.moveToObject( this.zombie, tileToPixels( temporaryStepTarget ) );
+  }
+  onTemporaryStepTargetReach() {
+    this.temporaryStepIndex++;
+    if ( this.temporaryStepIndex === this.temporaryPath.length ) {
+      this.changePathToStandard();
+    }
   }
 }
