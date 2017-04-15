@@ -1019,7 +1019,7 @@ var ProjectNostradamus = function (_Phaser$Game) {
 
 exports.default = ProjectNostradamus;
 
-},{"./levels/Level1":13,"./levels/Level2":14,"./states/Boot":26,"./states/Menu":28,"./states/Preload":29}],7:[function(require,module,exports){
+},{"./levels/Level1":13,"./levels/Level2":14,"./states/Boot":23,"./states/Menu":25,"./states/Preload":26}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1202,7 +1202,7 @@ var Level1 = function (_Game) {
 
 exports.default = Level1;
 
-},{"../states/Game.js":27}],14:[function(require,module,exports){
+},{"../states/Game.js":24}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1275,215 +1275,7 @@ var Level2 = function (_Game) {
 
 exports.default = Level2;
 
-},{"../states/Game.js":27}],15:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-  };
-}();
-
-var _TileMapConstants = require('../constants/TileMapConstants');
-
-var _MapUtils = require('../utils/MapUtils.js');
-
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-
-var BoidsManager = function () {
-  function BoidsManager(game, entities, mapGrid) {
-    var boidsDistance = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : Math.max(_TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT);
-    var distanceBetweenBoidsAndWalls = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : boidsDistance;
-
-    _classCallCheck(this, BoidsManager);
-
-    this.entities = entities;
-    this.mapGrid = mapGrid;
-    this.boidsDistance = boidsDistance;
-    this.distanceBetweenBoidsAndWalls = distanceBetweenBoidsAndWalls;
-    this.game = game;
-  }
-
-  _createClass(BoidsManager, [{
-    key: 'update',
-    value: function update() {
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = this.entities[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var boid = _step.value;
-
-          if (boid.isChasing === false) {
-            continue;
-          }
-          var velocity1 = this.flyTowardsMassCenterRule(boid);
-          var velocity2 = this.keepSmallDistanceFromObstaclesRule(boid);
-          var velocity3 = this.tryMatchingOtherEnitiesVelocityRule(boid);
-
-          boid.body.velocity.x += velocity1.x + velocity2.x + velocity3.x;
-          boid.body.velocity.y += velocity1.y + velocity2.y + velocity3.y;
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-    }
-  }, {
-    key: 'flyTowardsMassCenterRule',
-    value: function flyTowardsMassCenterRule(boid) {
-      var velocity = { x: 0, y: 0 };
-
-      var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
-
-      try {
-        for (var _iterator2 = this.entities[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var entity = _step2.value;
-
-          if (entity === boid) {
-            continue;
-          }
-          velocity.x += entity.body.x;
-          velocity.y += entity.body.y;
-        }
-      } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion2 && _iterator2.return) {
-            _iterator2.return();
-          }
-        } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
-          }
-        }
-      }
-
-      velocity.x = velocity.x / (this.entities.length - 1) / 100;
-      velocity.y = velocity.y / (this.entities.length - 1) / 100;
-
-      return velocity;
-    }
-  }, {
-    key: 'keepSmallDistanceFromObstaclesRule',
-    value: function keepSmallDistanceFromObstaclesRule(boid) {
-      var velocity = { x: 0, y: 0 };
-
-      var _iteratorNormalCompletion3 = true;
-      var _didIteratorError3 = false;
-      var _iteratorError3 = undefined;
-
-      try {
-        for (var _iterator3 = this.entities[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-          var otherBoid = _step3.value;
-
-          if (otherBoid === boid) {
-            continue;
-          }
-          if (this.game.physics.arcade.distanceBetween(otherBoid, boid) <= this.boidsDistance) {
-            velocity.x -= otherBoid.body.x - boid.body.x;
-            velocity.y -= otherBoid.body.y - boid.body.y;
-          }
-        }
-      } catch (err) {
-        _didIteratorError3 = true;
-        _iteratorError3 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion3 && _iterator3.return) {
-            _iterator3.return();
-          }
-        } finally {
-          if (_didIteratorError3) {
-            throw _iteratorError3;
-          }
-        }
-      }
-
-      var wallBodies = this.getAdjoiningWallBodies(boid);
-      var _iteratorNormalCompletion4 = true;
-      var _didIteratorError4 = false;
-      var _iteratorError4 = undefined;
-
-      try {
-        for (var _iterator4 = wallBodies[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-          var wallBody = _step4.value;
-
-          if (this.game.physics.arcade.distanceBetween(wallBody, boid) <= this.distanceBetweenBoidsAndWalls) {
-            velocity.x -= wallBody.x - boid.body.x;
-            velocity.y -= wallBody.y - boid.body.y;
-          }
-        }
-      } catch (err) {
-        _didIteratorError4 = true;
-        _iteratorError4 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion4 && _iterator4.return) {
-            _iterator4.return();
-          }
-        } finally {
-          if (_didIteratorError4) {
-            throw _iteratorError4;
-          }
-        }
-      }
-
-      return velocity;
-    }
-  }, {
-    key: 'getAdjoiningWallBodies',
-    value: function getAdjoiningWallBodies(entity) {
-      var _this = this;
-
-      var entityTile = (0, _MapUtils.pixelsToTile)(entity);
-      var adjoiningTiles = [{ x: entityTile.x - 1, y: entityTile.y - 1 }, { x: entityTile.x - 1, y: entityTile.y }, { x: entityTile.x - 1, y: entityTile.y + 1 }, { x: entityTile.x, y: entityTile.y - 1 }, { x: entityTile.x, y: entityTile.y + 1 }, { x: entityTile.x + 1, y: entityTile.y - 1 }, { x: entityTile.x + 1, y: entityTile.y }, { x: entityTile.x + 1, y: entityTile.y + 1 }];
-
-      var adjoiningWallTiles = adjoiningTiles.filter(function (tile) {
-        return _this.mapGrid[tile.y][tile.x] === 1;
-      });
-      return adjoiningWallTiles.map(_MapUtils.tileToPixels);
-    }
-  }, {
-    key: 'tryMatchingOtherEnitiesVelocityRule',
-    value: function tryMatchingOtherEnitiesVelocityRule() {
-      return { x: 0, y: 0 };
-    }
-  }]);
-
-  return BoidsManager;
-}();
-
-exports.default = BoidsManager;
-
-},{"../constants/TileMapConstants":9,"../utils/MapUtils.js":31}],16:[function(require,module,exports){
+},{"../states/Game.js":24}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1582,258 +1374,7 @@ var Entity = function (_Phaser$Sprite) {
 
 exports.default = Entity;
 
-},{}],17:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-  };
-}();
-
-var _Entity2 = require('./Entity');
-
-var _Entity3 = _interopRequireDefault(_Entity2);
-
-var _PathFinder = require('../objects/PathFinder.js');
-
-var _PathFinder2 = _interopRequireDefault(_PathFinder);
-
-var _ZombieConstants = require('../constants/ZombieConstants');
-
-var _TileMapConstants = require('../constants/TileMapConstants');
-
-var _MapUtils = require('../utils/MapUtils.js');
-
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : { default: obj };
-}
-
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-
-function _possibleConstructorReturn(self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }return call && (typeof call === "object" || typeof call === "function") ? call : self;
-}
-
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-}
-
-/** Create Entity that is supposed to walk on given path. Set position of entity on first given target*/
-var EntityWalkingOnPath = function (_Entity) {
-  _inherits(EntityWalkingOnPath, _Entity);
-
-  function EntityWalkingOnPath(game, imageKey, frame, targets, walls) {
-    _classCallCheck(this, EntityWalkingOnPath);
-
-    var position = (0, _MapUtils.tileToPixels)(targets[0]);
-
-    var _this = _possibleConstructorReturn(this, (EntityWalkingOnPath.__proto__ || Object.getPrototypeOf(EntityWalkingOnPath)).call(this, game, position.x, position.y, imageKey, frame));
-
-    _this.pathfinder = new _PathFinder2.default();
-    _this.wallsPositions = (0, _MapUtils.getWallsPostions)(walls);
-
-    _this.pathfinder.setGrid(_this.wallsPositions);
-
-    _this.targets = targets;
-
-    _this.pathsBetweenPathTargets = [];
-
-    _this.currentPathIndex = 0;
-    _this.currentStepIndex = 0;
-
-    _this.isOnStandardPath = true;
-    _this.temporaryPath = [];
-    _this.temporaryStepIndex = 0;
-
-    /* disable update until paths are calculated */
-    _this.isInitialized = false;
-    _this.canMove = false;
-
-    _this.calculatePathsBetweenTargets(function () {
-      _this.stepTarget = _this.pathsBetweenPathTargets[_this.currentPathIndex].path[_this.currentStepIndex];
-      _this.isInitialized = true;
-      _this.canMove = true;
-    });
-    return _this;
-  }
-  /**Recursive function that calculates standard paths and save them into pathsBetweenPathTargets container.  Recurse approach is used to handle asynchronous nature of findPath method */
-
-  _createClass(EntityWalkingOnPath, [{
-    key: 'calculatePathsBetweenTargets',
-    value: function calculatePathsBetweenTargets(doneCallback) {
-      var _this2 = this;
-
-      var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-
-      if (this.pathsBetweenPathTargets.length === this.targets.length) {
-        doneCallback();
-        return;
-      }
-
-      var start = this.targets[index];
-      var target = index === this.targets.length - 1 ? this.targets[0] : this.targets[index + 1];
-
-      this.pathfinder.findPath(start.x, start.y, target.x, target.y, function (path) {
-        _this2.pathsBetweenPathTargets.push({ path: path, start: start, target: target });
-        _this2.calculatePathsBetweenTargets(doneCallback, index + 1);
-      });
-    }
-  }, {
-    key: 'update',
-    value: function update() {
-      /** Check if current target or step target is reached. Move body in stepTarget direction. */
-      if (this.canMove) {
-        if (this.isReached(this.stepTarget)) {
-          this.onStepTargetReach();
-        }
-        this.game.physics.arcade.moveToObject(this, (0, _MapUtils.tileToPixels)(this.stepTarget), _ZombieConstants.ZOMBIE_SPEED);
-
-        this.updateLookDirection();
-      }
-    }
-    /** When current step target or temporary step target is reached, set step target to the next one.*/
-    /** If current target is reached or temporary target is reached set path to the next one, or get back to standard path*/
-
-  }, {
-    key: 'onStepTargetReach',
-    value: function onStepTargetReach() {
-      if (this.isOnStandardPath) {
-        if (this.currentStepIndex + 1 === this.pathsBetweenPathTargets[this.currentPathIndex].path.length) {
-          this.currentPathIndex = this.currentPathIndex + 1 === this.pathsBetweenPathTargets.length ? 0 : this.currentPathIndex + 1;
-          this.currentStepIndex = 0;
-        } else {
-          this.currentStepIndex++;
-        }
-        this.stepTarget = this.pathsBetweenPathTargets[this.currentPathIndex].path[this.currentStepIndex];
-      } else {
-        if (this.temporaryStepIndex + 1 === this.temporaryPath.length) {
-          this.changePathToStandard();
-        } else {
-          this.temporaryStepIndex++;
-          this.stepTarget = this.temporaryPath[this.temporaryStepIndex];
-        }
-      }
-    }
-  }, {
-    key: 'updateLookDirection',
-    value: function updateLookDirection() {
-      var lookTarget = this.getTilesEndCoords(this.stepTarget);
-      var targetPoint = new Phaser.Point(lookTarget.x, lookTarget.y);
-      var entityCenter = new Phaser.Point(this.body.x + this.width / 2, this.body.y + this.height / 2);
-
-      var deltaTargetRad = this.rotation - Phaser.Math.angleBetweenPoints(targetPoint, entityCenter) - 1.5 * Math.PI;
-
-      deltaTargetRad = deltaTargetRad % (Math.PI * 2);
-
-      if (deltaTargetRad != deltaTargetRad % Math.PI) {
-        deltaTargetRad = deltaTargetRad + Math.PI * (deltaTargetRad < 0 ? 2 : -2);
-      }
-
-      this.body.rotateLeft(_ZombieConstants.ZOMBIE_ROTATING_SPEED * deltaTargetRad);
-    }
-  }, {
-    key: 'getTilesEndCoords',
-    value: function getTilesEndCoords(tile) {
-      var tileCoords = (0, _MapUtils.tileToPixels)(tile);
-      var veryFarAway = 1000;
-      if (Math.abs(this.body.velocity.x) > Math.abs(this.body.velocity.y)) {
-        if (this.body.velocity.x > 0) {
-          tileCoords.x += veryFarAway * _TileMapConstants.TILE_WIDTH;
-        } else {
-          tileCoords.x -= veryFarAway * _TileMapConstants.TILE_WIDTH;
-        }
-      } else if (Math.abs(this.body.velocity.x) < Math.abs(this.body.velocity.y)) {
-        if (this.body.velocity.y > 0) {
-          tileCoords.y += veryFarAway * _TileMapConstants.TILE_HEIGHT;
-        } else {
-          tileCoords.y -= veryFarAway * _TileMapConstants.TILE_HEIGHT;
-        }
-      }
-
-      return tileCoords;
-    }
-  }, {
-    key: 'isReached',
-    value: function isReached(target) {
-      var distanceToTarget = this.game.physics.arcade.distanceBetween(this, (0, _MapUtils.tileToPixels)(target));
-      return distanceToTarget <= _ZombieConstants.MIN_DISTANCE_TO_TARGET;
-    }
-  }, {
-    key: 'calculateTemporaryPath',
-    value: function calculateTemporaryPath(start, target, callback) {
-      this.pathfinder.findPath(start.x, start.y, target.x, target.y, callback);
-    }
-    /**
-    * Change path to temporary and automatically get back to standard path, after reaching temporary target.
-    * @param {tile} start - start tile coordinates, if this tile is different that entity's tile then it goes straight to this tile.
-    */
-
-  }, {
-    key: 'changePathToTemporary',
-    value: function changePathToTemporary(start) {
-      var _this3 = this;
-
-      var currentTarget = this.pathsBetweenPathTargets[this.currentPathIndex].target;
-
-      this.canMove = false;
-      this.calculateTemporaryPath(start, currentTarget, function (path) {
-        if (path) {
-          if (path.length === 0) {
-            _this3.changePathToStandard();
-            return;
-          }
-          _this3.temporaryPath = path;
-          _this3.temporaryStepIndex = 0;
-          _this3.stepTarget = path[_this3.temporaryStepIndex];
-          _this3.isOnStandardPath = false;
-          _this3.canMove = true;
-        }
-      });
-    }
-  }, {
-    key: 'changePathToStandard',
-    value: function changePathToStandard() {
-      this.currentPathIndex = this.currentPathIndex + 1 === this.pathsBetweenPathTargets.length ? 0 : this.currentPathIndex + 1;
-      this.currentStepIndex = 0;
-      this.stepTarget = this.pathsBetweenPathTargets[this.currentPathIndex].path[this.currentStepIndex];
-      this.isOnStandardPath = true;
-    }
-  }, {
-    key: 'disableMovement',
-    value: function disableMovement() {
-      this.canMove = false;
-      this.resetVelocity();
-    }
-  }, {
-    key: 'enableMovement',
-    value: function enableMovement() {
-      this.canMove = true;
-    }
-  }]);
-
-  return EntityWalkingOnPath;
-}(_Entity3.default);
-
-exports.default = EntityWalkingOnPath;
-
-},{"../constants/TileMapConstants":9,"../constants/ZombieConstants":11,"../objects/PathFinder.js":20,"../utils/MapUtils.js":31,"./Entity":16}],18:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1939,7 +1480,7 @@ var Journal = function (_Phaser$Sprite) {
 
 exports.default = Journal;
 
-},{"../constants/ItemConstants":7,"../constants/TileMapConstants":9}],19:[function(require,module,exports){
+},{"../constants/ItemConstants":7,"../constants/TileMapConstants":9}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2145,7 +1686,7 @@ var JournalsManager = function (_Phaser$Group) {
 
 exports.default = JournalsManager;
 
-},{"../constants/ItemConstants":7,"../utils/UserInterfaceUtils":32}],20:[function(require,module,exports){
+},{"../constants/ItemConstants":7,"../utils/UserInterfaceUtils":28}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2203,7 +1744,7 @@ var PathFinder = function () {
 
 exports.default = PathFinder;
 
-},{"easystarjs":1}],21:[function(require,module,exports){
+},{"easystarjs":1}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2506,7 +2047,7 @@ var Player = function (_Entity) {
 
 exports.default = Player;
 
-},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"./Entity":16}],22:[function(require,module,exports){
+},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"./Entity":15}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2694,7 +2235,7 @@ var TileMap = function (_Phaser$Tilemap) {
 
 exports.default = TileMap;
 
-},{"../utils/MapUtils.js":31}],23:[function(require,module,exports){
+},{"../utils/MapUtils.js":27}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2711,15 +2252,15 @@ var _createClass = function () {
   };
 }();
 
-var _EntityManagerUtils = require('../utils/EntityManagerUtils');
+var _Entity2 = require('./Entity');
 
-var _MapUtils = require('../utils/MapUtils.js');
+var _Entity3 = _interopRequireDefault(_Entity2);
 
-var _BoidsManager = require('./BoidsManager.js');
+var _ZombiePathManager = require('./ZombiePathManager');
 
-var _BoidsManager2 = _interopRequireDefault(_BoidsManager);
+var _ZombiePathManager2 = _interopRequireDefault(_ZombiePathManager);
 
-var _TileMapConstants = require('../constants/TileMapConstants');
+var _MapUtils = require('../utils/MapUtils');
 
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : { default: obj };
@@ -2743,380 +2284,62 @@ function _inherits(subClass, superClass) {
   }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 }
 
-var WalkingEntitiesManager = function (_Phaser$Group) {
-  _inherits(WalkingEntitiesManager, _Phaser$Group);
+var Zombie = function (_Entity) {
+  _inherits(Zombie, _Entity);
 
-  function WalkingEntitiesManager(game, grid) {
-    _classCallCheck(this, WalkingEntitiesManager);
+  function Zombie(game, key) {
+    var x = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+    var y = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
 
-    var _this = _possibleConstructorReturn(this, (WalkingEntitiesManager.__proto__ || Object.getPrototypeOf(WalkingEntitiesManager)).call(this, game));
-
-    _this.mapGrid = (0, _MapUtils.getWallsPostions)(grid);
-    _this.allEntitiesInitialized = false;
-
-    _this.boidsManager = new _BoidsManager2.default(_this.game, _this.children, _this.mapGrid);
-    return _this;
-  }
-
-  _createClass(WalkingEntitiesManager, [{
-    key: 'update',
-    value: function update() {
-      if (this.allEntitiesInitialized || this.areAllEntitiesInitialized()) {
-        this.manageMovingEntities();
-      }
-
-      Phaser.Group.prototype.update.call(this);
-
-      this.boidsManager.update();
-    }
-  }, {
-    key: 'manageMovingEntities',
-    value: function manageMovingEntities() {
-      for (var entityIndex1 in this.children) {
-        for (var entityIndex2 in this.children) {
-          if (entityIndex1 === entityIndex2) {
-            continue;
-          }
-          var currentHandledEntity = this.children[Math.min(entityIndex1, entityIndex2)];
-          var otherEntity = this.children[Math.max(entityIndex1, entityIndex2)];
-
-          if (currentHandledEntity.canMove && otherEntity.canMove && (0, _EntityManagerUtils.willEntitiesBeOnTheSameTile)(currentHandledEntity, otherEntity)) {
-            var freeTile = (0, _EntityManagerUtils.getFreeTileAroundEntityExcludingOtherEntity)(currentHandledEntity, otherEntity, this.mapGrid);
-            var currentTarget = currentHandledEntity.pathsBetweenPathTargets[currentHandledEntity.currentPathIndex].target;
-
-            currentHandledEntity.changePathToTemporary(freeTile, currentTarget);
-          }
-        }
-      }
-    }
-  }, {
-    key: 'onCollisionWihOtherEntity',
-    value: function onCollisionWihOtherEntity(entity1, entity2) {
-      var freeTile = (0, _EntityManagerUtils.getFreeTileAroundEntityExcludingOtherEntity)(entity1, entity2, this.mapGrid);
-      entity1.changePathToTemporary(freeTile);
-    }
-  }, {
-    key: 'onCollisionWithWalls',
-    value: function onCollisionWithWalls(entity, tileBody) {
-      if (entity.isChasing === false) {
-        this.findAdjoiningFreeTileAndGoBackOnPath(entity, tileBody);
-      } else {
-        this.resetVelocityInCorrespondingDimension(entity, tileBody);
-      }
-    }
-  }, {
-    key: 'findAdjoiningFreeTileAndGoBackOnPath',
-    value: function findAdjoiningFreeTileAndGoBackOnPath(entity, tileBody) {
-      var entityTile = (0, _MapUtils.pixelsToTile)(entity);
-      var tile = (0, _MapUtils.pixelsToTile)({ x: tileBody.x + _TileMapConstants.TILE_WIDTH / 2, y: tileBody.y + _TileMapConstants.TILE_HEIGHT / 2 });
-      var freeTile = void 0;
-
-      if (entityTile.x > tile.x) {
-        freeTile = { x: entityTile.x + 1, y: entityTile.y };
-      } else if (entityTile.x < tile.x) {
-        freeTile = { x: entityTile.x - 1, y: entityTile.y };
-      } else if (entityTile.y < tile.y) {
-        freeTile = { x: entityTile.x, y: entityTile.y - 1 };
-      } else if (entityTile.y > tile.y) {
-        freeTile = { x: entityTile.x, y: entityTile.y + 1 };
-      }
-
-      entity.changePathToTemporary(freeTile);
-    }
-  }, {
-    key: 'resetVelocityInCorrespondingDimension',
-    value: function resetVelocityInCorrespondingDimension(entity, tileBody) {
-      var direction = (0, _EntityManagerUtils.getDirectionBetweenEntities)(entity, tileBody);
-      // direction is not always correct becuase of the cases when zombie is colliding with tile's corner
-      if (direction === 'NORTH' || direction === 'SOUTH') {
-        entity.body.velocity.x = entity.body.velocity.x / Math.abs(entity.body.velocity.x) * Math.sqrt(Math.pow(entity.body.velocity.x, 2) + Math.pow(entity.body.velocity.y, 2));
-        entity.body.velocity.y = 0;
-      } else {
-        entity.body.velocity.y = entity.body.velocity.y / Math.abs(entity.body.velocity.y) * Math.sqrt(Math.pow(entity.body.velocity.x, 2) + Math.pow(entity.body.velocity.y, 2));
-        entity.body.velocity.x = 0;
-      }
-    }
-  }, {
-    key: 'areAllEntitiesInitialized',
-    value: function areAllEntitiesInitialized() {
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = this.children[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var entity = _step.value;
-
-          if (!entity.isInitialized) {
-            return false;
-          }
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-
-      this.allEntitiesInitialized = true;
-      return true;
-    }
-  }]);
-
-  return WalkingEntitiesManager;
-}(Phaser.Group);
-
-exports.default = WalkingEntitiesManager;
-
-},{"../constants/TileMapConstants":9,"../utils/EntityManagerUtils":30,"../utils/MapUtils.js":31,"./BoidsManager.js":15}],24:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-  };
-}();
-
-var _EntityWalkingOnPath2 = require('./EntityWalkingOnPath');
-
-var _EntityWalkingOnPath3 = _interopRequireDefault(_EntityWalkingOnPath2);
-
-var _ZombieConstants = require('../constants/ZombieConstants');
-
-var _MapUtils = require('../utils/MapUtils.js');
-
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : { default: obj };
-}
-
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-
-function _possibleConstructorReturn(self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }return call && (typeof call === "object" || typeof call === "function") ? call : self;
-}
-
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-}
-
-var Zombie = function (_EntityWalkingOnPath) {
-  _inherits(Zombie, _EntityWalkingOnPath);
-
-  function Zombie(game, imageKey, frame, targets, walls, player) {
     _classCallCheck(this, Zombie);
 
-    var _this = _possibleConstructorReturn(this, (Zombie.__proto__ || Object.getPrototypeOf(Zombie)).call(this, game, imageKey, frame, targets, walls));
+    var _this = _possibleConstructorReturn(this, (Zombie.__proto__ || Object.getPrototypeOf(Zombie)).call(this, game, x, y, key));
 
-    _this.player = player;
-    _this.walls = walls;
-    _this.isPlayerInViewRange = false;
-    _this.isPlayerInHearingRange = false;
-    _this.isInAttackRange = false;
-    _this.isChasing = false;
-    _this.lastKnownPlayerPosition = { x: 1, y: 1 };
-    _this.canDealDamage = true;
-    _this.zombiesInShoutRange = [];
-    _this.foundOnHisOwn = false;
+    _this.isPathSystemInitialized = false;
+    _this.PM = null;
 
-    _this.damageTaken = _ZombieConstants.ZOMBIE_DAMAGE_TAKEN;
-
-    _this.animations.add('walk', [0, 1, 2, 3, 4, 5], 0);
-    _this.animations.add('attack', [6, 7, 8, 9], 6);
-    _this.animations.play('walk', _ZombieConstants.ZOMBIE_WALK_ANIMATION_FRAMERATE, true);
-
-    _this.isPlayerDead = false;
-
-    _this.body.clearShapes();
-
-    _this.viewSensor = _this.body.addCircle(_ZombieConstants.ZOMBIE_SIGHT_RANGE);
-    _this.viewSensor.sensor = true;
-    _this.viewSensor.sensorType = 'view';
-
-    _this.viewSensor = _this.body.addCircle(_ZombieConstants.ZOMBIE_HEARING_RANGE);
-    _this.viewSensor.sensor = true;
-    _this.viewSensor.sensorType = 'hear';
-
-    _this.attackSensor = _this.body.addCircle(50);
-    _this.attackSensor.sensor = true;
-    _this.attackSensor.sensorType = 'attack';
-
-    // this is a little bit hard coded so if it works don't bother but if it doesn't, well try changing this line
-    _this.body.addCapsule(_ZombieConstants.ZOMBIE_WIDTH / 4, _ZombieConstants.ZOMBIE_HEIGHT / 2);
+    _this.state = 'not-ready';
     return _this;
   }
 
   _createClass(Zombie, [{
+    key: 'setTilePosition',
+    value: function setTilePosition(tile) {
+      var pixelPosition = (0, _MapUtils.tileToPixels)(tile);
+      Object.assign(this.body, pixelPosition);
+    }
+  }, {
+    key: 'initializePathSystem',
+    value: function initializePathSystem(targets, walls) {
+      this.PM = new _ZombiePathManager2.default(this, targets, walls);
+
+      this.state = 'not-walking';
+    }
+  }, {
+    key: 'startPathSystem',
+    value: function startPathSystem() {
+      var _this2 = this;
+
+      this.PM.start(function () {
+        return _this2.state = 'walking-on-path';
+      });
+    }
+  }, {
     key: 'update',
     value: function update() {
-      if (this.canDetectPlayer()) {
-        this.isChasing = true;
-        this.lastKnownPlayerPosition = { x: this.player.x, y: this.player.y };
-        if (this.shouldAttack()) {
-          this.handleAttack();
-        }
-      }
-
-      if (this.isChasing) {
-        this.chasePlayer();
-      } else {
-        _EntityWalkingOnPath3.default.prototype.update.call(this);
-      }
-    }
-  }, {
-    key: 'canDetectPlayer',
-    value: function canDetectPlayer() {
-      if (this.isPlayerDead) {
-        return false;
-      }
-
-      /** Draw line between player and zombie and check if it can see him. If yes, chase him. */
-      var playerSeekingRay = new Phaser.Line();
-      playerSeekingRay.start.set(this.x, this.y);
-      playerSeekingRay.end.set(this.player.x, this.player.y);
-
-      var tileHits = this.walls.getRayCastTiles(playerSeekingRay, 0, false, false);
-
-      if (tileHits.length > 0) {
-        for (var i = 0; i < tileHits.length; i++) {
-          if (tileHits[i].index >= 0) {
-            return false;
-          }
-        }
-      }
-
-      return this.canSeePlayer() || this.canHearPlayer();
-    }
-  }, {
-    key: 'canSeePlayer',
-    value: function canSeePlayer() {
-      return this.isPlayerInViewRange && this.isInDegreeRange(this, this.player, _ZombieConstants.ZOMBIE_SIGHT_ANGLE);
-    }
-  }, {
-    key: 'canHearPlayer',
-    value: function canHearPlayer() {
-      return this.isPlayerInHearingRange && !this.player.isSneaking && this.player.isMoving();
-    }
-  }, {
-    key: 'onCollisionEnter',
-    value: function onCollisionEnter(bodyA, bodyB, shapeA) {
-      if (this.isItSensorArea(bodyA, shapeA)) {
-        if (shapeA.sensorType === 'view' && bodyA.sprite.key === 'player') {
-          this.isPlayerInViewRange = true;
-        } else if (shapeA.sensorType === 'hear' && bodyA.sprite.key === 'player') {
-          this.isPlayerInHearingRange = true;
-        } else if (shapeA.sensorType === 'attack' && bodyA.sprite.key === 'player') {
-          this.isInAttackRange = true;
-        }
-      }
-    }
-  }, {
-    key: 'onCollisionLeave',
-    value: function onCollisionLeave(bodyA, bodyB, shapeA) {
-      if (this.isItSensorArea(bodyA, shapeA)) {
-        if (shapeA.sensorType === 'view' && bodyA.sprite.key === 'player') {
-          this.isPlayerInViewRange = false;
-        } else if (shapeA.sensorType === 'hear' && bodyA.sprite.key === 'player') {
-          this.isPlayerInHearingRange = false;
-        } else if (shapeA.sensorType === 'attack' && bodyA.sprite.key === 'player') {
-          this.isInAttackRange = false;
-        }
-      }
-    }
-  }, {
-    key: 'isItSensorArea',
-    value: function isItSensorArea(body, shape) {
-      if (body.sprite == null || shape.sensor == null) {
-        return false;
-      }
-
-      return shape.sensor;
-    }
-  }, {
-    key: 'chasePlayer',
-    value: function chasePlayer() {
-      this.game.physics.arcade.moveToObject(this, this.lastKnownPlayerPosition, _ZombieConstants.ZOMBIE_SPEED * _ZombieConstants.ZOMBIE_SPEED_CHASING_MULTIPLIER);
-      this.lookAt(this.lastKnownPlayerPosition.x, this.lastKnownPlayerPosition.y);
-
-      var distanceToTarget = this.game.physics.arcade.distanceBetween(this, this.lastKnownPlayerPosition);
-      if (!this.canDetectPlayer() && distanceToTarget <= _ZombieConstants.MIN_DISTANCE_TO_TARGET) {
-        this.stopChasingPlayer();
-      }
-    }
-  }, {
-    key: 'takeDamage',
-    value: function takeDamage(damage) {
-      this.damage(damage * _ZombieConstants.ZOMBIE_DAMAGE_MULTIPLIER);
-      this.health = Math.floor(this.health * 100) / 100;
-    }
-  }, {
-    key: 'endCooldown',
-    value: function endCooldown() {
-      this.canDealDamage = true;
-      this.animations.play('walk', _ZombieConstants.ZOMBIE_WALK_ANIMATION_FRAMERATE, true);
-    }
-  }, {
-    key: 'stopChasingPlayer',
-    value: function stopChasingPlayer() {
-      this.body.velocity.x = 0;
-      this.body.velocity.y = 0;
-      this.isChasing = false;
-      this.foundOnHisOwn = false;
-      this.changePathToTemporary((0, _MapUtils.pixelsToTile)(this));
-    }
-  }, {
-    key: 'shouldAttack',
-    value: function shouldAttack() {
-      return this.alive && this.canDealDamage && this.isInAttackRange;
-    }
-  }, {
-    key: 'handleAttack',
-    value: function handleAttack() {
-      this.animations.play('attack', _ZombieConstants.ZOMBIE_FIGHT_ANIMATION_FRAMERATE, false);
-      this.player.takeDamage(0.1);
-      this.canDealDamage = false;
-      this.game.time.events.add(Phaser.Timer.SECOND * _ZombieConstants.ZOMBIE_DAMAGE_COOLDOWN, this.endCooldown, this);
-      this.game.camera.shake(0.005, 100, false);
-    }
-  }, {
-    key: 'onPlayerDeath',
-    value: function onPlayerDeath() {
-      this.isPlayerDead = true;
-      if (this.isChasing) {
-        this.stopChasingPlayer();
+      switch (this.state) {
+        case 'walking-on-path':
+          this.PM.update();
       }
     }
   }]);
 
   return Zombie;
-}(_EntityWalkingOnPath3.default);
+}(_Entity3.default);
 
 exports.default = Zombie;
 
-},{"../constants/ZombieConstants":11,"../utils/MapUtils.js":31,"./EntityWalkingOnPath":17}],25:[function(require,module,exports){
+},{"../utils/MapUtils":27,"./Entity":15,"./ZombiePathManager":22}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3133,9 +2356,13 @@ var _createClass = function () {
   };
 }();
 
-var _WalkingEntitiesManager = require('../objects/WalkingEntitiesManager');
+var _PathFinder = require('./PathFinder');
 
-var _WalkingEntitiesManager2 = _interopRequireDefault(_WalkingEntitiesManager);
+var _PathFinder2 = _interopRequireDefault(_PathFinder);
+
+var _MapUtils = require('../utils/MapUtils');
+
+var _ZombieConstants = require('../constants/ZombieConstants');
 
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : { default: obj };
@@ -3147,40 +2374,98 @@ function _classCallCheck(instance, Constructor) {
   }
 }
 
-function _possibleConstructorReturn(self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }return call && (typeof call === "object" || typeof call === "function") ? call : self;
-}
+var ZombiePathManager = function () {
+  function ZombiePathManager(zombie, targets, walls) {
+    _classCallCheck(this, ZombiePathManager);
 
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-}
+    this.zombie = zombie;
+    this.targets = targets;
+    this.walls = walls;
 
-var ZombieManager = function (_WalkingEntitiesManag) {
-  _inherits(ZombieManager, _WalkingEntitiesManag);
+    this.pathFinder = new _PathFinder2.default();
+    this.pathFinder.setGrid(walls);
 
-  function ZombieManager(game, grid) {
-    _classCallCheck(this, ZombieManager);
+    this.pathsBetweenTargets = [];
 
-    return _possibleConstructorReturn(this, (ZombieManager.__proto__ || Object.getPrototypeOf(ZombieManager)).call(this, game, grid));
+    this.currentPathIndex = 0;
+    this.currentStepIndex = 0;
+
+    this.temporaryPath = [];
+    this.temporaryStepIndex = 0;
   }
 
-  _createClass(ZombieManager, [{
+  _createClass(ZombiePathManager, [{
+    key: 'start',
+    value: function start(callback) {
+      // for now it assumes that zombie is placed on first path target
+      this.calculatePathsBetweenTargets(callback);
+    }
+    // Recursive function that calculates standard paths and save them into pathsBetweenPathTargets container.
+    // Recurse approach is used to handle asynchronous nature of findPath method.
+
+  }, {
+    key: 'calculatePathsBetweenTargets',
+    value: function calculatePathsBetweenTargets(doneCallback) {
+      var _this = this;
+
+      var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+      if (this.pathsBetweenTargets.length === this.targets.length) {
+        doneCallback();
+        return;
+      }
+
+      var start = this.targets[index];
+      var target = index === this.targets.length - 1 ? this.targets[0] : this.targets[index + 1];
+
+      this.pathFinder.findPath(start.x, start.y, target.x, target.y, function (path) {
+        _this.pathsBetweenTargets.push({ path: path, start: start, target: target });
+        _this.calculatePathsBetweenTargets(doneCallback, index + 1);
+      });
+    }
+  }, {
     key: 'update',
     value: function update() {
-      _WalkingEntitiesManager2.default.prototype.update.call(this);
+      var stepTarget = this.getCurrentStepTarget();
+
+      if (this.isReached(stepTarget)) {
+        this.onStepTargetReach();
+      }
+      this.zombie.game.physics.arcade.moveToObject(this.zombie, (0, _MapUtils.tileToPixels)(stepTarget));
+    }
+  }, {
+    key: 'isReached',
+    value: function isReached(target) {
+      var distanceToTarget = this.zombie.game.physics.arcade.distanceBetween(this.zombie, (0, _MapUtils.tileToPixels)(target));
+      return distanceToTarget <= _ZombieConstants.MIN_DISTANCE_TO_TARGET;
+    }
+  }, {
+    key: 'onStepTargetReach',
+    value: function onStepTargetReach() {
+      this.currentStepIndex++;
+
+      if (this.currentStepIndex === this.pathsBetweenTargets[this.currentPathIndex].path.length) {
+        this.currentStepIndex = 0;
+        this.currentPathIndex++;
+
+        if (this.currentPathIndex === this.pathsBetweenTargets.length) {
+          this.currentPathIndex = 0;
+        }
+      }
+    }
+  }, {
+    key: 'getCurrentStepTarget',
+    value: function getCurrentStepTarget() {
+      return this.pathsBetweenTargets[this.currentPathIndex].path[this.currentStepIndex];
     }
   }]);
 
-  return ZombieManager;
-}(_WalkingEntitiesManager2.default);
+  return ZombiePathManager;
+}();
 
-exports.default = ZombieManager;
+exports.default = ZombiePathManager;
 
-},{"../objects/WalkingEntitiesManager":23}],26:[function(require,module,exports){
+},{"../constants/ZombieConstants":11,"../utils/MapUtils":27,"./PathFinder":18}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3249,7 +2534,7 @@ var Boot = function (_Phaser$State) {
 
 exports.default = Boot;
 
-},{}],27:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3278,10 +2563,6 @@ var _TileMap = require('../objects/TileMap');
 
 var _TileMap2 = _interopRequireDefault(_TileMap);
 
-var _ZombiesManager = require('../objects/ZombiesManager');
-
-var _ZombiesManager2 = _interopRequireDefault(_ZombiesManager);
-
 var _JournalsManager = require('../objects/JournalsManager');
 
 var _JournalsManager2 = _interopRequireDefault(_JournalsManager);
@@ -3297,6 +2578,8 @@ var _TileMapConstants = require('../constants/TileMapConstants');
 var _UserInterfaceConstants = require('../constants/UserInterfaceConstants');
 
 var _UserInterfaceUtils = require('../utils/UserInterfaceUtils');
+
+var _MapUtils = require('../utils/MapUtils');
 
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : { default: obj };
@@ -3335,7 +2618,7 @@ var Game = function (_Phaser$State) {
       var _this2 = this;
 
       this.map = new _TileMap2.default(this.game, 'map', _TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT);
-      this.zombies = new _ZombiesManager2.default(this.game, this.map.walls);
+      this.zombies = new Phaser.Group(this.game);
       var playerPos = this.map.getPlayerInitialPosition();
       this.player = new _Player2.default(this.game, playerPos.x, playerPos.y, 'player', _PlayerConstants.PLAYER_INITIAL_FRAME, this.zombies);
 
@@ -3359,32 +2642,15 @@ var Game = function (_Phaser$State) {
       this.player.body.collides([this.map.wallsCollisionGroup]);
 
       // init zombies
-
-      var _loop = function _loop(i) {
-        var newZombie = _this2.zombies.add(new _Zombie2.default(_this2.game, 'zombie', _PlayerConstants.PLAYER_INITIAL_FRAME, _this2.map.getPath(i), _this2.map.walls, _this2.player));
-
-        newZombie.body.onBeginContact.add(function () {
-          return newZombie.onCollisionEnter.apply(newZombie, arguments);
-        });
-        newZombie.body.onEndContact.add(function () {
-          return newZombie.onCollisionLeave.apply(newZombie, arguments);
-        });
-
-        newZombie.body.setCollisionGroup(_this2.zombiesCollisionGroup);
-        newZombie.body.collides(_this2.zombiesCollisionGroup, function (body1, body2) {
-          return _this2.zombies.onCollisionWihOtherEntity(body1.sprite, body2.sprite);
-        });
-        newZombie.body.collides(_this2.map.wallsCollisionGroup, function (body, tileBody) {
-          return _this2.zombies.onCollisionWithWalls(body.sprite, tileBody);
-        });
-        newZombie.body.collides([_this2.playerCollisionGroup, _this2.journalsCollisionGroup]);
-        _this2.player.onDeath.add(function () {
-          return newZombie.onPlayerDeath();
-        });
-      };
-
+      var wallsPositions = (0, _MapUtils.getWallsPositions)(this.map.walls);
       for (var i = 0; i < this.map.paths.length; i++) {
-        _loop(i);
+        var newZombie = new _Zombie2.default(this.game, 'zombie');
+
+        newZombie.setTilePosition(this.map.paths[i][0]);
+        newZombie.initializePathSystem(this.map.getPath(i), wallsPositions);
+        newZombie.startPathSystem();
+
+        this.zombies.add(newZombie);
       }
       this.player.body.collides([this.zombiesCollisionGroup]);
       this.map.collides([this.zombiesCollisionGroup]);
@@ -3397,11 +2663,11 @@ var Game = function (_Phaser$State) {
         return _this2.journals.onMouseWheel();
       };
 
-      for (var i = 0; i < journalsData.length; i++) {
-        var content = journalsContent[journalsData[i].name];
+      for (var _i = 0; _i < journalsData.length; _i++) {
+        var content = journalsContent[journalsData[_i].name];
         var newJournal = new _Journal2.default(this.game, content, 'computer');
-        newJournal.setCorner(journalsData[i].cornerX, journalsData[i].cornerY);
-        newJournal.setPosition(journalsData[i].x, journalsData[i].y);
+        newJournal.setCorner(journalsData[_i].cornerX, journalsData[_i].cornerY);
+        newJournal.setPosition(journalsData[_i].x, journalsData[_i].y);
         newJournal.enableJournal();
 
         newJournal.body.setCollisionGroup(this.journalsCollisionGroup);
@@ -3497,7 +2763,7 @@ var Game = function (_Phaser$State) {
 
 exports.default = Game;
 
-},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"../constants/UserInterfaceConstants":10,"../objects/Journal":18,"../objects/JournalsManager":19,"../objects/Player":21,"../objects/TileMap":22,"../objects/Zombie":24,"../objects/ZombiesManager":25,"../utils/UserInterfaceUtils":32}],28:[function(require,module,exports){
+},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"../constants/UserInterfaceConstants":10,"../objects/Journal":16,"../objects/JournalsManager":17,"../objects/Player":19,"../objects/TileMap":20,"../objects/Zombie":21,"../utils/MapUtils":27,"../utils/UserInterfaceUtils":28}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3566,7 +2832,7 @@ var Menu = function (_Phaser$State) {
 
 exports.default = Menu;
 
-},{}],29:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3642,200 +2908,13 @@ var Preload = function (_Phaser$State) {
 
 exports.default = Preload;
 
-},{"../constants/PlayerConstants.js":8,"../constants/ZombieConstants.js":11}],30:[function(require,module,exports){
+},{"../constants/PlayerConstants.js":8,"../constants/ZombieConstants.js":11}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getFreeTileAroundEntityExcludingOtherEntity = exports.getDirectionBetweenEntities = exports.willEntitiesBeOnTheSameTile = exports.getEntityCurrentStepTarget = exports.getEntityNextTile = undefined;
-
-var _MapUtils = require('../utils/MapUtils');
-
-var getEntityNextTile = exports.getEntityNextTile = function getEntityNextTile(entity) {
-  if (entity.isOnStandardPath) {
-    var pathIndex = entity.currentPathIndex;
-    var stepIndex = entity.currentStepIndex;
-
-    if (entity.pathsBetweenPathTargets[pathIndex].path.length === stepIndex + 1) {
-      stepIndex = 0;
-
-      if (entity.pathsBetweenPathTargets.length === pathIndex + 1) {
-        pathIndex = 0;
-      } else {
-        pathIndex++;
-      }
-    } else {
-      stepIndex++;
-    }
-    if (entity.pathsBetweenPathTargets[pathIndex].path[stepIndex] == undefined) {
-      throw new Error('Wrong path data: pathIndex: ' + pathIndex + ', stepIndex: ' + stepIndex + ', entity: ' + entity);
-    }
-    return entity.pathsBetweenPathTargets[pathIndex].path[stepIndex];
-  } else {
-    var _stepIndex = entity.temporaryStepIndex;
-    if (_stepIndex + 1 === entity.temporaryPath.length) {
-      _stepIndex = 0;
-      var _pathIndex = entity.currentPathIndex + 1 === entity.pathsBetweenPathTargets.length ? 0 : entity.currentPathIndex + 1;
-      if (entity.pathsBetweenPathTargets[_pathIndex].path[_stepIndex] == undefined) {
-        throw new Error('Wrong path data: pathIndex: ' + _pathIndex + ', stepIndex: ' + _stepIndex + ', entity: ' + entity);
-      }
-      return entity.pathsBetweenPathTargets[_pathIndex].path[_stepIndex];
-    } else {
-      if (entity.temporaryPath[_stepIndex] == undefined) {
-        throw new Error('Wrong temporary path data: stepIndex: ' + _stepIndex);
-      }
-      return entity.temporaryPath[_stepIndex];
-    }
-  }
-};
-
-var areTilesTheSame = function areTilesTheSame(tile1, tile2) {
-  return tile1.x === tile2.x && tile1.y === tile2.y;
-};
-
-var getEntityCurrentStepTarget = exports.getEntityCurrentStepTarget = function getEntityCurrentStepTarget(entity) {
-  return entity.isOnStandardPath ? entity.pathsBetweenPathTargets[entity.currentPathIndex].path[entity.currentStepIndex] : entity.temporaryPath[entity.temporaryStepIndex];
-};
-
-var willEntitiesBeOnTheSameTile = exports.willEntitiesBeOnTheSameTile = function willEntitiesBeOnTheSameTile(entity1, entity2) {
-  var entityNextTarget1 = getEntityNextTile(entity1);
-  var entityNextTarget2 = getEntityNextTile(entity2);
-  var entityCurrentTarget1 = getEntityCurrentStepTarget(entity1);
-  var entityCurrentTarget2 = getEntityCurrentStepTarget(entity2);
-
-  return areTilesTheSame(entityNextTarget1, entityNextTarget2) || areTilesTheSame(entityNextTarget1, entityCurrentTarget2) || areTilesTheSame(entityCurrentTarget1, entityCurrentTarget2);
-};
-
-var getDirectionBetweenTiles = function getDirectionBetweenTiles(tile1, tile2) {
-  if (tile1.y === tile2.y) {
-    if (tile1.x > tile2.x) {
-      return 'WEST';
-    } else if (tile1.x < tile2.x) {
-      return 'EAST';
-    } else {
-      throw new Error('Uncorrect tiles coordinates! tile1.x: ' + tile1.x + ', tile1.y: ' + tile1.y + ' | tile2.x: ' + tile2.x + ' tile2.y: ' + tile2.y);
-    }
-  } else if (tile1.x === tile2.x) {
-    if (tile1.y > tile2.y) {
-      return 'NORTH';
-    } else if (tile1.y < tile2.y) {
-      return 'SOUTH';
-    } else {
-      throw new Error('Uncorrect tiles coordinates! tile1.x: ' + tile1.x + ', tile1.y: ' + tile1.y + ' | tile2.x: ' + tile2.x + ' tile2.y: ' + tile2.y);
-    }
-  } else {
-    if (tile1.y < tile2.y && tile1.x < tile2.x) {
-      return Math.random() > 0.5 ? 'SOUTH' : 'EAST';
-    } else if (tile1.y > tile2.y && tile1.x < tile2.x) {
-      return Math.random() > 0.5 ? 'NORTH' : 'EAST';
-    } else if (tile1.y < tile2.y && tile1.x > tile2.x) {
-      return Math.random() > 0.5 ? 'NORTH' : 'WEST';
-    } else if (tile1.y > tile2.y && tile1.x > tile2.x) {
-      return Math.random() > 0.5 ? 'SOUTH' : 'WEST';
-    }
-  }
-  throw new Error('Uncorrect tiles coordinates! tile1.x: ' + tile1.x + ', tile1.y: ' + tile1.y + ' | tile2.x: ' + tile2.x + ' tile2.y: ' + tile2.y);
-};
-
-var getDirectionBetweenEntities = exports.getDirectionBetweenEntities = function getDirectionBetweenEntities(entity1, entity2) {
-  var entityTile1 = (0, _MapUtils.pixelsToTile)(entity1);
-  var entityTile2 = (0, _MapUtils.pixelsToTile)(entity2);
-
-  if (areTilesTheSame(entityTile1, entityTile2)) {
-    // this case maybe can be handled better
-    return getDirectionBetweenTiles(entity1, entity2);
-  } else {
-    return getDirectionBetweenTiles(entityTile1, entityTile2);
-  }
-};
-
-var getFreeTileAroundEntityExcludingOtherEntity = exports.getFreeTileAroundEntityExcludingOtherEntity = function getFreeTileAroundEntityExcludingOtherEntity(entity, entityToExclude, mapGrid) {
-  var entityTile = (0, _MapUtils.pixelsToTile)(entity);
-  var tileToExclude = getEntityNextTile(entityToExclude);
-
-  var directionToExclude = void 0;
-
-  if (entityTile.x === tileToExclude.x && entityTile.y === tileToExclude.y || entityTile.x !== tileToExclude.x && entityTile.y !== tileToExclude.y) {
-    directionToExclude = getDirectionBetweenEntities(entity, entityToExclude);
-  } else {
-    directionToExclude = getDirectionBetweenTiles(entityTile, tileToExclude);
-  }
-
-  switch (directionToExclude) {
-    case 'NORTH':
-      return getFreeTileExcludingNorth(entityTile, mapGrid);
-    case 'SOUTH':
-      return getFreeTileExcludingSouth(entityTile, mapGrid);
-    case 'WEST':
-      return getFreeTileExcludingWest(entityTile, mapGrid);
-    case 'EAST':
-      return getFreeTileExcludingEast(entityTile, mapGrid);
-  }
-
-  throw new Error('Couldn\'t find free tile entityTile: ' + entityTile + ', directionToExclude: ' + directionToExclude);
-};
-
-function getFreeTileExcludingNorth(entityTile, mapGrid) {
-  var freeTile = { x: -1, y: entityTile.y };
-  if (mapGrid[entityTile.x - 1][entityTile.y] === 0 && mapGrid[entityTile.x + 1][entityTile.y] === 0) {
-    freeTile.x = Math.random() > 0.5 ? entityTile.x - 1 : entityTile.x + 1;
-  } else if (mapGrid[entityTile.x - 1][entityTile.y] === 0) {
-    freeTile.x = entityTile.x - 1;
-  } else if (mapGrid[entityTile.x + 1][entityTile.y] === 0) {
-    freeTile.x = entityTile.x + 1;
-  } else if (mapGrid[entityTile.x][entityTile.y + 1] === 0) {
-    freeTile = { x: entityTile.x, y: entityTile.y + 1 };
-  }
-  return freeTile;
-}
-function getFreeTileExcludingSouth(entityTile, mapGrid) {
-  var freeTile = { x: -1, y: entityTile.y };
-  if (mapGrid[entityTile.x - 1][entityTile.y] === 0 && mapGrid[entityTile.x + 1][entityTile.y] === 0) {
-    freeTile.x = Math.random() > 0.5 ? entityTile.x - 1 : entityTile.x + 1;
-  } else if (mapGrid[entityTile.x - 1][entityTile.y] === 0) {
-    freeTile.x = entityTile.x - 1;
-  } else if (mapGrid[entityTile.x + 1][entityTile.y] === 0) {
-    freeTile.x = entityTile.x + 1;
-  } else if (mapGrid[entityTile.x][entityTile.y - 1] === 0) {
-    freeTile = { x: entityTile.x, y: entityTile.y - 1 };
-  }
-  return freeTile;
-}
-function getFreeTileExcludingWest(entityTile, mapGrid) {
-  var freeTile = { x: entityTile.x, y: -1 };
-  if (mapGrid[entityTile.x][entityTile.y - 1] === 0 && mapGrid[entityTile.x][entityTile.y + 1] === 0) {
-    freeTile.y = Math.random() > 0.5 ? entityTile.y - 1 : entityTile.y + 1;
-  } else if (mapGrid[entityTile.x][entityTile.y - 1] === 0) {
-    freeTile.y = entityTile.y - 1;
-  } else if (mapGrid[entityTile.x][entityTile.y + 1] === 0) {
-    freeTile.y = entityTile.y + 1;
-  } else if (mapGrid[entityTile.x + 1][entityTile.y] === 0) {
-    freeTile = { x: entityTile.x + 1, y: entityTile.y };
-  }
-  return freeTile;
-}
-function getFreeTileExcludingEast(entityTile, mapGrid) {
-  var freeTile = { x: entityTile.x, y: -1 };
-  if (mapGrid[entityTile.x][entityTile.y - 1] === 0 && mapGrid[entityTile.x][entityTile.y + 1] === 0) {
-    freeTile.y = Math.random() > 0.5 ? entityTile.y - 1 : entityTile.y + 1;
-  } else if (mapGrid[entityTile.x][entityTile.y - 1] === 0) {
-    freeTile.y = entityTile.y - 1;
-  } else if (mapGrid[entityTile.x][entityTile.y + 1] === 0) {
-    freeTile.y = entityTile.y + 1;
-  } else if (mapGrid[entityTile.x - 1][entityTile.y] === 0) {
-    freeTile = { x: entityTile.x - 1, y: entityTile.y };
-  }
-  return freeTile;
-}
-
-},{"../utils/MapUtils":31}],31:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.getWallsPostions = exports.pixelsToTile = exports.tileToPixels = exports.pixelsToTileY = exports.pixelsToTileX = undefined;
+exports.getWallsPositions = exports.pixelsToTile = exports.tileToPixels = exports.pixelsToTileY = exports.pixelsToTileX = undefined;
 
 var _TileMapConstants = require('../constants/TileMapConstants');
 
@@ -3860,7 +2939,7 @@ var pixelsToTile = exports.pixelsToTile = function pixelsToTile(coords) {
   };
 };
 
-var getWallsPostions = exports.getWallsPostions = function getWallsPostions(layer) {
+var getWallsPositions = exports.getWallsPositions = function getWallsPositions(layer) {
   var walls = layer.getTiles(0, 0, 2048, 2048);
   var wallsArr = [];
 
@@ -3882,7 +2961,7 @@ var getWallsPostions = exports.getWallsPostions = function getWallsPostions(laye
   return wallsArr;
 };
 
-},{"../constants/TileMapConstants":9}],32:[function(require,module,exports){
+},{"../constants/TileMapConstants":9}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

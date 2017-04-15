@@ -13,7 +13,7 @@ export const pixelsToTile = ( coords ) => ( {
   y: Math.floor( coords.y / TILE_HEIGHT ),
 } );
 
-export const getWallsPostions = ( layer ) => {
+export const getWallsPositions = ( layer ) => {
   const walls = layer.getTiles( 0, 0, 2048, 2048 );
   const wallsArr = [];
 

@@ -1,7 +1,6 @@
 import Player from '../objects/Player';
 import Zombie from '../objects/Zombie';
 import TileMap from '../objects/TileMap';
-import ZombiesManager from '../objects/ZombiesManager';
 import JournalsManager from '../objects/JournalsManager';
 import Journal from '../objects/Journal';
 
@@ -10,12 +9,13 @@ import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 import { END_SCREEN_FADE_IN_DURATION } from '../constants/UserInterfaceConstants';
 
 import { getScreenCenter, showBackgroundLayer } from '../utils/UserInterfaceUtils';
+import { getWallsPositions } from '../utils/MapUtils';
 
 export default class Game extends Phaser.State {
   create() {
 
     this.map = new TileMap( this.game, 'map', TILE_WIDTH, TILE_HEIGHT );
-    this.zombies = new ZombiesManager( this.game, this.map.walls );
+    this.zombies = new Phaser.Group( this.game );
     const playerPos = this.map.getPlayerInitialPosition();
     this.player = new Player( this.game, playerPos.x, playerPos.y, 'player', PLAYER_INITIAL_FRAME, this.zombies );
 
@@ -39,17 +39,15 @@ export default class Game extends Phaser.State {
     this.player.body.collides( [ this.map.wallsCollisionGroup ] );
 
     // init zombies
+    const wallsPositions = getWallsPositions( this.map.walls );
     for ( let i = 0; i < this.map.paths.length; i++ ) {
-      const newZombie = this.zombies.add( new Zombie( this.game, 'zombie', PLAYER_INITIAL_FRAME, this.map.getPath( i ), this.map.walls, this.player ) );
+      const newZombie = new Zombie( this.game, 'zombie' );
 
-      newZombie.body.onBeginContact.add( ( ...args ) => newZombie.onCollisionEnter( ...args ) );
-      newZombie.body.onEndContact.add( ( ...args ) => newZombie.onCollisionLeave( ...args ) );
+      newZombie.setTilePosition( this.map.paths[ i ][ 0 ] );
+      newZombie.initializePathSystem( this.map.getPath( i ), wallsPositions );
+      newZombie.startPathSystem();
 
-      newZombie.body.setCollisionGroup( this.zombiesCollisionGroup );
-      newZombie.body.collides( this.zombiesCollisionGroup, ( body1, body2 ) => this.zombies.onCollisionWihOtherEntity( body1.sprite, body2.sprite ) );
-      newZombie.body.collides( this.map.wallsCollisionGroup, ( body, tileBody ) => this.zombies.onCollisionWithWalls( body.sprite, tileBody ) );
-      newZombie.body.collides( [ this.playerCollisionGroup, this.journalsCollisionGroup ] );
-      this.player.onDeath.add( () => newZombie.onPlayerDeath() );
+      this.zombies.add( newZombie );
     }
     this.player.body.collides( [ this.zombiesCollisionGroup ] );
     this.map.collides( [ this.zombiesCollisionGroup ] );
