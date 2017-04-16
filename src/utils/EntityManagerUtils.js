@@ -42,7 +42,7 @@ const areTilesTheSame = ( tile1, tile2 ) => tile1.x === tile2.x && tile1.y === t
 
 export const getEntityCurrentStepTarget = ( entity ) => ( entity.isOnStandardPath ) ? entity.pathsBetweenPathTargets[ entity.currentPathIndex ].path[ entity.currentStepIndex ] : entity.temporaryPath[ entity.temporaryStepIndex ];
 
-export const willEntitiesBeOnTheSameTile = ( entity1, entity2 ) => {
+export const willZombiesPathsInterfere = ( entity1, entity2 ) => {
   const entityNextTarget1 = getEntityNextTile( entity1 );
   const entityNextTarget2 = getEntityNextTile( entity2 );
   const entityCurrentTarget1 = getEntityCurrentStepTarget( entity1 );

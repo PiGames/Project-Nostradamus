@@ -1,6 +1,8 @@
 import PathFinder from './PathFinder';
+import { willZombiesPathsInterfere } from '../utils/ZombiePathManagerUtils';
 import { tileToPixels } from '../utils/MapUtils';
 import { MIN_DISTANCE_TO_TARGET } from '../constants/ZombieConstants';
+import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 
 export default class ZombiePathManager {
   constructor( zombie, targets, walls ) {
@@ -18,6 +20,13 @@ export default class ZombiePathManager {
 
     this.temporaryPath = [];
     this.temporaryStepIndex = 0;
+
+    this.collisionSensor = this.zombie.body.addRectangle( 1.5 * TILE_WIDTH, 1.5 * TILE_HEIGHT );
+    this.collisionSensor.sensor = true;
+
+    this.zombie.body.onBeginContact.add( ( ...args ) => this.onCollision( ...args ) );
+
+    this.zombie.body.debug = true;
 
     this.state = 'not-started';
   }
@@ -120,6 +129,17 @@ export default class ZombiePathManager {
     this.temporaryStepIndex++;
     if ( this.temporaryStepIndex === this.temporaryPath.length ) {
       this.changePathToStandard();
+    }
+  }
+  onCollision( bodyA, bodyB, shapeA, shapeB ) {
+    if ( shapeA.sensor === true && shapeB.sensor === true && bodyA.sprite.key === 'zombie' ) {
+      this.checkForCollisionPossibility( bodyA.sprite );
+    }
+  }
+  checkForCollisionPossibility( zombieToCollideWith ) {
+    if ( willZombiesPathsInterfere( this, zombieToCollideWith.PM ) ) {
+      console.log( 'watch out!' );
+      //TODO
     }
   }
 }

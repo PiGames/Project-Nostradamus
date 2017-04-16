@@ -29,4 +29,11 @@ export default class Zombie extends Entity {
       this.PM.update();
     }
   }
+  onCollision( bodyA, bodyB, shapeA, shapeB ) {
+    switch ( this.state ) {
+    case 'walking-on-path':
+      this.PM.onCollision( bodyA, bodyB, shapeA, shapeB );
+    }
+  }
+
 }
