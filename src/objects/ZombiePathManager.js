@@ -1,5 +1,6 @@
 import PathFinder from './PathFinder';
-import { willZombiesPathsInterfere } from '../utils/ZombiePathManagerUtils';
+import { willZombiesPathsInterfere } from '../utils/DeterminePathCollisionUtils';
+import { getFreeTileAroundZombieExcludingOtherZombie } from '../utils/HandlePathCollisionUtils';
 import { tileToPixels } from '../utils/MapUtils';
 import { MIN_DISTANCE_TO_TARGET } from '../constants/ZombieConstants';
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
@@ -99,6 +100,8 @@ export default class ZombiePathManager {
 
     const currentTarget = this.pathsBetweenTargets[ this.currentPathIndex ].target;
 
+    console.log( startTile, currentTarget );
+
     this.pathFinder.findPath( startTile.x, startTile.y, currentTarget.x, currentTarget.y, ( path ) => {
       if ( path.length === 0 ) {
         this.changePathToStandard();
@@ -132,14 +135,14 @@ export default class ZombiePathManager {
     }
   }
   onCollision( bodyA, bodyB, shapeA, shapeB ) {
-    if ( shapeA.sensor === true && shapeB.sensor === true && bodyA.sprite.key === 'zombie' ) {
+    if ( shapeA.sensor === shapeB.sensor && bodyA.sprite.key === 'zombie' ) {
       this.checkForCollisionPossibility( bodyA.sprite );
     }
   }
   checkForCollisionPossibility( zombieToCollideWith ) {
     if ( willZombiesPathsInterfere( this, zombieToCollideWith.PM ) ) {
-      console.log( 'watch out!' );
-      //TODO
+      const newTemporaryTarget = getFreeTileAroundZombieExcludingOtherZombie( this.zombie, zombieToCollideWith, this.walls );
+      this.changePathToTemporary( newTemporaryTarget );
     }
   }
 }

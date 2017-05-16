@@ -1,8 +1,10 @@
-import { pixelsToTile } from './MapUtils';
-
-const areTilesTheSame = ( tile1, tile2 ) => tile1.x === tile2.x && tile1.y === tile2.y;
+import { areTilesTheSame } from './MapUtils';
 
 export function willZombiesPathsInterfere( zombie1, zombie2 ) {
+  if ( zombie1.state === 'calculating-temporary-path' || zombie2.state === 'calculating-temporary-path' ) {
+    return false;
+  }
+
   const zombie1NextTile = getZombieNextStepTarget( zombie1 );
   const zombie2NextTile = getZombieNextStepTarget( zombie2 );
   const zombie1CurrentTile = getZombieCurrentStepTarget( zombie1 );
@@ -23,7 +25,6 @@ function getZombieNextStepTarget( zombie ) {
   case 'on-temporary-path':
     nextStepTarget = getZombieNextTemporaryStepTarget( zombie );
   }
-
   return nextStepTarget;
 }
 
@@ -64,8 +65,4 @@ function getZombieCurrentStepTarget( zombie ) {
   case 'on-temporary-path':
     return zombie.getTemporaryStepTarget();
   }
-}
-
-export function getFreeTileAroundZombieExcludingOtherZombie( entity, entityToExclude, mapGrid ) {
-  //TODO
 }

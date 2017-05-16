@@ -1,5 +1,7 @@
 import { TILE_WIDTH, TILE_HEIGHT, MAP_WIDTH } from '../constants/TileMapConstants';
 
+export const areTilesTheSame = ( tile1, tile2 ) => tile1.x === tile2.x && tile1.y === tile2.y;
+
 export const pixelsToTileX = ( coord ) => Math.floor( coord / TILE_WIDTH );
 export const pixelsToTileY = ( coord ) => Math.floor( coord / TILE_HEIGHT );
 
