@@ -22,12 +22,14 @@ export default class ZombiePathManager {
     this.temporaryPath = [];
     this.temporaryStepIndex = 0;
 
-    this.collisionSensor = this.zombie.body.addRectangle( 1.5 * TILE_WIDTH, 1.5 * TILE_HEIGHT );
+    this.zombie.body.clearShapes();
+
+    this.collisionSensor = this.zombie.body.addCircle( Math.max( TILE_WIDTH, TILE_HEIGHT ) * 0.25 );
+
+    this.collisionSensor = this.zombie.body.addCircle( Math.max( TILE_WIDTH, TILE_HEIGHT ) * 0.75 );
     this.collisionSensor.sensor = true;
 
     this.zombie.body.onBeginContact.add( ( ...args ) => this.onCollision( ...args ) );
-
-    this.zombie.body.debug = true;
 
     this.state = 'not-started';
   }
@@ -134,8 +136,8 @@ export default class ZombiePathManager {
       this.changePathToStandard();
     }
   }
-  onCollision( bodyA, bodyB, shapeA, shapeB ) {
-    if ( shapeA.sensor === shapeB.sensor && bodyA.sprite.key === 'zombie' ) {
+  onCollision( bodyA ) {
+    if ( bodyA.sprite.key === 'zombie' ) {
       this.checkForCollisionPossibility( bodyA.sprite );
     }
   }

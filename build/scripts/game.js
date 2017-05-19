@@ -2409,14 +2409,16 @@ var ZombiePathManager = function () {
     this.temporaryPath = [];
     this.temporaryStepIndex = 0;
 
-    this.collisionSensor = this.zombie.body.addRectangle(1.5 * _TileMapConstants.TILE_WIDTH, 1.5 * _TileMapConstants.TILE_HEIGHT);
+    this.zombie.body.clearShapes();
+
+    this.collisionSensor = this.zombie.body.addCircle(Math.max(_TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT) * 0.25);
+
+    this.collisionSensor = this.zombie.body.addCircle(Math.max(_TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT) * 0.75);
     this.collisionSensor.sensor = true;
 
     this.zombie.body.onBeginContact.add(function () {
       return _this.onCollision.apply(_this, arguments);
     });
-
-    this.zombie.body.debug = true;
 
     this.state = 'not-started';
   }
@@ -2559,8 +2561,8 @@ var ZombiePathManager = function () {
     }
   }, {
     key: 'onCollision',
-    value: function onCollision(bodyA, bodyB, shapeA, shapeB) {
-      if (shapeA.sensor === shapeB.sensor && bodyA.sprite.key === 'zombie') {
+    value: function onCollision(bodyA) {
+      if (bodyA.sprite.key === 'zombie') {
         this.checkForCollisionPossibility(bodyA.sprite);
       }
     }
@@ -2762,7 +2764,7 @@ var Game = function (_Phaser$State) {
 
         newZombie.setTilePosition(this.map.paths[i][0]);
         newZombie.body.setCollisionGroup(this.zombiesCollisionGroup);
-        newZombie.body.collides([this.zombiesCollisionGroup]);
+        newZombie.body.collides([this.zombiesCollisionGroup, this.map.wallsCollisionGroup]);
 
         newZombie.initializePathSystem(this.map.getPath(i), wallsPositions);
         newZombie.startPathSystem();
@@ -3111,25 +3113,78 @@ var _MapUtils = require('./MapUtils');
 
 function getFreeTileAroundZombieExcludingOtherZombie(zombie, zombieToExclude, mapGrid) {
   var zombieTile = (0, _MapUtils.pixelsToTile)(zombie);
-  var zombieToExcludeTile = (0, _MapUtils.pixelsToTile)(zombieToExclude);
 
-  var collisionSide = void 0;
+  var collisionSide = getBodyCollisionSide(zombie, zombieToExclude);
 
-  if ((0, _MapUtils.areTilesTheSame)(zombieTile, zombieToExcludeTile)) {
-    collisionSide = getBodyCollisionSide(zombie, zombieToExclude);
-  } else {
-    collisionSide = getTileCollisionSide(zombieTile, zombieToExcludeTile);
+  var tileToExclude = getTileToExcludeBaseOnCollisionSide(zombieTile, collisionSide);
+
+  return getFreeTileAroundTileExcludingOtherTile(zombieTile, tileToExclude, mapGrid);
+}
+
+function getBodyCollisionSide(zombie1, zombie2) {
+  var zombieOffsetX = zombie1.position.x - zombie2.position.x;
+  var zombieOffsetY = zombie1.position.y - zombie2.position.y;
+
+  var directionX = zombieOffsetX > 0 ? 'LEFT' : 'RIGHT';
+  var directionY = zombieOffsetY > 0 ? 'UP' : 'DOWN';
+
+  return Math.abs(zombieOffsetX) < Math.abs(zombieOffsetY) ? directionX : directionY;
+}
+
+function getTileToExcludeBaseOnCollisionSide(tile, collisionSide) {
+  var tileCandidates = getTileCandidates(tile);
+
+  switch (collisionSide) {
+    case 'UP':
+      return tileCandidates[0];
+    case 'DOWN':
+      return tileCandidates[1];
+    case 'LEFT':
+      return tileCandidates[2];
+    case 'RIGHT':
+      return tileCandidates[3];
+  }
+}
+
+function getFreeTileAroundTileExcludingOtherTile(tile, tileToExclude, mapGrid) {
+  var tileCandidates = getTileCandidates(tile);
+
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
+
+  try {
+    for (var _iterator = tileCandidates[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var tileCandidate = _step.value;
+
+      if (!(0, _MapUtils.areTilesTheSame)(tileCandidate, tileToExclude) && !isWall(tileCandidate, mapGrid)) {
+        return tileCandidate;
+      }
+    }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator.return) {
+        _iterator.return();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
+    }
   }
 
-  switch (collisionSide) {}
+  throw new Error('Couldn\'t find tile');
 }
 
-function getBodyCollisionSide() {
-  //TODO
+function isWall(tile, mapGrid) {
+  return mapGrid[tile.x][tile.y] === 1;
 }
 
-function getTileCollisionSide() {
-  //TODO
+function getTileCandidates(tile) {
+  return [{ x: tile.x, y: tile.y - 1 }, { x: tile.x, y: tile.y + 1 }, { x: tile.x - 1, y: tile.y }, { x: tile.x + 1, y: tile.y }];
 }
 
 },{"./MapUtils":29}],29:[function(require,module,exports){
