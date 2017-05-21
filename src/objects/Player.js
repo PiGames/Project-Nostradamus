@@ -12,7 +12,6 @@ export default class Player extends Entity {
     this.zombies = zombies.children;
 
     this.godMode = false;
-    // this.godMode = true;
 
     this.isSneaking = false;
     this.isSprinting = false;

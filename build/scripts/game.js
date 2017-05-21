@@ -1019,7 +1019,7 @@ var ProjectNostradamus = function (_Phaser$Game) {
 
 exports.default = ProjectNostradamus;
 
-},{"./levels/Level1":13,"./levels/Level2":14,"./states/Boot":23,"./states/Menu":25,"./states/Preload":26}],7:[function(require,module,exports){
+},{"./levels/Level1":13,"./levels/Level2":14,"./states/Boot":24,"./states/Menu":26,"./states/Preload":27}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1202,7 +1202,7 @@ var Level1 = function (_Game) {
 
 exports.default = Level1;
 
-},{"../states/Game.js":24}],14:[function(require,module,exports){
+},{"../states/Game.js":25}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1275,7 +1275,7 @@ var Level2 = function (_Game) {
 
 exports.default = Level2;
 
-},{"../states/Game.js":24}],15:[function(require,module,exports){
+},{"../states/Game.js":25}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1686,7 +1686,7 @@ var JournalsManager = function (_Phaser$Group) {
 
 exports.default = JournalsManager;
 
-},{"../constants/ItemConstants":7,"../utils/UserInterfaceUtils":30}],18:[function(require,module,exports){
+},{"../constants/ItemConstants":7,"../utils/UserInterfaceUtils":31}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1805,7 +1805,6 @@ var Player = function (_Entity) {
     _this.zombies = zombies.children;
 
     _this.godMode = false;
-    // this.godMode = true;
 
     _this.isSneaking = false;
     _this.isSprinting = false;
@@ -2235,7 +2234,7 @@ var TileMap = function (_Phaser$Tilemap) {
 
 exports.default = TileMap;
 
-},{"../utils/MapUtils.js":29}],21:[function(require,module,exports){
+},{"../utils/MapUtils.js":30}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2261,6 +2260,12 @@ var _ZombiePathManager = require('./ZombiePathManager');
 var _ZombiePathManager2 = _interopRequireDefault(_ZombiePathManager);
 
 var _MapUtils = require('../utils/MapUtils');
+
+var _ZombieConstants = require('../constants/ZombieConstants');
+
+var _ZombieRotationManager = require('./ZombieComponents/ZombieRotationManager');
+
+var _ZombieRotationManager2 = _interopRequireDefault(_ZombieRotationManager);
 
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : { default: obj };
@@ -2299,10 +2304,21 @@ var Zombie = function (_Entity) {
     _this.PM = null;
 
     _this.state = 'not-ready';
+
+    _this.rotationManager = new _ZombieRotationManager2.default(_this);
+
+    _this.initAnimations();
     return _this;
   }
 
   _createClass(Zombie, [{
+    key: 'initAnimations',
+    value: function initAnimations() {
+      this.animations.add('walk', [0, 1, 2, 3, 4, 5], 0);
+      this.animations.add('attack', [6, 7, 8, 9], 6);
+      this.animations.play('walk', _ZombieConstants.ZOMBIE_WALK_ANIMATION_FRAMERATE, true);
+    }
+  }, {
     key: 'setTilePosition',
     value: function setTilePosition(tile) {
       var pixelPosition = (0, _MapUtils.tileToPixels)(tile);
@@ -2329,7 +2345,7 @@ var Zombie = function (_Entity) {
     value: function update() {
       switch (this.state) {
         case 'walking-on-path':
-          this.PM.update();
+          this.handleWalkingOnPathState();
       }
     }
   }, {
@@ -2340,6 +2356,14 @@ var Zombie = function (_Entity) {
           this.PM.onCollision(bodyA, bodyB, shapeA, shapeB);
       }
     }
+  }, {
+    key: 'handleWalkingOnPathState',
+    value: function handleWalkingOnPathState() {
+      this.PM.update();
+
+      var currentTileTarget = this.PM.getCurrentTileTarget();
+      this.rotationManager.update(currentTileTarget);
+    }
   }]);
 
   return Zombie;
@@ -2347,7 +2371,88 @@ var Zombie = function (_Entity) {
 
 exports.default = Zombie;
 
-},{"../utils/MapUtils":29,"./Entity":15,"./ZombiePathManager":22}],22:[function(require,module,exports){
+},{"../constants/ZombieConstants":11,"../utils/MapUtils":30,"./Entity":15,"./ZombieComponents/ZombieRotationManager":22,"./ZombiePathManager":23}],22:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
+
+var _ZombieConstants = require('../../constants/ZombieConstants');
+
+var _MapUtils = require('../../utils/MapUtils');
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+var ZombieRotationManager = function () {
+  function ZombieRotationManager(zombie) {
+    _classCallCheck(this, ZombieRotationManager);
+
+    this.zombie = zombie;
+  }
+
+  _createClass(ZombieRotationManager, [{
+    key: 'update',
+    value: function update(tileTarget) {
+      var lookTarget = this.getLookTarget(tileTarget);
+      var targetPoint = new Phaser.Point(lookTarget.x, lookTarget.y);
+      var entityCenter = new Phaser.Point(this.zombie.body.x + this.zombie.width / 2, this.zombie.body.y + this.zombie.height / 2);
+
+      var deltaTargetRad = this.zombie.rotation - Phaser.Math.angleBetweenPoints(targetPoint, entityCenter) - 1.5 * Math.PI;
+
+      deltaTargetRad = deltaTargetRad % (Math.PI * 2);
+
+      if (deltaTargetRad != deltaTargetRad % Math.PI) {
+        deltaTargetRad = deltaTargetRad + Math.PI * (deltaTargetRad < 0 ? 2 : -2);
+      }
+
+      this.zombie.body.rotateLeft(_ZombieConstants.ZOMBIE_ROTATING_SPEED * deltaTargetRad);
+    }
+  }, {
+    key: 'getLookTarget',
+    value: function getLookTarget(tile) {
+      var velocity = this.zombie.body.velocity;
+      var tileCoords = (0, _MapUtils.tileToPixels)(tile);
+      var veryFarAway = 1000;
+
+      if (Math.abs(velocity.x) > Math.abs(velocity.y)) {
+        if (velocity.x > 0) {
+          tileCoords.x += veryFarAway;
+        } else {
+          tileCoords.x -= veryFarAway;
+        }
+      } else if (Math.abs(velocity.x) < Math.abs(velocity.y)) {
+        if (velocity.y > 0) {
+          tileCoords.y += veryFarAway;
+        } else {
+          tileCoords.y -= veryFarAway;
+        }
+      }
+
+      return tileCoords;
+    }
+  }]);
+
+  return ZombieRotationManager;
+}();
+
+exports.default = ZombieRotationManager;
+
+},{"../../constants/ZombieConstants":11,"../../utils/MapUtils":30}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2517,8 +2622,6 @@ var ZombiePathManager = function () {
 
       var currentTarget = this.pathsBetweenTargets[this.currentPathIndex].target;
 
-      console.log(startTile, currentTarget);
-
       this.pathFinder.findPath(startTile.x, startTile.y, currentTarget.x, currentTarget.y, function (path) {
         if (path.length === 0) {
           _this4.changePathToStandard();
@@ -2574,6 +2677,16 @@ var ZombiePathManager = function () {
         this.changePathToTemporary(newTemporaryTarget);
       }
     }
+  }, {
+    key: 'getCurrentTileTarget',
+    value: function getCurrentTileTarget() {
+      if (this.state === 'on-standard-path') {
+        return this.getCurrentStepTarget();
+      } else if (this.state === 'on-temporary-path') {
+        return this.getTemporaryStepTarget();
+      }
+      throw new Error('No current tile target defined');
+    }
   }]);
 
   return ZombiePathManager;
@@ -2581,7 +2694,7 @@ var ZombiePathManager = function () {
 
 exports.default = ZombiePathManager;
 
-},{"../constants/TileMapConstants":9,"../constants/ZombieConstants":11,"../utils/DeterminePathCollisionUtils":27,"../utils/HandlePathCollisionUtils":28,"../utils/MapUtils":29,"./PathFinder":18}],23:[function(require,module,exports){
+},{"../constants/TileMapConstants":9,"../constants/ZombieConstants":11,"../utils/DeterminePathCollisionUtils":28,"../utils/HandlePathCollisionUtils":29,"../utils/MapUtils":30,"./PathFinder":18}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2650,7 +2763,7 @@ var Boot = function (_Phaser$State) {
 
 exports.default = Boot;
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2882,7 +2995,7 @@ var Game = function (_Phaser$State) {
 
 exports.default = Game;
 
-},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"../constants/UserInterfaceConstants":10,"../objects/Journal":16,"../objects/JournalsManager":17,"../objects/Player":19,"../objects/TileMap":20,"../objects/Zombie":21,"../utils/MapUtils":29,"../utils/UserInterfaceUtils":30}],25:[function(require,module,exports){
+},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"../constants/UserInterfaceConstants":10,"../objects/Journal":16,"../objects/JournalsManager":17,"../objects/Player":19,"../objects/TileMap":20,"../objects/Zombie":21,"../utils/MapUtils":30,"../utils/UserInterfaceUtils":31}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2951,7 +3064,7 @@ var Menu = function (_Phaser$State) {
 
 exports.default = Menu;
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3027,7 +3140,7 @@ var Preload = function (_Phaser$State) {
 
 exports.default = Preload;
 
-},{"../constants/PlayerConstants.js":8,"../constants/ZombieConstants.js":11}],27:[function(require,module,exports){
+},{"../constants/PlayerConstants.js":8,"../constants/ZombieConstants.js":11}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3101,7 +3214,7 @@ function getZombieCurrentStepTarget(zombie) {
   }
 }
 
-},{"./MapUtils":29}],28:[function(require,module,exports){
+},{"./MapUtils":30}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3187,7 +3300,7 @@ function getTileCandidates(tile) {
   return [{ x: tile.x, y: tile.y - 1 }, { x: tile.x, y: tile.y + 1 }, { x: tile.x - 1, y: tile.y }, { x: tile.x + 1, y: tile.y }];
 }
 
-},{"./MapUtils":29}],29:[function(require,module,exports){
+},{"./MapUtils":30}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3244,7 +3357,7 @@ var getWallsPositions = exports.getWallsPositions = function getWallsPositions(l
   return wallsArr;
 };
 
-},{"../constants/TileMapConstants":9}],30:[function(require,module,exports){
+},{"../constants/TileMapConstants":9}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

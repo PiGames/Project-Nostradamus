@@ -123,5 +123,6 @@ $RECYCLE.BIN/
 
 build
 .publish
+.vscode
 
 # End of https://www.gitignore.io/api/osx,macos,linux,node,windows

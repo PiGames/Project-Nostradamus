@@ -102,8 +102,6 @@ export default class ZombiePathManager {
 
     const currentTarget = this.pathsBetweenTargets[ this.currentPathIndex ].target;
 
-    console.log( startTile, currentTarget );
-
     this.pathFinder.findPath( startTile.x, startTile.y, currentTarget.x, currentTarget.y, ( path ) => {
       if ( path.length === 0 ) {
         this.changePathToStandard();
@@ -147,4 +145,13 @@ export default class ZombiePathManager {
       this.changePathToTemporary( newTemporaryTarget );
     }
   }
+  getCurrentTileTarget() {
+    if ( this.state === 'on-standard-path' ) {
+      return this.getCurrentStepTarget();
+    } else if ( this.state === 'on-temporary-path' ) {
+      return this.getTemporaryStepTarget();
+    }
+    throw new Error( 'No current tile target defined' );
+  }
 }
+
