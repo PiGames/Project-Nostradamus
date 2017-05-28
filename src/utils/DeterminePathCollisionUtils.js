@@ -1,7 +1,7 @@
 import { areTilesTheSame } from './MapUtils';
 
 export function willZombiesPathsInterfere( zombie1, zombie2 ) {
-  if ( zombie1.state === 'calculating-temporary-path' || zombie2.state === 'calculating-temporary-path' ) {
+  if ( !isZombieInMovement( zombie1 ) || !isZombieInMovement( zombie2 ) ) {
     return false;
   }
 
@@ -65,4 +65,8 @@ function getZombieCurrentStepTarget( zombie ) {
   case 'on-temporary-path':
     return zombie.getTemporaryStepTarget();
   }
+}
+
+function isZombieInMovement( zombie ){
+   return zombie.state !== 'calculating-temporary-path' && zombie.state !== 'not-started';
 }

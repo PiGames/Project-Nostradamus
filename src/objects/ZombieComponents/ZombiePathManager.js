@@ -1,9 +1,8 @@
 import PathFinder from './PathFinder';
-import { willZombiesPathsInterfere } from '../utils/DeterminePathCollisionUtils';
-import { getFreeTileAroundZombieExcludingOtherZombie } from '../utils/HandlePathCollisionUtils';
-import { tileToPixels } from '../utils/MapUtils';
-import { MIN_DISTANCE_TO_TARGET } from '../constants/ZombieConstants';
-import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
+import { willZombiesPathsInterfere } from '../../utils/DeterminePathCollisionUtils';
+import { getFreeTileAroundZombieExcludingOtherZombie } from '../../utils/HandlePathCollisionUtils';
+import { tileToPixels } from '../../utils/MapUtils';
+import { MIN_DISTANCE_TO_TARGET } from '../../constants/ZombieConstants';
 
 export default class ZombiePathManager {
   constructor( zombie, targets, walls ) {
@@ -21,15 +20,6 @@ export default class ZombiePathManager {
 
     this.temporaryPath = [];
     this.temporaryStepIndex = 0;
-
-    this.zombie.body.clearShapes();
-
-    this.collisionSensor = this.zombie.body.addCircle( Math.max( TILE_WIDTH, TILE_HEIGHT ) * 0.25 );
-
-    this.collisionSensor = this.zombie.body.addCircle( Math.max( TILE_WIDTH, TILE_HEIGHT ) * 0.75 );
-    this.collisionSensor.sensor = true;
-
-    this.zombie.body.onBeginContact.add( ( ...args ) => this.onCollision( ...args ) );
 
     this.state = 'not-started';
   }
@@ -134,13 +124,17 @@ export default class ZombiePathManager {
       this.changePathToStandard();
     }
   }
-  onCollision( bodyA ) {
+  onCollisionEnter( bodyA ) {
+    if ( bodyA == null || bodyA.sprite == null ) {
+      return;
+    }
+
     if ( bodyA.sprite.key === 'zombie' ) {
       this.checkForCollisionPossibility( bodyA.sprite );
     }
   }
   checkForCollisionPossibility( zombieToCollideWith ) {
-    if ( willZombiesPathsInterfere( this, zombieToCollideWith.PM ) ) {
+    if ( willZombiesPathsInterfere( this, zombieToCollideWith.walkingOnPathManager ) ) {
       const newTemporaryTarget = getFreeTileAroundZombieExcludingOtherZombie( this.zombie, zombieToCollideWith, this.walls );
       this.changePathToTemporary( newTemporaryTarget );
     }
@@ -154,4 +148,3 @@ export default class ZombiePathManager {
     throw new Error( 'No current tile target defined' );
   }
 }
-

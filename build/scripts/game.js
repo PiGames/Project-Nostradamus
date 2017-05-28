@@ -1019,7 +1019,7 @@ var ProjectNostradamus = function (_Phaser$Game) {
 
 exports.default = ProjectNostradamus;
 
-},{"./levels/Level1":13,"./levels/Level2":14,"./states/Boot":24,"./states/Menu":26,"./states/Preload":27}],7:[function(require,module,exports){
+},{"./levels/Level1":13,"./levels/Level2":14,"./states/Boot":26,"./states/Menu":28,"./states/Preload":29}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1088,8 +1088,9 @@ var ZOMBIE_WALK_ANIMATION_FRAMERATE = exports.ZOMBIE_WALK_ANIMATION_FRAMERATE = 
 var ZOMBIE_FIGHT_ANIMATION_FRAMERATE = exports.ZOMBIE_FIGHT_ANIMATION_FRAMERATE = 10;
 var MIN_DISTANCE_TO_TARGET = exports.MIN_DISTANCE_TO_TARGET = 10;
 var ZOMBIE_SIGHT_ANGLE = exports.ZOMBIE_SIGHT_ANGLE = 45;
-var ZOMBIE_SIGHT_RANGE = exports.ZOMBIE_SIGHT_RANGE = 500;
+var ZOMBIE_SIGHT_RANGE = exports.ZOMBIE_SIGHT_RANGE = 200;
 var ZOMBIE_HEARING_RANGE = exports.ZOMBIE_HEARING_RANGE = 100;
+var ZOMBIE_ATTACK_RANGE = exports.ZOMBIE_ATTACK_RANGE = 50;
 var ZOMBIE_ROTATING_SPEED = exports.ZOMBIE_ROTATING_SPEED = 50;
 var ZOMBIE_DAMAGE_MULTIPLIER = exports.ZOMBIE_DAMAGE_MULTIPLIER = 1;
 var ZOMBIE_DAMAGE_COOLDOWN = exports.ZOMBIE_DAMAGE_COOLDOWN = 0.2;
@@ -1202,7 +1203,7 @@ var Level1 = function (_Game) {
 
 exports.default = Level1;
 
-},{"../states/Game.js":25}],14:[function(require,module,exports){
+},{"../states/Game.js":27}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1275,7 +1276,7 @@ var Level2 = function (_Game) {
 
 exports.default = Level2;
 
-},{"../states/Game.js":25}],15:[function(require,module,exports){
+},{"../states/Game.js":27}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1686,65 +1687,7 @@ var JournalsManager = function (_Phaser$Group) {
 
 exports.default = JournalsManager;
 
-},{"../constants/ItemConstants":7,"../utils/UserInterfaceUtils":31}],18:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-  };
-}();
-
-var _easystarjs = require('easystarjs');
-
-var _easystarjs2 = _interopRequireDefault(_easystarjs);
-
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : { default: obj };
-}
-
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-
-var PathFinder = function () {
-  function PathFinder() {
-    _classCallCheck(this, PathFinder);
-
-    this.easystar = new _easystarjs2.default.js();
-
-    this.easystar.setAcceptableTiles([0]);
-  }
-
-  _createClass(PathFinder, [{
-    key: 'setGrid',
-    value: function setGrid(grid) {
-      this.easystar.setGrid(grid);
-    }
-  }, {
-    key: 'findPath',
-    value: function findPath(startX, startY, endX, endY, callback) {
-      this.easystar.findPath(startX, startY, endX, endY, callback);
-      this.easystar.calculate();
-    }
-  }]);
-
-  return PathFinder;
-}();
-
-exports.default = PathFinder;
-
-},{"easystarjs":1}],19:[function(require,module,exports){
+},{"../constants/ItemConstants":7,"../utils/UserInterfaceUtils":34}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2046,7 +1989,7 @@ var Player = function (_Entity) {
 
 exports.default = Player;
 
-},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"./Entity":15}],20:[function(require,module,exports){
+},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"./Entity":15}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2234,7 +2177,7 @@ var TileMap = function (_Phaser$Tilemap) {
 
 exports.default = TileMap;
 
-},{"../utils/MapUtils.js":30}],21:[function(require,module,exports){
+},{"../utils/MapUtils.js":32}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2255,17 +2198,27 @@ var _Entity2 = require('./Entity');
 
 var _Entity3 = _interopRequireDefault(_Entity2);
 
-var _ZombiePathManager = require('./ZombiePathManager');
+var _ZombiePathManager = require('./ZombieComponents/ZombiePathManager');
 
 var _ZombiePathManager2 = _interopRequireDefault(_ZombiePathManager);
-
-var _MapUtils = require('../utils/MapUtils');
-
-var _ZombieConstants = require('../constants/ZombieConstants');
 
 var _ZombieRotationManager = require('./ZombieComponents/ZombieRotationManager');
 
 var _ZombieRotationManager2 = _interopRequireDefault(_ZombieRotationManager);
+
+var _SeekingPlayerManager = require('./ZombieComponents/SeekingPlayerManager');
+
+var _SeekingPlayerManager2 = _interopRequireDefault(_SeekingPlayerManager);
+
+var _ChasingPlayerManager = require('./ZombieComponents/ChasingPlayerManager');
+
+var _ChasingPlayerManager2 = _interopRequireDefault(_ChasingPlayerManager);
+
+var _MapUtils = require('../utils/MapUtils');
+
+var _TileMapConstants = require('../constants/TileMapConstants');
+
+var _ZombieConstants = require('../constants/ZombieConstants');
 
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : { default: obj };
@@ -2301,17 +2254,29 @@ var Zombie = function (_Entity) {
     var _this = _possibleConstructorReturn(this, (Zombie.__proto__ || Object.getPrototypeOf(Zombie)).call(this, game, x, y, key));
 
     _this.isPathSystemInitialized = false;
-    _this.PM = null;
+    _this.walkingOnPathManager = null;
+    _this.rotationManager = new _ZombieRotationManager2.default(_this);
+    _this.chasingPlayerManager = null;
 
     _this.state = 'not-ready';
 
-    _this.rotationManager = new _ZombieRotationManager2.default(_this);
-
+    _this.initCollider();
     _this.initAnimations();
+
+    _this.body.onBeginContact.add(_this.onCollisionEnter, _this);
+    _this.body.onEndContact.add(_this.onCollisionLeave, _this);
+    _this.body.debug = true;
     return _this;
   }
 
   _createClass(Zombie, [{
+    key: 'initCollider',
+    value: function initCollider() {
+      this.body.clearShapes();
+
+      this.body.addCircle(Math.max(_TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT) * 0.25);
+    }
+  }, {
     key: 'initAnimations',
     value: function initAnimations() {
       this.animations.add('walk', [0, 1, 2, 3, 4, 5], 0);
@@ -2327,7 +2292,7 @@ var Zombie = function (_Entity) {
   }, {
     key: 'initializePathSystem',
     value: function initializePathSystem(targets, walls) {
-      this.PM = new _ZombiePathManager2.default(this, targets, walls);
+      this.walkingOnPathManager = new _ZombiePathManager2.default(this, targets, walls);
 
       this.state = 'not-walking';
     }
@@ -2336,9 +2301,17 @@ var Zombie = function (_Entity) {
     value: function startPathSystem() {
       var _this2 = this;
 
-      this.PM.start(function () {
+      this.walkingOnPathManager.start(function () {
         return _this2.state = 'walking-on-path';
       });
+    }
+  }, {
+    key: 'initializeChasingSystem',
+    value: function initializeChasingSystem(player, walls) {
+      this.seekingPlayerManager = new _SeekingPlayerManager2.default(this, player, walls);
+      this.seekingPlayerManager.chasePlayerSignal.add(this.changeStateToChasing, this);
+
+      this.chasingPlayerManager = new _ChasingPlayerManager2.default(this, player);
     }
   }, {
     key: 'update',
@@ -2346,23 +2319,42 @@ var Zombie = function (_Entity) {
       switch (this.state) {
         case 'walking-on-path':
           this.handleWalkingOnPathState();
+          break;
       }
     }
   }, {
-    key: 'onCollision',
-    value: function onCollision(bodyA, bodyB, shapeA, shapeB) {
+    key: 'onCollisionEnter',
+    value: function onCollisionEnter(bodyA, bodyB, shapeA, shapeB) {
       switch (this.state) {
         case 'walking-on-path':
-          this.PM.onCollision(bodyA, bodyB, shapeA, shapeB);
+          this.walkingOnPathManager.onCollisionEnter(bodyA, bodyB, shapeA, shapeB);
+          this.seekingPlayerManager.onCollisionEnter(bodyA, bodyB, shapeA, shapeB);
+      }
+    }
+  }, {
+    key: 'onCollisionLeave',
+    value: function onCollisionLeave() {
+      var _seekingPlayerManager;
+
+      switch (this.state) {
+        case 'walking-on-path':
+          (_seekingPlayerManager = this.seekingPlayerManager).onCollisionLeave.apply(_seekingPlayerManager, arguments);
       }
     }
   }, {
     key: 'handleWalkingOnPathState',
     value: function handleWalkingOnPathState() {
-      this.PM.update();
+      this.walkingOnPathManager.update();
 
-      var currentTileTarget = this.PM.getCurrentTileTarget();
+      var currentTileTarget = this.walkingOnPathManager.getCurrentTileTarget();
       this.rotationManager.update(currentTileTarget);
+
+      this.seekingPlayerManager.update();
+    }
+  }, {
+    key: 'changeStateToChasing',
+    value: function changeStateToChasing() {
+      console.log('chase!');
     }
   }]);
 
@@ -2371,7 +2363,460 @@ var Zombie = function (_Entity) {
 
 exports.default = Zombie;
 
-},{"../constants/ZombieConstants":11,"../utils/MapUtils":30,"./Entity":15,"./ZombieComponents/ZombieRotationManager":22,"./ZombiePathManager":23}],22:[function(require,module,exports){
+},{"../constants/TileMapConstants":9,"../constants/ZombieConstants":11,"../utils/MapUtils":32,"./Entity":15,"./ZombieComponents/ChasingPlayerManager":21,"./ZombieComponents/SeekingPlayerManager":23,"./ZombieComponents/ZombiePathManager":24,"./ZombieComponents/ZombieRotationManager":25}],21:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+var ChasingPlayerManager = function ChasingPlayerManager(zombie, player) {
+  _classCallCheck(this, ChasingPlayerManager);
+
+  this.zombie = zombie;
+  this.player = player;
+};
+
+exports.default = ChasingPlayerManager;
+
+},{}],22:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
+
+var _easystarjs = require('easystarjs');
+
+var _easystarjs2 = _interopRequireDefault(_easystarjs);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+var PathFinder = function () {
+  function PathFinder() {
+    _classCallCheck(this, PathFinder);
+
+    this.easystar = new _easystarjs2.default.js();
+
+    this.easystar.setAcceptableTiles([0]);
+  }
+
+  _createClass(PathFinder, [{
+    key: 'setGrid',
+    value: function setGrid(grid) {
+      this.easystar.setGrid(grid);
+    }
+  }, {
+    key: 'findPath',
+    value: function findPath(startX, startY, endX, endY, callback) {
+      this.easystar.findPath(startX, startY, endX, endY, callback);
+      this.easystar.calculate();
+    }
+  }]);
+
+  return PathFinder;
+}();
+
+exports.default = PathFinder;
+
+},{"easystarjs":1}],23:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
+
+var _ZombieConstants = require('../../constants/ZombieConstants');
+
+var _MathUtils = require('../../utils/MathUtils');
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+var SeekingPlayerManager = function () {
+  function SeekingPlayerManager(zombie, player, walls) {
+    _classCallCheck(this, SeekingPlayerManager);
+
+    this.zombie = zombie;
+    this.player = player;
+    this.walls = walls;
+
+    this.state = 'searching';
+
+    this.isPlayerInViewRange = false;
+    this.isPlayerInHearingRange = false;
+
+    var body = this.zombie.body;
+
+    var viewSensor = body.addCircle(_ZombieConstants.ZOMBIE_SIGHT_RANGE);
+    viewSensor.sensor = true;
+    viewSensor.sensorType = 'view';
+
+    var hearSensor = body.addCircle(_ZombieConstants.ZOMBIE_HEARING_RANGE);
+    hearSensor.sensor = true;
+    hearSensor.sensorType = 'hear';
+
+    this.chasePlayerSignal = new Phaser.Signal();
+  }
+
+  _createClass(SeekingPlayerManager, [{
+    key: 'update',
+    value: function update() {
+      if (this.canDetectPlayer()) {
+        this.changeStateToChasing();
+      }
+    }
+  }, {
+    key: 'canDetectPlayer',
+    value: function canDetectPlayer() {
+      if (this.isPlayerDead) {
+        return false;
+      }
+
+      /** Draw line between player and zombie and check if it can see him. If yes, chase him. */
+      var playerSeekingRay = new Phaser.Line();
+      playerSeekingRay.start.set(this.zombie.x, this.zombie.y);
+      playerSeekingRay.end.set(this.player.x, this.player.y);
+
+      var tileHits = this.walls.getRayCastTiles(playerSeekingRay, 0, false, false);
+
+      for (var i = 0; i < tileHits.length; i++) {
+        if (tileHits[i].index >= 0) {
+          return false;
+        }
+      }
+
+      return this.canSeePlayer() || this.canHearPlayer();
+    }
+  }, {
+    key: 'canSeePlayer',
+    value: function canSeePlayer() {
+      //console.log( this.isPlayerInViewRange, isInDegreeRange( this, this.player, ZOMBIE_SIGHT_ANGLE ) );
+      return this.isPlayerInViewRange && (0, _MathUtils.isInDegreeRange)(this, this.player, _ZombieConstants.ZOMBIE_SIGHT_ANGLE);
+    }
+  }, {
+    key: 'canHearPlayer',
+    value: function canHearPlayer() {
+      return this.isPlayerInHearingRange && !this.player.isSneaking && this.player.isMoving();
+    }
+    // TODO figure out why player is not detected
+
+  }, {
+    key: 'onCollisionEnter',
+    value: function onCollisionEnter(bodyA, bodyB, shapeA) {
+      console.log(bodyA);
+
+      if (this.isItSensorArea(bodyA, shapeA)) {
+        if (shapeA.sensorType === 'view' && bodyA.sprite.key === 'player') {
+          this.isPlayerInViewRange = true;
+        } else if (shapeA.sensorType === 'hear' && bodyA.sprite.key === 'player') {
+          this.isPlayerInHearingRange = true;
+        }
+      }
+    }
+  }, {
+    key: 'onCollisionLeave',
+    value: function onCollisionLeave(bodyA, bodyB, shapeA) {
+      console.log(bodyA);
+
+      if (this.isItSensorArea(bodyA, shapeA)) {
+        if (shapeA.sensorType === 'view' && bodyA.sprite.key === 'player') {
+          this.isPlayerInViewRange = false;
+        } else if (shapeA.sensorType === 'hear' && bodyA.sprite.key === 'player') {
+          this.isPlayerInHearingRange = false;
+        }
+      }
+    }
+  }, {
+    key: 'isItSensorArea',
+    value: function isItSensorArea(body, shape) {
+      if (body == null || body.sprite == null || shape.sensor == null) {
+        return false;
+      }
+
+      return shape.sensor;
+    }
+  }, {
+    key: 'changeStateToChasing',
+    value: function changeStateToChasing() {
+      this.chasePlayerSignal.dispatch();
+    }
+  }]);
+
+  return SeekingPlayerManager;
+}();
+
+exports.default = SeekingPlayerManager;
+
+},{"../../constants/ZombieConstants":11,"../../utils/MathUtils":33}],24:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
+
+var _PathFinder = require('./PathFinder');
+
+var _PathFinder2 = _interopRequireDefault(_PathFinder);
+
+var _DeterminePathCollisionUtils = require('../../utils/DeterminePathCollisionUtils');
+
+var _HandlePathCollisionUtils = require('../../utils/HandlePathCollisionUtils');
+
+var _MapUtils = require('../../utils/MapUtils');
+
+var _ZombieConstants = require('../../constants/ZombieConstants');
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+var ZombiePathManager = function () {
+  function ZombiePathManager(zombie, targets, walls) {
+    _classCallCheck(this, ZombiePathManager);
+
+    this.zombie = zombie;
+    this.targets = targets;
+    this.walls = walls;
+
+    this.pathFinder = new _PathFinder2.default();
+    this.pathFinder.setGrid(walls);
+
+    this.pathsBetweenTargets = [];
+
+    this.currentPathIndex = 0;
+    this.currentStepIndex = 0;
+
+    this.temporaryPath = [];
+    this.temporaryStepIndex = 0;
+
+    this.state = 'not-started';
+  }
+
+  _createClass(ZombiePathManager, [{
+    key: 'start',
+    value: function start(callback) {
+      var _this = this;
+
+      // for now it assumes that zombie is placed on first path target
+      this.calculatePathsBetweenTargets(function () {
+        _this.state = 'on-standard-path';
+        callback();
+      });
+    }
+    // Recursive function that calculates standard paths and save them into pathsBetweenPathTargets container.
+    // Recurse approach is used to handle asynchronous nature of findPath method.
+
+  }, {
+    key: 'calculatePathsBetweenTargets',
+    value: function calculatePathsBetweenTargets(doneCallback) {
+      var _this2 = this;
+
+      var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+      if (this.pathsBetweenTargets.length === this.targets.length) {
+        doneCallback();
+        return;
+      }
+
+      var start = this.targets[index];
+      var target = index === this.targets.length - 1 ? this.targets[0] : this.targets[index + 1];
+
+      this.pathFinder.findPath(start.x, start.y, target.x, target.y, function (path) {
+        _this2.pathsBetweenTargets.push({ path: path, start: start, target: target });
+        _this2.calculatePathsBetweenTargets(doneCallback, index + 1);
+      });
+    }
+  }, {
+    key: 'update',
+    value: function update() {
+      switch (this.state) {
+        case 'on-standard-path':
+          this.moveOnStandardPath();
+          break;
+        case 'on-temporary-path':
+          this.moveOnTemporaryPath();
+          break;
+        case 'calculating-temporary-path':
+          this.zombie.velocity.x = 0;
+          this.zombie.velocity.y = 0;
+          break;
+      }
+    }
+  }, {
+    key: 'moveOnStandardPath',
+    value: function moveOnStandardPath() {
+      var stepTarget = this.getCurrentStepTarget();
+
+      if (this.isReached(stepTarget)) {
+        this.onStepTargetReach();
+      }
+      this.zombie.game.physics.arcade.moveToObject(this.zombie, (0, _MapUtils.tileToPixels)(stepTarget));
+    }
+  }, {
+    key: 'isReached',
+    value: function isReached(target) {
+      var distanceToTarget = this.zombie.game.physics.arcade.distanceBetween(this.zombie, (0, _MapUtils.tileToPixels)(target));
+      return distanceToTarget <= _ZombieConstants.MIN_DISTANCE_TO_TARGET;
+    }
+  }, {
+    key: 'onStepTargetReach',
+    value: function onStepTargetReach() {
+      this.currentStepIndex++;
+
+      if (this.currentStepIndex === this.pathsBetweenTargets[this.currentPathIndex].path.length) {
+        this.currentStepIndex = 0;
+        this.currentPathIndex++;
+
+        if (this.currentPathIndex === this.pathsBetweenTargets.length) {
+          this.currentPathIndex = 0;
+        }
+      }
+    }
+  }, {
+    key: 'getCurrentStepTarget',
+    value: function getCurrentStepTarget() {
+      return this.pathsBetweenTargets[this.currentPathIndex].path[this.currentStepIndex];
+    }
+  }, {
+    key: 'changePathToTemporary',
+    value: function changePathToTemporary(startTile) {
+      var _this3 = this;
+
+      this.state = 'calculating-temporary-path';
+
+      var currentTarget = this.pathsBetweenTargets[this.currentPathIndex].target;
+
+      this.pathFinder.findPath(startTile.x, startTile.y, currentTarget.x, currentTarget.y, function (path) {
+        if (path.length === 0) {
+          _this3.changePathToStandard();
+          return;
+        }
+        _this3.temporaryPath = path;
+        _this3.temporaryStepIndex = 0;
+
+        _this3.state = 'on-temporary-path';
+      });
+    }
+  }, {
+    key: 'getTemporaryStepTarget',
+    value: function getTemporaryStepTarget() {
+      return this.temporaryPath[this.temporaryStepIndex];
+    }
+  }, {
+    key: 'changePathToStandard',
+    value: function changePathToStandard() {
+      this.currentPathIndex = this.currentPathIndex + 1 === this.pathsBetweenTargets.length ? 0 : this.currentPathIndex + 1;
+      this.currentStepIndex = 0;
+      this.state = 'on-standard-path';
+    }
+  }, {
+    key: 'moveOnTemporaryPath',
+    value: function moveOnTemporaryPath() {
+      var temporaryStepTarget = this.getTemporaryStepTarget();
+      if (this.isReached(temporaryStepTarget)) {
+        this.onTemporaryStepTargetReach();
+      }
+      this.zombie.game.physics.arcade.moveToObject(this.zombie, (0, _MapUtils.tileToPixels)(temporaryStepTarget));
+    }
+  }, {
+    key: 'onTemporaryStepTargetReach',
+    value: function onTemporaryStepTargetReach() {
+      this.temporaryStepIndex++;
+      if (this.temporaryStepIndex === this.temporaryPath.length) {
+        this.changePathToStandard();
+      }
+    }
+  }, {
+    key: 'onCollisionEnter',
+    value: function onCollisionEnter(bodyA) {
+      if (bodyA == null || bodyA.sprite == null) {
+        return;
+      }
+
+      if (bodyA.sprite.key === 'zombie') {
+        this.checkForCollisionPossibility(bodyA.sprite);
+      }
+    }
+  }, {
+    key: 'checkForCollisionPossibility',
+    value: function checkForCollisionPossibility(zombieToCollideWith) {
+      if ((0, _DeterminePathCollisionUtils.willZombiesPathsInterfere)(this, zombieToCollideWith.walkingOnPathManager)) {
+        var newTemporaryTarget = (0, _HandlePathCollisionUtils.getFreeTileAroundZombieExcludingOtherZombie)(this.zombie, zombieToCollideWith, this.walls);
+        this.changePathToTemporary(newTemporaryTarget);
+      }
+    }
+  }, {
+    key: 'getCurrentTileTarget',
+    value: function getCurrentTileTarget() {
+      if (this.state === 'on-standard-path') {
+        return this.getCurrentStepTarget();
+      } else if (this.state === 'on-temporary-path') {
+        return this.getTemporaryStepTarget();
+      }
+      throw new Error('No current tile target defined');
+    }
+  }]);
+
+  return ZombiePathManager;
+}();
+
+exports.default = ZombiePathManager;
+
+},{"../../constants/ZombieConstants":11,"../../utils/DeterminePathCollisionUtils":30,"../../utils/HandlePathCollisionUtils":31,"../../utils/MapUtils":32,"./PathFinder":22}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2452,249 +2897,7 @@ var ZombieRotationManager = function () {
 
 exports.default = ZombieRotationManager;
 
-},{"../../constants/ZombieConstants":11,"../../utils/MapUtils":30}],23:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-  };
-}();
-
-var _PathFinder = require('./PathFinder');
-
-var _PathFinder2 = _interopRequireDefault(_PathFinder);
-
-var _DeterminePathCollisionUtils = require('../utils/DeterminePathCollisionUtils');
-
-var _HandlePathCollisionUtils = require('../utils/HandlePathCollisionUtils');
-
-var _MapUtils = require('../utils/MapUtils');
-
-var _ZombieConstants = require('../constants/ZombieConstants');
-
-var _TileMapConstants = require('../constants/TileMapConstants');
-
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : { default: obj };
-}
-
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-
-var ZombiePathManager = function () {
-  function ZombiePathManager(zombie, targets, walls) {
-    var _this = this;
-
-    _classCallCheck(this, ZombiePathManager);
-
-    this.zombie = zombie;
-    this.targets = targets;
-    this.walls = walls;
-
-    this.pathFinder = new _PathFinder2.default();
-    this.pathFinder.setGrid(walls);
-
-    this.pathsBetweenTargets = [];
-
-    this.currentPathIndex = 0;
-    this.currentStepIndex = 0;
-
-    this.temporaryPath = [];
-    this.temporaryStepIndex = 0;
-
-    this.zombie.body.clearShapes();
-
-    this.collisionSensor = this.zombie.body.addCircle(Math.max(_TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT) * 0.25);
-
-    this.collisionSensor = this.zombie.body.addCircle(Math.max(_TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT) * 0.75);
-    this.collisionSensor.sensor = true;
-
-    this.zombie.body.onBeginContact.add(function () {
-      return _this.onCollision.apply(_this, arguments);
-    });
-
-    this.state = 'not-started';
-  }
-
-  _createClass(ZombiePathManager, [{
-    key: 'start',
-    value: function start(callback) {
-      var _this2 = this;
-
-      // for now it assumes that zombie is placed on first path target
-      this.calculatePathsBetweenTargets(function () {
-        _this2.state = 'on-standard-path';
-        callback();
-      });
-    }
-    // Recursive function that calculates standard paths and save them into pathsBetweenPathTargets container.
-    // Recurse approach is used to handle asynchronous nature of findPath method.
-
-  }, {
-    key: 'calculatePathsBetweenTargets',
-    value: function calculatePathsBetweenTargets(doneCallback) {
-      var _this3 = this;
-
-      var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-
-      if (this.pathsBetweenTargets.length === this.targets.length) {
-        doneCallback();
-        return;
-      }
-
-      var start = this.targets[index];
-      var target = index === this.targets.length - 1 ? this.targets[0] : this.targets[index + 1];
-
-      this.pathFinder.findPath(start.x, start.y, target.x, target.y, function (path) {
-        _this3.pathsBetweenTargets.push({ path: path, start: start, target: target });
-        _this3.calculatePathsBetweenTargets(doneCallback, index + 1);
-      });
-    }
-  }, {
-    key: 'update',
-    value: function update() {
-      switch (this.state) {
-        case 'on-standard-path':
-          this.moveOnStandardPath();
-          break;
-        case 'on-temporary-path':
-          this.moveOnTemporaryPath();
-          break;
-        case 'calculating-temporary-path':
-          this.zombie.velocity.x = 0;
-          this.zombie.velocity.y = 0;
-          break;
-      }
-    }
-  }, {
-    key: 'moveOnStandardPath',
-    value: function moveOnStandardPath() {
-      var stepTarget = this.getCurrentStepTarget();
-
-      if (this.isReached(stepTarget)) {
-        this.onStepTargetReach();
-      }
-      this.zombie.game.physics.arcade.moveToObject(this.zombie, (0, _MapUtils.tileToPixels)(stepTarget));
-    }
-  }, {
-    key: 'isReached',
-    value: function isReached(target) {
-      var distanceToTarget = this.zombie.game.physics.arcade.distanceBetween(this.zombie, (0, _MapUtils.tileToPixels)(target));
-      return distanceToTarget <= _ZombieConstants.MIN_DISTANCE_TO_TARGET;
-    }
-  }, {
-    key: 'onStepTargetReach',
-    value: function onStepTargetReach() {
-      this.currentStepIndex++;
-
-      if (this.currentStepIndex === this.pathsBetweenTargets[this.currentPathIndex].path.length) {
-        this.currentStepIndex = 0;
-        this.currentPathIndex++;
-
-        if (this.currentPathIndex === this.pathsBetweenTargets.length) {
-          this.currentPathIndex = 0;
-        }
-      }
-    }
-  }, {
-    key: 'getCurrentStepTarget',
-    value: function getCurrentStepTarget() {
-      return this.pathsBetweenTargets[this.currentPathIndex].path[this.currentStepIndex];
-    }
-  }, {
-    key: 'changePathToTemporary',
-    value: function changePathToTemporary(startTile) {
-      var _this4 = this;
-
-      this.state = 'calculating-temporary-path';
-
-      var currentTarget = this.pathsBetweenTargets[this.currentPathIndex].target;
-
-      this.pathFinder.findPath(startTile.x, startTile.y, currentTarget.x, currentTarget.y, function (path) {
-        if (path.length === 0) {
-          _this4.changePathToStandard();
-          return;
-        }
-        _this4.temporaryPath = path;
-        _this4.temporaryStepIndex = 0;
-
-        _this4.state = 'on-temporary-path';
-      });
-    }
-  }, {
-    key: 'getTemporaryStepTarget',
-    value: function getTemporaryStepTarget() {
-      return this.temporaryPath[this.temporaryStepIndex];
-    }
-  }, {
-    key: 'changePathToStandard',
-    value: function changePathToStandard() {
-      this.currentPathIndex = this.currentPathIndex + 1 === this.pathsBetweenTargets.length ? 0 : this.currentPathIndex + 1;
-      this.currentStepIndex = 0;
-      this.state = 'on-standard-path';
-    }
-  }, {
-    key: 'moveOnTemporaryPath',
-    value: function moveOnTemporaryPath() {
-      var temporaryStepTarget = this.getTemporaryStepTarget();
-      if (this.isReached(temporaryStepTarget)) {
-        this.onTemporaryStepTargetReach();
-      }
-      this.zombie.game.physics.arcade.moveToObject(this.zombie, (0, _MapUtils.tileToPixels)(temporaryStepTarget));
-    }
-  }, {
-    key: 'onTemporaryStepTargetReach',
-    value: function onTemporaryStepTargetReach() {
-      this.temporaryStepIndex++;
-      if (this.temporaryStepIndex === this.temporaryPath.length) {
-        this.changePathToStandard();
-      }
-    }
-  }, {
-    key: 'onCollision',
-    value: function onCollision(bodyA) {
-      if (bodyA.sprite.key === 'zombie') {
-        this.checkForCollisionPossibility(bodyA.sprite);
-      }
-    }
-  }, {
-    key: 'checkForCollisionPossibility',
-    value: function checkForCollisionPossibility(zombieToCollideWith) {
-      if ((0, _DeterminePathCollisionUtils.willZombiesPathsInterfere)(this, zombieToCollideWith.PM)) {
-        var newTemporaryTarget = (0, _HandlePathCollisionUtils.getFreeTileAroundZombieExcludingOtherZombie)(this.zombie, zombieToCollideWith, this.walls);
-        this.changePathToTemporary(newTemporaryTarget);
-      }
-    }
-  }, {
-    key: 'getCurrentTileTarget',
-    value: function getCurrentTileTarget() {
-      if (this.state === 'on-standard-path') {
-        return this.getCurrentStepTarget();
-      } else if (this.state === 'on-temporary-path') {
-        return this.getTemporaryStepTarget();
-      }
-      throw new Error('No current tile target defined');
-    }
-  }]);
-
-  return ZombiePathManager;
-}();
-
-exports.default = ZombiePathManager;
-
-},{"../constants/TileMapConstants":9,"../constants/ZombieConstants":11,"../utils/DeterminePathCollisionUtils":28,"../utils/HandlePathCollisionUtils":29,"../utils/MapUtils":30,"./PathFinder":18}],24:[function(require,module,exports){
+},{"../../constants/ZombieConstants":11,"../../utils/MapUtils":32}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2763,7 +2966,7 @@ var Boot = function (_Phaser$State) {
 
 exports.default = Boot;
 
-},{}],25:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2877,10 +3080,11 @@ var Game = function (_Phaser$State) {
 
         newZombie.setTilePosition(this.map.paths[i][0]);
         newZombie.body.setCollisionGroup(this.zombiesCollisionGroup);
-        newZombie.body.collides([this.zombiesCollisionGroup, this.map.wallsCollisionGroup]);
-
+        newZombie.body.collides([this.playerCollisionGroup, this.map.wallsCollisionGroup, this.journalsCollisionGroup, this.zombiesCollisionGroup]);
         newZombie.initializePathSystem(this.map.getPath(i), wallsPositions);
         newZombie.startPathSystem();
+
+        newZombie.initializeChasingSystem(this.player, this.map.walls);
 
         this.zombies.add(newZombie);
       }
@@ -2995,7 +3199,7 @@ var Game = function (_Phaser$State) {
 
 exports.default = Game;
 
-},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"../constants/UserInterfaceConstants":10,"../objects/Journal":16,"../objects/JournalsManager":17,"../objects/Player":19,"../objects/TileMap":20,"../objects/Zombie":21,"../utils/MapUtils":30,"../utils/UserInterfaceUtils":31}],26:[function(require,module,exports){
+},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"../constants/UserInterfaceConstants":10,"../objects/Journal":16,"../objects/JournalsManager":17,"../objects/Player":18,"../objects/TileMap":19,"../objects/Zombie":20,"../utils/MapUtils":32,"../utils/UserInterfaceUtils":34}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3064,7 +3268,7 @@ var Menu = function (_Phaser$State) {
 
 exports.default = Menu;
 
-},{}],27:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3140,7 +3344,7 @@ var Preload = function (_Phaser$State) {
 
 exports.default = Preload;
 
-},{"../constants/PlayerConstants.js":8,"../constants/ZombieConstants.js":11}],28:[function(require,module,exports){
+},{"../constants/PlayerConstants.js":8,"../constants/ZombieConstants.js":11}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3151,7 +3355,7 @@ exports.willZombiesPathsInterfere = willZombiesPathsInterfere;
 var _MapUtils = require('./MapUtils');
 
 function willZombiesPathsInterfere(zombie1, zombie2) {
-  if (zombie1.state === 'calculating-temporary-path' || zombie2.state === 'calculating-temporary-path') {
+  if (!isZombieInMovement(zombie1) || !isZombieInMovement(zombie2)) {
     return false;
   }
 
@@ -3214,7 +3418,11 @@ function getZombieCurrentStepTarget(zombie) {
   }
 }
 
-},{"./MapUtils":30}],29:[function(require,module,exports){
+function isZombieInMovement(zombie) {
+  return zombie.state !== 'calculating-temporary-path' && zombie.state !== 'not-started';
+}
+
+},{"./MapUtils":32}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3300,7 +3508,7 @@ function getTileCandidates(tile) {
   return [{ x: tile.x, y: tile.y - 1 }, { x: tile.x, y: tile.y + 1 }, { x: tile.x - 1, y: tile.y }, { x: tile.x + 1, y: tile.y }];
 }
 
-},{"./MapUtils":30}],30:[function(require,module,exports){
+},{"./MapUtils":32}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3357,7 +3565,20 @@ var getWallsPositions = exports.getWallsPositions = function getWallsPositions(l
   return wallsArr;
 };
 
-},{"../constants/TileMapConstants":9}],31:[function(require,module,exports){
+},{"../constants/TileMapConstants":9}],33:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.isInDegreeRange = isInDegreeRange;
+function isInDegreeRange(entity, target, sightAngle) {
+  var angleDelta = Math.abs(Phaser.Math.radToDeg(Phaser.Math.angleBetween(entity.x, entity.y, target.x, target.y)) + 90 - entity.angle);
+
+  return angleDelta <= sightAngle || angleDelta >= 360 - sightAngle;
+}
+
+},{}],34:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

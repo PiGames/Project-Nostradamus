@@ -45,10 +45,11 @@ export default class Game extends Phaser.State {
 
       newZombie.setTilePosition( this.map.paths[ i ][ 0 ] );
       newZombie.body.setCollisionGroup( this.zombiesCollisionGroup );
-      newZombie.body.collides( [ this.zombiesCollisionGroup, this.map.wallsCollisionGroup ] );
-
+      newZombie.body.collides( [ this.playerCollisionGroup, this.map.wallsCollisionGroup, this.journalsCollisionGroup, this.zombiesCollisionGroup ] );
       newZombie.initializePathSystem( this.map.getPath( i ), wallsPositions );
       newZombie.startPathSystem();
+
+      newZombie.initializeChasingSystem( this.player, this.map.walls );
 
       this.zombies.add( newZombie );
     }
