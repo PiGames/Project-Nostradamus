@@ -2253,6 +2253,9 @@ var Zombie = function (_Entity) {
 
     var _this = _possibleConstructorReturn(this, (Zombie.__proto__ || Object.getPrototypeOf(Zombie)).call(this, game, x, y, key));
 
+    _this.initCollider();
+    _this.initAnimations();
+
     _this.isPathSystemInitialized = false;
     _this.walkingOnPathManager = null;
     _this.rotationManager = new _ZombieRotationManager2.default(_this);
@@ -2260,12 +2263,8 @@ var Zombie = function (_Entity) {
 
     _this.state = 'not-ready';
 
-    _this.initCollider();
-    _this.initAnimations();
-
     _this.body.onBeginContact.add(_this.onCollisionEnter, _this);
     _this.body.onEndContact.add(_this.onCollisionLeave, _this);
-    _this.body.debug = true;
     return _this;
   }
 
@@ -2324,21 +2323,23 @@ var Zombie = function (_Entity) {
     }
   }, {
     key: 'onCollisionEnter',
-    value: function onCollisionEnter(bodyA, bodyB, shapeA, shapeB) {
+    value: function onCollisionEnter() {
+      var _walkingOnPathManager, _seekingPlayerManager;
+
       switch (this.state) {
         case 'walking-on-path':
-          this.walkingOnPathManager.onCollisionEnter(bodyA, bodyB, shapeA, shapeB);
-          this.seekingPlayerManager.onCollisionEnter(bodyA, bodyB, shapeA, shapeB);
+          (_walkingOnPathManager = this.walkingOnPathManager).onCollisionEnter.apply(_walkingOnPathManager, arguments);
+          (_seekingPlayerManager = this.seekingPlayerManager).onCollisionEnter.apply(_seekingPlayerManager, arguments);
       }
     }
   }, {
     key: 'onCollisionLeave',
     value: function onCollisionLeave() {
-      var _seekingPlayerManager;
+      var _seekingPlayerManager2;
 
       switch (this.state) {
         case 'walking-on-path':
-          (_seekingPlayerManager = this.seekingPlayerManager).onCollisionLeave.apply(_seekingPlayerManager, arguments);
+          (_seekingPlayerManager2 = this.seekingPlayerManager).onCollisionLeave.apply(_seekingPlayerManager2, arguments);
       }
     }
   }, {
@@ -2483,7 +2484,7 @@ var SeekingPlayerManager = function () {
     this.isPlayerInViewRange = false;
     this.isPlayerInHearingRange = false;
 
-    var body = this.zombie.body;
+    var body = zombie.body;
 
     var viewSensor = body.addCircle(_ZombieConstants.ZOMBIE_SIGHT_RANGE);
     viewSensor.sensor = true;
@@ -2528,7 +2529,6 @@ var SeekingPlayerManager = function () {
   }, {
     key: 'canSeePlayer',
     value: function canSeePlayer() {
-      //console.log( this.isPlayerInViewRange, isInDegreeRange( this, this.player, ZOMBIE_SIGHT_ANGLE ) );
       return this.isPlayerInViewRange && (0, _MathUtils.isInDegreeRange)(this, this.player, _ZombieConstants.ZOMBIE_SIGHT_ANGLE);
     }
   }, {
@@ -2541,8 +2541,6 @@ var SeekingPlayerManager = function () {
   }, {
     key: 'onCollisionEnter',
     value: function onCollisionEnter(bodyA, bodyB, shapeA) {
-      console.log(bodyA);
-
       if (this.isItSensorArea(bodyA, shapeA)) {
         if (shapeA.sensorType === 'view' && bodyA.sprite.key === 'player') {
           this.isPlayerInViewRange = true;
@@ -2554,8 +2552,6 @@ var SeekingPlayerManager = function () {
   }, {
     key: 'onCollisionLeave',
     value: function onCollisionLeave(bodyA, bodyB, shapeA) {
-      console.log(bodyA);
-
       if (this.isItSensorArea(bodyA, shapeA)) {
         if (shapeA.sensorType === 'view' && bodyA.sprite.key === 'player') {
           this.isPlayerInViewRange = false;
@@ -3079,12 +3075,12 @@ var Game = function (_Phaser$State) {
         var newZombie = new _Zombie2.default(this.game, 'zombie');
 
         newZombie.setTilePosition(this.map.paths[i][0]);
+        newZombie.initializeChasingSystem(this.player, this.map.walls);
+        // ^^ watch out this must be over 'collides'
         newZombie.body.setCollisionGroup(this.zombiesCollisionGroup);
         newZombie.body.collides([this.playerCollisionGroup, this.map.wallsCollisionGroup, this.journalsCollisionGroup, this.zombiesCollisionGroup]);
         newZombie.initializePathSystem(this.map.getPath(i), wallsPositions);
         newZombie.startPathSystem();
-
-        newZombie.initializeChasingSystem(this.player, this.map.walls);
 
         this.zombies.add(newZombie);
       }

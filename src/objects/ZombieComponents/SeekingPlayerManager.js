@@ -12,7 +12,7 @@ export default class SeekingPlayerManager {
     this.isPlayerInViewRange = false;
     this.isPlayerInHearingRange = false;
 
-    const body = this.zombie.body;
+    const body = zombie.body;
 
     const viewSensor = body.addCircle( ZOMBIE_SIGHT_RANGE );
     viewSensor.sensor = true;
@@ -51,7 +51,6 @@ export default class SeekingPlayerManager {
     return this.canSeePlayer() || this.canHearPlayer();
   }
   canSeePlayer() {
-    //console.log( this.isPlayerInViewRange, isInDegreeRange( this, this.player, ZOMBIE_SIGHT_ANGLE ) );
     return ( this.isPlayerInViewRange && isInDegreeRange( this, this.player, ZOMBIE_SIGHT_ANGLE ) );
   }
   canHearPlayer() {
@@ -59,8 +58,6 @@ export default class SeekingPlayerManager {
   }
   // TODO figure out why player is not detected
   onCollisionEnter( bodyA, bodyB, shapeA ) {
-    console.log( bodyA );
-
     if ( this.isItSensorArea( bodyA, shapeA ) ) {
       if ( shapeA.sensorType === 'view' && bodyA.sprite.key === 'player' ) {
         this.isPlayerInViewRange = true;
@@ -71,8 +68,6 @@ export default class SeekingPlayerManager {
   }
 
   onCollisionLeave( bodyA, bodyB, shapeA ) {
-    console.log( bodyA );
-
     if ( this.isItSensorArea( bodyA, shapeA ) ) {
       if ( shapeA.sensorType === 'view' && bodyA.sprite.key === 'player' ) {
         this.isPlayerInViewRange = false;

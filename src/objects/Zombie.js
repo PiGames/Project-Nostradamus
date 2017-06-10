@@ -11,6 +11,9 @@ export default class Zombie extends Entity {
   constructor( game, key, x = 0, y = 0 ) {
     super( game, x, y, key );
 
+    this.initCollider();
+    this.initAnimations();
+
     this.isPathSystemInitialized = false;
     this.walkingOnPathManager = null;
     this.rotationManager = new ZombieRotationManager( this );
@@ -18,12 +21,8 @@ export default class Zombie extends Entity {
 
     this.state = 'not-ready';
 
-    this.initCollider();
-    this.initAnimations();
-
     this.body.onBeginContact.add( this.onCollisionEnter, this );
     this.body.onEndContact.add( this.onCollisionLeave, this );
-    this.body.debug = true;
   }
   initCollider() {
     this.body.clearShapes();
@@ -60,11 +59,11 @@ export default class Zombie extends Entity {
       break;
     }
   }
-  onCollisionEnter( bodyA, bodyB, shapeA, shapeB ) {
+  onCollisionEnter( ...args ) {
     switch ( this.state ) {
     case 'walking-on-path':
-      this.walkingOnPathManager.onCollisionEnter( bodyA, bodyB, shapeA, shapeB );
-      this.seekingPlayerManager.onCollisionEnter( bodyA, bodyB, shapeA, shapeB );
+      this.walkingOnPathManager.onCollisionEnter( ...args );
+      this.seekingPlayerManager.onCollisionEnter( ...args );
     }
   }
   onCollisionLeave( ...args ) {
