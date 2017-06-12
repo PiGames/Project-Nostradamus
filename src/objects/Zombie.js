@@ -7,6 +7,15 @@ import { tileToPixels } from '../utils/MapUtils';
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 import { ZOMBIE_WALK_ANIMATION_FRAMERATE } from '../constants/ZombieConstants';
 
+/* eslint-disable no-inline-comments */
+
+const STATES = {
+  NOT_READY: 0, // zombie is created but no system is initialized
+  NOT_WALKING: 1, // walking on path manager is initialized but paths are not calculated yet
+  WALKING_ON_PATH: 2, // zombie is walking on precalculated paths
+  CHASING_PLAYER: 3, // zombie is chasing player
+};
+
 export default class Zombie extends Entity {
   constructor( game, key, x = 0, y = 0 ) {
     super( game, x, y, key );
@@ -19,7 +28,7 @@ export default class Zombie extends Entity {
     this.rotationManager = new ZombieRotationManager( this );
     this.chasingPlayerManager = null;
 
-    this.state = 'not-ready';
+    this.state = STATES.NOT_READY;
 
     this.body.onBeginContact.add( this.onCollisionEnter, this );
     this.body.onEndContact.add( this.onCollisionLeave, this );
@@ -41,10 +50,10 @@ export default class Zombie extends Entity {
   initializePathSystem( targets, walls ) {
     this.walkingOnPathManager = new ZombiePathManager( this, targets, walls );
 
-    this.state = 'not-walking';
+    this.state = STATES.NOT_WALKING;
   }
   startPathSystem() {
-    this.walkingOnPathManager.start( () => this.state = 'walking-on-path' );
+    this.walkingOnPathManager.start( () => this.state = STATES.WALKING_ON_PATH );
   }
   initializeChasingSystem( player, walls ) {
     this.seekingPlayerManager = new SeekingPlayerManager( this, player, walls );
@@ -54,24 +63,24 @@ export default class Zombie extends Entity {
   }
   update() {
     switch ( this.state ) {
-    case 'walking-on-path':
+    case STATES.WALKING_ON_PATH:
       this.handleWalkingOnPathState();
       break;
     }
   }
   onCollisionEnter( ...args ) {
     switch ( this.state ) {
-    case 'walking-on-path':
+    case STATES.WALKING_ON_PATH:
       this.walkingOnPathManager.onCollisionEnter( ...args );
       this.seekingPlayerManager.onCollisionEnter( ...args );
       break;
-    case 'chasing-player':
+    case STATES.CHASING_PLAYER:
       this.chasingPlayerManager.onCollisionEnter( ...args );
     }
   }
   onCollisionLeave( ...args ) {
     switch ( this.state ) {
-    case 'walking-on-path':
+    case STATES.WALKING_ON_PATH:
       this.seekingPlayerManager.onCollisionLeave( ...args );
     }
   }
@@ -84,9 +93,6 @@ export default class Zombie extends Entity {
     this.seekingPlayerManager.update();
   }
   changeStateToChasing() {
-    this.state = 'stop';
-    this.body.velocity.x = 0;
-    this.body.velocity.y = 0;
-    console.log( 'chase' );
+    this.state = STATES.CHASING_PLAYER;
   }
 }

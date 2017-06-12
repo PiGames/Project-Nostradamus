@@ -2242,6 +2242,14 @@ function _inherits(subClass, superClass) {
   }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 }
 
+/* eslint-disable no-inline-comments */
+
+var STATES = {
+  NOT_READY: 0, // zombie is created but no system is initialized
+  NOT_WALKING: 1, // walking on path manager is initialized but paths are not calculated yet
+  WALKING_ON_PATH: 2, // zombie is walking on precalculated paths
+  CHASING_PLAYER: 3 };
+
 var Zombie = function (_Entity) {
   _inherits(Zombie, _Entity);
 
@@ -2261,7 +2269,7 @@ var Zombie = function (_Entity) {
     _this.rotationManager = new _ZombieRotationManager2.default(_this);
     _this.chasingPlayerManager = null;
 
-    _this.state = 'not-ready';
+    _this.state = STATES.NOT_READY;
 
     _this.body.onBeginContact.add(_this.onCollisionEnter, _this);
     _this.body.onEndContact.add(_this.onCollisionLeave, _this);
@@ -2293,7 +2301,7 @@ var Zombie = function (_Entity) {
     value: function initializePathSystem(targets, walls) {
       this.walkingOnPathManager = new _ZombiePathManager2.default(this, targets, walls);
 
-      this.state = 'not-walking';
+      this.state = STATES.NOT_WALKING;
     }
   }, {
     key: 'startPathSystem',
@@ -2301,7 +2309,7 @@ var Zombie = function (_Entity) {
       var _this2 = this;
 
       this.walkingOnPathManager.start(function () {
-        return _this2.state = 'walking-on-path';
+        return _this2.state = STATES.WALKING_ON_PATH;
       });
     }
   }, {
@@ -2316,7 +2324,7 @@ var Zombie = function (_Entity) {
     key: 'update',
     value: function update() {
       switch (this.state) {
-        case 'walking-on-path':
+        case STATES.WALKING_ON_PATH:
           this.handleWalkingOnPathState();
           break;
       }
@@ -2327,11 +2335,11 @@ var Zombie = function (_Entity) {
       var _walkingOnPathManager, _seekingPlayerManager, _chasingPlayerManager;
 
       switch (this.state) {
-        case 'walking-on-path':
+        case STATES.WALKING_ON_PATH:
           (_walkingOnPathManager = this.walkingOnPathManager).onCollisionEnter.apply(_walkingOnPathManager, arguments);
           (_seekingPlayerManager = this.seekingPlayerManager).onCollisionEnter.apply(_seekingPlayerManager, arguments);
           break;
-        case 'chasing-player':
+        case STATES.CHASING_PLAYER:
           (_chasingPlayerManager = this.chasingPlayerManager).onCollisionEnter.apply(_chasingPlayerManager, arguments);
       }
     }
@@ -2341,7 +2349,7 @@ var Zombie = function (_Entity) {
       var _seekingPlayerManager2;
 
       switch (this.state) {
-        case 'walking-on-path':
+        case STATES.WALKING_ON_PATH:
           (_seekingPlayerManager2 = this.seekingPlayerManager).onCollisionLeave.apply(_seekingPlayerManager2, arguments);
       }
     }
@@ -2358,10 +2366,7 @@ var Zombie = function (_Entity) {
   }, {
     key: 'changeStateToChasing',
     value: function changeStateToChasing() {
-      this.state = 'stop';
-      this.body.velocity.x = 0;
-      this.body.velocity.y = 0;
-      console.log('chase');
+      this.state = STATES.CHASING_PLAYER;
     }
   }]);
 
