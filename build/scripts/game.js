@@ -2327,20 +2327,20 @@ var Zombie = function (_Entity) {
         case STATES.WALKING_ON_PATH:
           this.handleWalkingOnPathState();
           break;
+        case STATES.CHASING_PLAYER:
+          this.handleChasingPlayerState();
       }
     }
   }, {
     key: 'onCollisionEnter',
     value: function onCollisionEnter() {
-      var _walkingOnPathManager, _seekingPlayerManager, _chasingPlayerManager;
+      var _walkingOnPathManager, _seekingPlayerManager;
 
       switch (this.state) {
         case STATES.WALKING_ON_PATH:
           (_walkingOnPathManager = this.walkingOnPathManager).onCollisionEnter.apply(_walkingOnPathManager, arguments);
           (_seekingPlayerManager = this.seekingPlayerManager).onCollisionEnter.apply(_seekingPlayerManager, arguments);
           break;
-        case STATES.CHASING_PLAYER:
-          (_chasingPlayerManager = this.chasingPlayerManager).onCollisionEnter.apply(_chasingPlayerManager, arguments);
       }
     }
   }, {
@@ -2364,9 +2364,20 @@ var Zombie = function (_Entity) {
       this.seekingPlayerManager.update();
     }
   }, {
+    key: 'handleChasingPlayerState',
+    value: function handleChasingPlayerState() {
+      var lastKnownPlayerPosition = this.seekingPlayerManager.getLastKnownPlayerPosition();
+      this.chasingPlayerManager.update(lastKnownPlayerPosition);
+    }
+  }, {
     key: 'changeStateToChasing',
     value: function changeStateToChasing() {
       this.state = STATES.CHASING_PLAYER;
+    }
+  }, {
+    key: 'changeStateToWalking',
+    value: function changeStateToWalking() {
+      this.state = STATES.WALKING_ON_PATH;
     }
   }]);
 
@@ -2392,6 +2403,8 @@ var _createClass = function () {
   };
 }();
 
+var _ZombieConstants = require('../../constants/ZombieConstants');
+
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -2407,6 +2420,14 @@ var ChasingPlayerManager = function () {
   }
 
   _createClass(ChasingPlayerManager, [{
+    key: 'update',
+    value: function update(lastKnownPlayerPosition) {
+      this.zombie.game.physics.arcade.moveToObject(this.zombie, lastKnownPlayerPosition, _ZombieConstants.ZOMBIE_SPEED * _ZombieConstants.ZOMBIE_SPEED_CHASING_MULTIPLIER);
+      this.zombie.lookAt(lastKnownPlayerPosition.x, lastKnownPlayerPosition.y);
+
+      //TODO make zombie get back on path if it lose track of players position
+    }
+  }, {
     key: 'onCollisionEnter',
     value: function onCollisionEnter(bodyA) {
       console.log('colliision', bodyA);
@@ -2418,7 +2439,7 @@ var ChasingPlayerManager = function () {
 
 exports.default = ChasingPlayerManager;
 
-},{}],22:[function(require,module,exports){
+},{"../../constants/ZombieConstants":11}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2601,7 +2622,16 @@ var SeekingPlayerManager = function () {
   }, {
     key: 'changeStateToChasing',
     value: function changeStateToChasing() {
+      this.lastKnownPlayerPosition = Object.assign({}, this.player.position);
       this.chasePlayerSignal.dispatch();
+    }
+  }, {
+    key: 'getLastKnownPlayerPosition',
+    value: function getLastKnownPlayerPosition() {
+      if (this.canDetectPlayer()) {
+        this.lastKnownPlayerPosition = Object.assign({}, this.player.position);
+      }
+      return this.lastKnownPlayerPosition;
     }
   }]);
 
@@ -2716,8 +2746,8 @@ var ZombiePathManager = function () {
           this.moveOnTemporaryPath();
           break;
         case 'calculating-temporary-path':
-          this.zombie.velocity.x = 0;
-          this.zombie.velocity.y = 0;
+          this.zombie.body.velocity.x = 0;
+          this.zombie.body.velocity.y = 0;
           break;
       }
     }

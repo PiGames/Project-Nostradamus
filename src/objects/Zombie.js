@@ -66,6 +66,8 @@ export default class Zombie extends Entity {
     case STATES.WALKING_ON_PATH:
       this.handleWalkingOnPathState();
       break;
+    case STATES.CHASING_PLAYER:
+      this.handleChasingPlayerState();
     }
   }
   onCollisionEnter( ...args ) {
@@ -74,8 +76,6 @@ export default class Zombie extends Entity {
       this.walkingOnPathManager.onCollisionEnter( ...args );
       this.seekingPlayerManager.onCollisionEnter( ...args );
       break;
-    case STATES.CHASING_PLAYER:
-      this.chasingPlayerManager.onCollisionEnter( ...args );
     }
   }
   onCollisionLeave( ...args ) {
@@ -92,7 +92,14 @@ export default class Zombie extends Entity {
 
     this.seekingPlayerManager.update();
   }
+  handleChasingPlayerState() {
+    const lastKnownPlayerPosition = this.seekingPlayerManager.getLastKnownPlayerPosition();
+    this.chasingPlayerManager.update( lastKnownPlayerPosition );
+  }
   changeStateToChasing() {
     this.state = STATES.CHASING_PLAYER;
+  }
+  changeStateToWalking() {
+    this.state = STATES.WALKING_ON_PATH;
   }
 }

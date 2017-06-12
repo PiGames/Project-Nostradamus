@@ -81,6 +81,13 @@ export default class SeekingPlayerManager {
     return shape.sensor;
   }
   changeStateToChasing() {
+    this.lastKnownPlayerPosition = Object.assign( {}, this.player.position );
     this.chasePlayerSignal.dispatch();
+  }
+  getLastKnownPlayerPosition() {
+    if ( this.canDetectPlayer() ) {
+      this.lastKnownPlayerPosition = Object.assign( {}, this.player.position );
+    }
+    return this.lastKnownPlayerPosition;
   }
 }

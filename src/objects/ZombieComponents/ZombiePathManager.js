@@ -55,8 +55,8 @@ export default class ZombiePathManager {
       this.moveOnTemporaryPath();
       break;
     case 'calculating-temporary-path':
-      this.zombie.velocity.x = 0;
-      this.zombie.velocity.y = 0;
+      this.zombie.body.velocity.x = 0;
+      this.zombie.body.velocity.y = 0;
       break;
     }
   }
