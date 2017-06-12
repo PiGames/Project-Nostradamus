@@ -47,16 +47,14 @@ export default class SeekingPlayerManager {
         return false;
       }
     }
-
     return this.canSeePlayer() || this.canHearPlayer();
   }
   canSeePlayer() {
-    return ( this.isPlayerInViewRange && isInDegreeRange( this, this.player, ZOMBIE_SIGHT_ANGLE ) );
+    return ( this.isPlayerInViewRange && isInDegreeRange( this.zombie, this.player, ZOMBIE_SIGHT_ANGLE ) );
   }
   canHearPlayer() {
     return ( this.isPlayerInHearingRange && !this.player.isSneaking && this.player.isMoving() );
   }
-  // TODO figure out why player is not detected
   onCollisionEnter( bodyA, bodyB, shapeA ) {
     if ( this.isItSensorArea( bodyA, shapeA ) ) {
       if ( shapeA.sensorType === 'view' && bodyA.sprite.key === 'player' ) {
@@ -66,7 +64,6 @@ export default class SeekingPlayerManager {
       }
     }
   }
-
   onCollisionLeave( bodyA, bodyB, shapeA ) {
     if ( this.isItSensorArea( bodyA, shapeA ) ) {
       if ( shapeA.sensorType === 'view' && bodyA.sprite.key === 'player' ) {

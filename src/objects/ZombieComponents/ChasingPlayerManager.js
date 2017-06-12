@@ -3,4 +3,7 @@ export default class ChasingPlayerManager {
     this.zombie = zombie;
     this.player = player;
   }
+  onCollisionEnter( bodyA ) {
+    console.log( 'colliision', bodyA );
+  }
 }

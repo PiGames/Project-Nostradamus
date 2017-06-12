@@ -2324,12 +2324,15 @@ var Zombie = function (_Entity) {
   }, {
     key: 'onCollisionEnter',
     value: function onCollisionEnter() {
-      var _walkingOnPathManager, _seekingPlayerManager;
+      var _walkingOnPathManager, _seekingPlayerManager, _chasingPlayerManager;
 
       switch (this.state) {
         case 'walking-on-path':
           (_walkingOnPathManager = this.walkingOnPathManager).onCollisionEnter.apply(_walkingOnPathManager, arguments);
           (_seekingPlayerManager = this.seekingPlayerManager).onCollisionEnter.apply(_seekingPlayerManager, arguments);
+          break;
+        case 'chasing-player':
+          (_chasingPlayerManager = this.chasingPlayerManager).onCollisionEnter.apply(_chasingPlayerManager, arguments);
       }
     }
   }, {
@@ -2355,7 +2358,10 @@ var Zombie = function (_Entity) {
   }, {
     key: 'changeStateToChasing',
     value: function changeStateToChasing() {
-      console.log('chase!');
+      this.state = 'stop';
+      this.body.velocity.x = 0;
+      this.body.velocity.y = 0;
+      console.log('chase');
     }
   }]);
 
@@ -2365,11 +2371,21 @@ var Zombie = function (_Entity) {
 exports.default = Zombie;
 
 },{"../constants/TileMapConstants":9,"../constants/ZombieConstants":11,"../utils/MapUtils":32,"./Entity":15,"./ZombieComponents/ChasingPlayerManager":21,"./ZombieComponents/SeekingPlayerManager":23,"./ZombieComponents/ZombiePathManager":24,"./ZombieComponents/ZombieRotationManager":25}],21:[function(require,module,exports){
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -2377,12 +2393,23 @@ function _classCallCheck(instance, Constructor) {
   }
 }
 
-var ChasingPlayerManager = function ChasingPlayerManager(zombie, player) {
-  _classCallCheck(this, ChasingPlayerManager);
+var ChasingPlayerManager = function () {
+  function ChasingPlayerManager(zombie, player) {
+    _classCallCheck(this, ChasingPlayerManager);
 
-  this.zombie = zombie;
-  this.player = player;
-};
+    this.zombie = zombie;
+    this.player = player;
+  }
+
+  _createClass(ChasingPlayerManager, [{
+    key: 'onCollisionEnter',
+    value: function onCollisionEnter(bodyA) {
+      console.log('colliision', bodyA);
+    }
+  }]);
+
+  return ChasingPlayerManager;
+}();
 
 exports.default = ChasingPlayerManager;
 
@@ -2523,21 +2550,18 @@ var SeekingPlayerManager = function () {
           return false;
         }
       }
-
       return this.canSeePlayer() || this.canHearPlayer();
     }
   }, {
     key: 'canSeePlayer',
     value: function canSeePlayer() {
-      return this.isPlayerInViewRange && (0, _MathUtils.isInDegreeRange)(this, this.player, _ZombieConstants.ZOMBIE_SIGHT_ANGLE);
+      return this.isPlayerInViewRange && (0, _MathUtils.isInDegreeRange)(this.zombie, this.player, _ZombieConstants.ZOMBIE_SIGHT_ANGLE);
     }
   }, {
     key: 'canHearPlayer',
     value: function canHearPlayer() {
       return this.isPlayerInHearingRange && !this.player.isSneaking && this.player.isMoving();
     }
-    // TODO figure out why player is not detected
-
   }, {
     key: 'onCollisionEnter',
     value: function onCollisionEnter(bodyA, bodyB, shapeA) {

@@ -64,6 +64,9 @@ export default class Zombie extends Entity {
     case 'walking-on-path':
       this.walkingOnPathManager.onCollisionEnter( ...args );
       this.seekingPlayerManager.onCollisionEnter( ...args );
+      break;
+    case 'chasing-player':
+      this.chasingPlayerManager.onCollisionEnter( ...args );
     }
   }
   onCollisionLeave( ...args ) {
@@ -81,6 +84,9 @@ export default class Zombie extends Entity {
     this.seekingPlayerManager.update();
   }
   changeStateToChasing() {
-    console.log( 'chase!' );
+    this.state = 'stop';
+    this.body.velocity.x = 0;
+    this.body.velocity.y = 0;
+    console.log( 'chase' );
   }
 }
