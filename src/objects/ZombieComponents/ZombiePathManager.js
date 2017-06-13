@@ -1,7 +1,7 @@
 import PathFinder from './PathFinder';
 import { willZombiesPathsInterfere } from '../../utils/DeterminePathCollisionUtils';
 import { getFreeTileAroundZombieExcludingOtherZombie } from '../../utils/HandlePathCollisionUtils';
-import { tileToPixels } from '../../utils/MapUtils';
+import { tileToPixels, pixelsToTile } from '../../utils/MapUtils';
 import { MIN_DISTANCE_TO_TARGET } from '../../constants/ZombieConstants';
 
 export default class ZombiePathManager {
@@ -146,5 +146,9 @@ export default class ZombiePathManager {
       return this.getTemporaryStepTarget();
     }
     throw new Error( 'No current tile target defined' );
+  }
+  getBackOnPath() {
+    const zombieTile = pixelsToTile( this.zombie );
+    this.changePathToTemporary( zombieTile );
   }
 }

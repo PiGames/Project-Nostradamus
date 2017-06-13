@@ -60,6 +60,7 @@ export default class Zombie extends Entity {
     this.seekingPlayerManager.chasePlayerSignal.add( this.changeStateToChasing, this );
 
     this.chasingPlayerManager = new ChasingPlayerManager( this, player );
+    this.chasingPlayerManager.stopChasingPlayerSignal.add( this.changeStateToWalking, this );
   }
   update() {
     switch ( this.state ) {
@@ -100,6 +101,7 @@ export default class Zombie extends Entity {
     this.state = STATES.CHASING_PLAYER;
   }
   changeStateToWalking() {
+    this.walkingOnPathManager.getBackOnPath();
     this.state = STATES.WALKING_ON_PATH;
   }
 }

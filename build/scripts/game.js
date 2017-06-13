@@ -2319,6 +2319,7 @@ var Zombie = function (_Entity) {
       this.seekingPlayerManager.chasePlayerSignal.add(this.changeStateToChasing, this);
 
       this.chasingPlayerManager = new _ChasingPlayerManager2.default(this, player);
+      this.chasingPlayerManager.stopChasingPlayerSignal.add(this.changeStateToWalking, this);
     }
   }, {
     key: 'update',
@@ -2377,6 +2378,7 @@ var Zombie = function (_Entity) {
   }, {
     key: 'changeStateToWalking',
     value: function changeStateToWalking() {
+      this.walkingOnPathManager.getBackOnPath();
       this.state = STATES.WALKING_ON_PATH;
     }
   }]);
@@ -2417,6 +2419,8 @@ var ChasingPlayerManager = function () {
 
     this.zombie = zombie;
     this.player = player;
+
+    this.stopChasingPlayerSignal = new Phaser.Signal();
   }
 
   _createClass(ChasingPlayerManager, [{
@@ -2425,7 +2429,20 @@ var ChasingPlayerManager = function () {
       this.zombie.game.physics.arcade.moveToObject(this.zombie, lastKnownPlayerPosition, _ZombieConstants.ZOMBIE_SPEED * _ZombieConstants.ZOMBIE_SPEED_CHASING_MULTIPLIER);
       this.zombie.lookAt(lastKnownPlayerPosition.x, lastKnownPlayerPosition.y);
 
-      //TODO make zombie get back on path if it lose track of players position
+      if (this.shouldZombieStopChasingPlayer(lastKnownPlayerPosition)) {
+        this.stopChasingPlayer();
+      }
+    }
+  }, {
+    key: 'shouldZombieStopChasingPlayer',
+    value: function shouldZombieStopChasingPlayer(lastKnownPlayerPosition) {
+      var distanceToTarget = this.zombie.game.physics.arcade.distanceBetween(this.zombie, lastKnownPlayerPosition);
+      return (this.player.x !== lastKnownPlayerPosition.x || this.player.y !== lastKnownPlayerPosition.y) && distanceToTarget <= _ZombieConstants.MIN_DISTANCE_TO_TARGET;
+    }
+  }, {
+    key: 'stopChasingPlayer',
+    value: function stopChasingPlayer() {
+      this.stopChasingPlayerSignal.dispatch();
     }
   }, {
     key: 'onCollisionEnter',
@@ -2863,6 +2880,12 @@ var ZombiePathManager = function () {
         return this.getTemporaryStepTarget();
       }
       throw new Error('No current tile target defined');
+    }
+  }, {
+    key: 'getBackOnPath',
+    value: function getBackOnPath() {
+      var zombieTile = (0, _MapUtils.pixelsToTile)(this.zombie);
+      this.changePathToTemporary(zombieTile);
     }
   }]);
 
