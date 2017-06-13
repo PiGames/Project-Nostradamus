@@ -104,4 +104,7 @@ export default class Zombie extends Entity {
     this.walkingOnPathManager.getBackOnPath();
     this.state = STATES.WALKING_ON_PATH;
   }
+  isChasing() {
+    return this.state === STATES.CHASING_PLAYER;
+  }
 }

@@ -1019,7 +1019,7 @@ var ProjectNostradamus = function (_Phaser$Game) {
 
 exports.default = ProjectNostradamus;
 
-},{"./levels/Level1":13,"./levels/Level2":14,"./states/Boot":26,"./states/Menu":28,"./states/Preload":29}],7:[function(require,module,exports){
+},{"./levels/Level1":13,"./levels/Level2":14,"./states/Boot":27,"./states/Menu":29,"./states/Preload":30}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1203,7 +1203,7 @@ var Level1 = function (_Game) {
 
 exports.default = Level1;
 
-},{"../states/Game.js":27}],14:[function(require,module,exports){
+},{"../states/Game.js":28}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1276,7 +1276,234 @@ var Level2 = function (_Game) {
 
 exports.default = Level2;
 
-},{"../states/Game.js":27}],15:[function(require,module,exports){
+},{"../states/Game.js":28}],15:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
+
+var _TileMapConstants = require('../constants/TileMapConstants');
+
+var _MapUtils = require('../utils/MapUtils.js');
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+function _possibleConstructorReturn(self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }return call && (typeof call === "object" || typeof call === "function") ? call : self;
+}
+
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+}
+
+var ZombiesBoidsManager = function (_Phaser$Group) {
+  _inherits(ZombiesBoidsManager, _Phaser$Group);
+
+  function ZombiesBoidsManager(game, mapGrid) {
+    var boidsDistance = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : Math.max(_TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT);
+    var distanceBetweenBoidsAndWalls = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : boidsDistance;
+
+    _classCallCheck(this, ZombiesBoidsManager);
+
+    var _this = _possibleConstructorReturn(this, (ZombiesBoidsManager.__proto__ || Object.getPrototypeOf(ZombiesBoidsManager)).call(this, game));
+
+    _this.entities = _this.children;
+    _this.mapGrid = mapGrid;
+    _this.boidsDistance = boidsDistance;
+    _this.distanceBetweenBoidsAndWalls = distanceBetweenBoidsAndWalls;
+    _this.game = game;
+    return _this;
+  }
+
+  _createClass(ZombiesBoidsManager, [{
+    key: 'update',
+    value: function update() {
+      Phaser.Group.prototype.update.call(this);
+
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = this.entities[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var boid = _step.value;
+
+          if (boid.isChasing() === false) {
+            continue;
+          }
+          var velocity1 = this.flyTowardsMassCenterRule(boid);
+          var velocity2 = this.keepSmallDistanceFromObstaclesRule(boid);
+          var velocity3 = this.tryMatchingOtherEnitiesVelocityRule(boid);
+
+          boid.body.velocity.x += velocity1.x + velocity2.x + velocity3.x;
+          boid.body.velocity.y += velocity1.y + velocity2.y + velocity3.y;
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+    }
+  }, {
+    key: 'flyTowardsMassCenterRule',
+    value: function flyTowardsMassCenterRule(boid) {
+      var velocity = { x: 0, y: 0 };
+
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = this.entities[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var entity = _step2.value;
+
+          if (entity === boid) {
+            continue;
+          }
+          velocity.x += entity.body.x;
+          velocity.y += entity.body.y;
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+
+      velocity.x = velocity.x / (this.entities.length - 1) / 100;
+      velocity.y = velocity.y / (this.entities.length - 1) / 100;
+
+      return velocity;
+    }
+  }, {
+    key: 'keepSmallDistanceFromObstaclesRule',
+    value: function keepSmallDistanceFromObstaclesRule(boid) {
+      var velocity = { x: 0, y: 0 };
+
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
+
+      try {
+        for (var _iterator3 = this.entities[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var otherBoid = _step3.value;
+
+          if (otherBoid === boid) {
+            continue;
+          }
+          if (this.game.physics.arcade.distanceBetween(otherBoid, boid) <= this.boidsDistance) {
+            velocity.x -= otherBoid.body.x - boid.body.x;
+            velocity.y -= otherBoid.body.y - boid.body.y;
+          }
+        }
+      } catch (err) {
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion3 && _iterator3.return) {
+            _iterator3.return();
+          }
+        } finally {
+          if (_didIteratorError3) {
+            throw _iteratorError3;
+          }
+        }
+      }
+
+      var wallBodies = this.getAdjoiningWallBodies(boid);
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
+
+      try {
+        for (var _iterator4 = wallBodies[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          var wallBody = _step4.value;
+
+          if (this.game.physics.arcade.distanceBetween(wallBody, boid) <= this.distanceBetweenBoidsAndWalls) {
+            velocity.x -= wallBody.x - boid.body.x;
+            velocity.y -= wallBody.y - boid.body.y;
+          }
+        }
+      } catch (err) {
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion4 && _iterator4.return) {
+            _iterator4.return();
+          }
+        } finally {
+          if (_didIteratorError4) {
+            throw _iteratorError4;
+          }
+        }
+      }
+
+      return velocity;
+    }
+  }, {
+    key: 'getAdjoiningWallBodies',
+    value: function getAdjoiningWallBodies(entity) {
+      var _this2 = this;
+
+      var entityTile = (0, _MapUtils.pixelsToTile)(entity);
+      var adjoiningTiles = [{ x: entityTile.x - 1, y: entityTile.y - 1 }, { x: entityTile.x - 1, y: entityTile.y }, { x: entityTile.x - 1, y: entityTile.y + 1 }, { x: entityTile.x, y: entityTile.y - 1 }, { x: entityTile.x, y: entityTile.y + 1 }, { x: entityTile.x + 1, y: entityTile.y - 1 }, { x: entityTile.x + 1, y: entityTile.y }, { x: entityTile.x + 1, y: entityTile.y + 1 }];
+
+      var adjoiningWallTiles = adjoiningTiles.filter(function (tile) {
+        return _this2.mapGrid[tile.y][tile.x] === 1;
+      });
+      return adjoiningWallTiles.map(_MapUtils.tileToPixels);
+    }
+  }, {
+    key: 'tryMatchingOtherEnitiesVelocityRule',
+    value: function tryMatchingOtherEnitiesVelocityRule() {
+      return { x: 0, y: 0 };
+    }
+  }]);
+
+  return ZombiesBoidsManager;
+}(Phaser.Group);
+
+exports.default = ZombiesBoidsManager;
+
+},{"../constants/TileMapConstants":9,"../utils/MapUtils.js":33}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1375,7 +1602,7 @@ var Entity = function (_Phaser$Sprite) {
 
 exports.default = Entity;
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1481,7 +1708,7 @@ var Journal = function (_Phaser$Sprite) {
 
 exports.default = Journal;
 
-},{"../constants/ItemConstants":7,"../constants/TileMapConstants":9}],17:[function(require,module,exports){
+},{"../constants/ItemConstants":7,"../constants/TileMapConstants":9}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1687,7 +1914,7 @@ var JournalsManager = function (_Phaser$Group) {
 
 exports.default = JournalsManager;
 
-},{"../constants/ItemConstants":7,"../utils/UserInterfaceUtils":34}],18:[function(require,module,exports){
+},{"../constants/ItemConstants":7,"../utils/UserInterfaceUtils":35}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1989,7 +2216,7 @@ var Player = function (_Entity) {
 
 exports.default = Player;
 
-},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"./Entity":15}],19:[function(require,module,exports){
+},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"./Entity":16}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2177,7 +2404,7 @@ var TileMap = function (_Phaser$Tilemap) {
 
 exports.default = TileMap;
 
-},{"../utils/MapUtils.js":32}],20:[function(require,module,exports){
+},{"../utils/MapUtils.js":33}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2381,6 +2608,11 @@ var Zombie = function (_Entity) {
       this.walkingOnPathManager.getBackOnPath();
       this.state = STATES.WALKING_ON_PATH;
     }
+  }, {
+    key: 'isChasing',
+    value: function isChasing() {
+      return this.state === STATES.CHASING_PLAYER;
+    }
   }]);
 
   return Zombie;
@@ -2388,7 +2620,7 @@ var Zombie = function (_Entity) {
 
 exports.default = Zombie;
 
-},{"../constants/TileMapConstants":9,"../constants/ZombieConstants":11,"../utils/MapUtils":32,"./Entity":15,"./ZombieComponents/ChasingPlayerManager":21,"./ZombieComponents/SeekingPlayerManager":23,"./ZombieComponents/ZombiePathManager":24,"./ZombieComponents/ZombieRotationManager":25}],21:[function(require,module,exports){
+},{"../constants/TileMapConstants":9,"../constants/ZombieConstants":11,"../utils/MapUtils":33,"./Entity":16,"./ZombieComponents/ChasingPlayerManager":22,"./ZombieComponents/SeekingPlayerManager":24,"./ZombieComponents/ZombiePathManager":25,"./ZombieComponents/ZombieRotationManager":26}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2456,7 +2688,7 @@ var ChasingPlayerManager = function () {
 
 exports.default = ChasingPlayerManager;
 
-},{"../../constants/ZombieConstants":11}],22:[function(require,module,exports){
+},{"../../constants/ZombieConstants":11}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2514,7 +2746,7 @@ var PathFinder = function () {
 
 exports.default = PathFinder;
 
-},{"easystarjs":1}],23:[function(require,module,exports){
+},{"easystarjs":1}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2657,7 +2889,7 @@ var SeekingPlayerManager = function () {
 
 exports.default = SeekingPlayerManager;
 
-},{"../../constants/ZombieConstants":11,"../../utils/MathUtils":33}],24:[function(require,module,exports){
+},{"../../constants/ZombieConstants":11,"../../utils/MathUtils":34}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2894,7 +3126,7 @@ var ZombiePathManager = function () {
 
 exports.default = ZombiePathManager;
 
-},{"../../constants/ZombieConstants":11,"../../utils/DeterminePathCollisionUtils":30,"../../utils/HandlePathCollisionUtils":31,"../../utils/MapUtils":32,"./PathFinder":22}],25:[function(require,module,exports){
+},{"../../constants/ZombieConstants":11,"../../utils/DeterminePathCollisionUtils":31,"../../utils/HandlePathCollisionUtils":32,"../../utils/MapUtils":33,"./PathFinder":23}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2975,7 +3207,7 @@ var ZombieRotationManager = function () {
 
 exports.default = ZombieRotationManager;
 
-},{"../../constants/ZombieConstants":11,"../../utils/MapUtils":32}],26:[function(require,module,exports){
+},{"../../constants/ZombieConstants":11,"../../utils/MapUtils":33}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3044,7 +3276,7 @@ var Boot = function (_Phaser$State) {
 
 exports.default = Boot;
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3080,6 +3312,10 @@ var _JournalsManager2 = _interopRequireDefault(_JournalsManager);
 var _Journal = require('../objects/Journal');
 
 var _Journal2 = _interopRequireDefault(_Journal);
+
+var _BoidsManager = require('../objects/BoidsManager');
+
+var _BoidsManager2 = _interopRequireDefault(_BoidsManager);
 
 var _PlayerConstants = require('../constants/PlayerConstants');
 
@@ -3128,7 +3364,8 @@ var Game = function (_Phaser$State) {
       var _this2 = this;
 
       this.map = new _TileMap2.default(this.game, 'map', _TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT);
-      this.zombies = new Phaser.Group(this.game);
+      var wallsPositions = (0, _MapUtils.getWallsPositions)(this.map.walls);
+      this.zombies = new _BoidsManager2.default(this.game, wallsPositions);
       var playerPos = this.map.getPlayerInitialPosition();
       this.player = new _Player2.default(this.game, playerPos.x, playerPos.y, 'player', _PlayerConstants.PLAYER_INITIAL_FRAME, this.zombies);
 
@@ -3152,7 +3389,6 @@ var Game = function (_Phaser$State) {
       this.player.body.collides([this.map.wallsCollisionGroup]);
 
       // init zombies
-      var wallsPositions = (0, _MapUtils.getWallsPositions)(this.map.walls);
       for (var i = 0; i < this.map.paths.length; i++) {
         var newZombie = new _Zombie2.default(this.game, 'zombie');
 
@@ -3166,6 +3402,7 @@ var Game = function (_Phaser$State) {
 
         this.zombies.add(newZombie);
       }
+
       this.player.body.collides([this.zombiesCollisionGroup]);
       this.map.collides([this.zombiesCollisionGroup]);
 
@@ -3277,7 +3514,7 @@ var Game = function (_Phaser$State) {
 
 exports.default = Game;
 
-},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"../constants/UserInterfaceConstants":10,"../objects/Journal":16,"../objects/JournalsManager":17,"../objects/Player":18,"../objects/TileMap":19,"../objects/Zombie":20,"../utils/MapUtils":32,"../utils/UserInterfaceUtils":34}],28:[function(require,module,exports){
+},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"../constants/UserInterfaceConstants":10,"../objects/BoidsManager":15,"../objects/Journal":17,"../objects/JournalsManager":18,"../objects/Player":19,"../objects/TileMap":20,"../objects/Zombie":21,"../utils/MapUtils":33,"../utils/UserInterfaceUtils":35}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3346,7 +3583,7 @@ var Menu = function (_Phaser$State) {
 
 exports.default = Menu;
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3422,7 +3659,7 @@ var Preload = function (_Phaser$State) {
 
 exports.default = Preload;
 
-},{"../constants/PlayerConstants.js":8,"../constants/ZombieConstants.js":11}],30:[function(require,module,exports){
+},{"../constants/PlayerConstants.js":8,"../constants/ZombieConstants.js":11}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3500,7 +3737,7 @@ function isZombieInMovement(zombie) {
   return zombie.state !== 'calculating-temporary-path' && zombie.state !== 'not-started';
 }
 
-},{"./MapUtils":32}],31:[function(require,module,exports){
+},{"./MapUtils":33}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3586,7 +3823,7 @@ function getTileCandidates(tile) {
   return [{ x: tile.x, y: tile.y - 1 }, { x: tile.x, y: tile.y + 1 }, { x: tile.x - 1, y: tile.y }, { x: tile.x + 1, y: tile.y }];
 }
 
-},{"./MapUtils":32}],32:[function(require,module,exports){
+},{"./MapUtils":33}],33:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3643,7 +3880,7 @@ var getWallsPositions = exports.getWallsPositions = function getWallsPositions(l
   return wallsArr;
 };
 
-},{"../constants/TileMapConstants":9}],33:[function(require,module,exports){
+},{"../constants/TileMapConstants":9}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3656,7 +3893,7 @@ function isInDegreeRange(entity, target, sightAngle) {
   return angleDelta <= sightAngle || angleDelta >= 360 - sightAngle;
 }
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

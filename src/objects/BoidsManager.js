@@ -1,17 +1,20 @@
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 import { pixelsToTile, tileToPixels } from '../utils/MapUtils.js';
 
-export default class BoidsManager {
-  constructor( game, entities, mapGrid, boidsDistance = Math.max( TILE_WIDTH, TILE_HEIGHT ), distanceBetweenBoidsAndWalls = boidsDistance ) {
-    this.entities = entities;
+export default class ZombiesBoidsManager extends Phaser.Group {
+  constructor( game, mapGrid, boidsDistance = Math.max( TILE_WIDTH, TILE_HEIGHT ), distanceBetweenBoidsAndWalls = boidsDistance ) {
+    super( game );
+    this.entities = this.children;
     this.mapGrid = mapGrid;
     this.boidsDistance = boidsDistance;
     this.distanceBetweenBoidsAndWalls = distanceBetweenBoidsAndWalls;
     this.game = game;
   }
   update() {
+    Phaser.Group.prototype.update.call( this );
+
     for ( const boid of this.entities ) {
-      if ( boid.isChasing === false ) {
+      if ( boid.isChasing() === false ) {
         continue;
       }
       const velocity1 = this.flyTowardsMassCenterRule( boid );

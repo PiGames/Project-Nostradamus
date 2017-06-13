@@ -3,6 +3,7 @@ import Zombie from '../objects/Zombie';
 import TileMap from '../objects/TileMap';
 import JournalsManager from '../objects/JournalsManager';
 import Journal from '../objects/Journal';
+import BoidsManager from '../objects/BoidsManager';
 
 import { PLAYER_INITIAL_FRAME } from '../constants/PlayerConstants';
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
@@ -15,7 +16,8 @@ export default class Game extends Phaser.State {
   create() {
 
     this.map = new TileMap( this.game, 'map', TILE_WIDTH, TILE_HEIGHT );
-    this.zombies = new Phaser.Group( this.game );
+    const wallsPositions = getWallsPositions( this.map.walls );
+    this.zombies = new BoidsManager( this.game, wallsPositions );
     const playerPos = this.map.getPlayerInitialPosition();
     this.player = new Player( this.game, playerPos.x, playerPos.y, 'player', PLAYER_INITIAL_FRAME, this.zombies );
 
@@ -39,7 +41,6 @@ export default class Game extends Phaser.State {
     this.player.body.collides( [ this.map.wallsCollisionGroup ] );
 
     // init zombies
-    const wallsPositions = getWallsPositions( this.map.walls );
     for ( let i = 0; i < this.map.paths.length; i++ ) {
       const newZombie = new Zombie( this.game, 'zombie' );
 
@@ -53,6 +54,7 @@ export default class Game extends Phaser.State {
 
       this.zombies.add( newZombie );
     }
+
     this.player.body.collides( [ this.zombiesCollisionGroup ] );
     this.map.collides( [ this.zombiesCollisionGroup ] );
 
