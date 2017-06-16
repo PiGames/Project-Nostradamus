@@ -193,8 +193,7 @@ export default class Player extends Entity {
 
   takeDamage( damage ) {
     if ( !this.godMode ) {
-      this.damage( damage );
-      this.health = Math.floor( this.health * 100 ) / 100;
+      Entity.prototype.takeDamage.call( this, [ damage ] );
     }
     this.drawHealthBar();
 

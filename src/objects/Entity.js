@@ -39,6 +39,10 @@ class Entity extends Phaser.Sprite {
 
     return angleDelta <= sightAngle || angleDelta >= ( 360 - sightAngle );
   }
+  takeDamage( damage ) {
+    this.damage( damage );
+    this.health = Math.floor( this.health * 100 ) / 100;
+  }
 }
 
 export default Entity;

@@ -17,7 +17,6 @@ export default class JournalsManager extends Phaser.Group {
     this.game.input.keyboard.removeKeyCapture( Phaser.Keyboard.ESC );
 
     this.isJournalOpened = false;
-    console.log( this.children );
   }
   tryToShowJournal() {
     if ( this.isJournalOpened ) {

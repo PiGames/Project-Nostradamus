@@ -52,6 +52,8 @@ export default class Game extends Phaser.State {
       newZombie.initializePathSystem( this.map.getPath( i ), wallsPositions );
       newZombie.startPathSystem();
 
+      this.player.onDeath.add( () => newZombie.onPlayerDeath() );
+
       this.zombies.add( newZombie );
     }
 

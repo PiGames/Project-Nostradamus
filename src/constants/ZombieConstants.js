@@ -15,3 +15,4 @@ export const ZOMBIE_ROTATING_SPEED = 50;
 export const ZOMBIE_DAMAGE_MULTIPLIER = 1;
 export const ZOMBIE_DAMAGE_COOLDOWN = 0.2;
 export const ZOMBIE_WARN_RANGE = 500;
+export const ZOMBIE_DAMAGE_VALUE = 0.1;

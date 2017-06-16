@@ -23,9 +23,12 @@ export default class SeekingPlayerManager {
     hearSensor.sensorType = 'hear';
 
     this.chasePlayerSignal = new Phaser.Signal();
+
+    this.shouldLookForThePlayer = true;
   }
   update() {
-    if ( this.canDetectPlayer() ) {
+
+    if ( this.shouldLookForThePlayer && this.canDetectPlayer() ) {
       this.changeStateToChasing();
     }
   }
@@ -89,5 +92,8 @@ export default class SeekingPlayerManager {
       this.lastKnownPlayerPosition = Object.assign( {}, this.player.position );
     }
     return this.lastKnownPlayerPosition;
+  }
+  stopLookingForThePlayer() {
+    this.shouldLookForThePlayer = false;
   }
 }

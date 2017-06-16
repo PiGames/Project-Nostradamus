@@ -145,7 +145,7 @@ export default class ZombiePathManager {
     } else if ( this.state === 'on-temporary-path' ) {
       return this.getTemporaryStepTarget();
     }
-    throw new Error( 'No current tile target defined' );
+    return pixelsToTile( this.zombie );
   }
   getBackOnPath() {
     const zombieTile = pixelsToTile( this.zombie );

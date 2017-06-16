@@ -1095,6 +1095,7 @@ var ZOMBIE_ROTATING_SPEED = exports.ZOMBIE_ROTATING_SPEED = 50;
 var ZOMBIE_DAMAGE_MULTIPLIER = exports.ZOMBIE_DAMAGE_MULTIPLIER = 1;
 var ZOMBIE_DAMAGE_COOLDOWN = exports.ZOMBIE_DAMAGE_COOLDOWN = 0.2;
 var ZOMBIE_WARN_RANGE = exports.ZOMBIE_WARN_RANGE = 500;
+var ZOMBIE_DAMAGE_VALUE = exports.ZOMBIE_DAMAGE_VALUE = 0.1;
 
 },{}],12:[function(require,module,exports){
 'use strict';
@@ -1595,6 +1596,12 @@ var Entity = function (_Phaser$Sprite) {
 
       return angleDelta <= sightAngle || angleDelta >= 360 - sightAngle;
     }
+  }, {
+    key: "takeDamage",
+    value: function takeDamage(damage) {
+      this.damage(damage);
+      this.health = Math.floor(this.health * 100) / 100;
+    }
   }]);
 
   return Entity;
@@ -1767,7 +1774,6 @@ var JournalsManager = function (_Phaser$Group) {
     _this.game.input.keyboard.removeKeyCapture(Phaser.Keyboard.ESC);
 
     _this.isJournalOpened = false;
-    console.log(_this.children);
     return _this;
   }
 
@@ -2170,8 +2176,7 @@ var Player = function (_Entity) {
     key: 'takeDamage',
     value: function takeDamage(damage) {
       if (!this.godMode) {
-        this.damage(damage);
-        this.health = Math.floor(this.health * 100) / 100;
+        _Entity3.default.prototype.takeDamage.call(this, [damage]);
       }
       this.drawHealthBar();
 
@@ -2562,23 +2567,30 @@ var Zombie = function (_Entity) {
   }, {
     key: 'onCollisionEnter',
     value: function onCollisionEnter() {
-      var _walkingOnPathManager, _seekingPlayerManager;
+      var _walkingOnPathManager, _seekingPlayerManager, _chasingPlayerManager;
 
       switch (this.state) {
         case STATES.WALKING_ON_PATH:
           (_walkingOnPathManager = this.walkingOnPathManager).onCollisionEnter.apply(_walkingOnPathManager, arguments);
           (_seekingPlayerManager = this.seekingPlayerManager).onCollisionEnter.apply(_seekingPlayerManager, arguments);
           break;
+        case STATES.CHASING_PLAYER:
+          (_chasingPlayerManager = this.chasingPlayerManager).onCollisionEnter.apply(_chasingPlayerManager, arguments);
+          break;
       }
     }
   }, {
     key: 'onCollisionLeave',
     value: function onCollisionLeave() {
-      var _seekingPlayerManager2;
+      var _seekingPlayerManager2, _chasingPlayerManager2;
 
       switch (this.state) {
         case STATES.WALKING_ON_PATH:
           (_seekingPlayerManager2 = this.seekingPlayerManager).onCollisionLeave.apply(_seekingPlayerManager2, arguments);
+          break;
+        case STATES.CHASING_PLAYER:
+          (_chasingPlayerManager2 = this.chasingPlayerManager).onCollisionLeave.apply(_chasingPlayerManager2, arguments);
+          break;
       }
     }
   }, {
@@ -2613,6 +2625,23 @@ var Zombie = function (_Entity) {
     value: function isChasing() {
       return this.state === STATES.CHASING_PLAYER;
     }
+  }, {
+    key: 'takeDamage',
+    value: function takeDamage(damage) {
+      _Entity3.default.prototype.takeDamage.call(this, [damage]);
+      if (this.health <= 0) {
+        this.destroy();
+      }
+    }
+  }, {
+    key: 'onPlayerDeath',
+    value: function onPlayerDeath() {
+      this.seekingPlayerManager.stopLookingForThePlayer();
+
+      if (this.isChasing()) {
+        this.changeStateToWalking();
+      }
+    }
   }]);
 
   return Zombie;
@@ -2639,6 +2668,20 @@ var _createClass = function () {
 
 var _ZombieConstants = require('../../constants/ZombieConstants');
 
+var CONSTANTS = _interopRequireWildcard(_ZombieConstants);
+
+function _interopRequireWildcard(obj) {
+  if (obj && obj.__esModule) {
+    return obj;
+  } else {
+    var newObj = {};if (obj != null) {
+      for (var key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+      }
+    }newObj.default = obj;return newObj;
+  }
+}
+
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -2653,23 +2696,35 @@ var ChasingPlayerManager = function () {
     this.player = player;
 
     this.stopChasingPlayerSignal = new Phaser.Signal();
+
+    // attack system init
+    this.canDealDamage = true;
+    this.isInAttackRange = false;
+
+    var attackSensor = this.zombie.body.addCircle(CONSTANTS.ZOMBIE_ATTACK_RANGE);
+    attackSensor.sensor = true;
+    attackSensor.sensorType = 'attack';
   }
 
   _createClass(ChasingPlayerManager, [{
     key: 'update',
     value: function update(lastKnownPlayerPosition) {
-      this.zombie.game.physics.arcade.moveToObject(this.zombie, lastKnownPlayerPosition, _ZombieConstants.ZOMBIE_SPEED * _ZombieConstants.ZOMBIE_SPEED_CHASING_MULTIPLIER);
+      this.zombie.game.physics.arcade.moveToObject(this.zombie, lastKnownPlayerPosition, CONSTANTS.ZOMBIE_SPEED * CONSTANTS.ZOMBIE_SPEED_CHASING_MULTIPLIER);
       this.zombie.lookAt(lastKnownPlayerPosition.x, lastKnownPlayerPosition.y);
 
       if (this.shouldZombieStopChasingPlayer(lastKnownPlayerPosition)) {
         this.stopChasingPlayer();
+      }
+
+      if (this.shouldAttack()) {
+        this.handleAttack();
       }
     }
   }, {
     key: 'shouldZombieStopChasingPlayer',
     value: function shouldZombieStopChasingPlayer(lastKnownPlayerPosition) {
       var distanceToTarget = this.zombie.game.physics.arcade.distanceBetween(this.zombie, lastKnownPlayerPosition);
-      return (this.player.x !== lastKnownPlayerPosition.x || this.player.y !== lastKnownPlayerPosition.y) && distanceToTarget <= _ZombieConstants.MIN_DISTANCE_TO_TARGET;
+      return (this.player.x !== lastKnownPlayerPosition.x || this.player.y !== lastKnownPlayerPosition.y) && distanceToTarget <= CONSTANTS.MIN_DISTANCE_TO_TARGET;
     }
   }, {
     key: 'stopChasingPlayer',
@@ -2678,8 +2733,43 @@ var ChasingPlayerManager = function () {
     }
   }, {
     key: 'onCollisionEnter',
-    value: function onCollisionEnter(bodyA) {
-      console.log('colliision', bodyA);
+    value: function onCollisionEnter(bodyA, bodyB, shapeA) {
+      if (bodyA == null || bodyA.sprite == null) {
+        return;
+      }
+      if (shapeA.sensorType === 'attack' && bodyA.sprite.key === 'player') {
+        this.isInAttackRange = true;
+      }
+    }
+  }, {
+    key: 'onCollisionLeave',
+    value: function onCollisionLeave(bodyA, bodyB, shapeA) {
+      if (bodyA == null || bodyA.sprite == null) {
+        return;
+      }
+      if (shapeA.sensorType === 'attack' && bodyA.sprite.key === 'player') {
+        this.isInAttackRange = false;
+      }
+    }
+  }, {
+    key: 'shouldAttack',
+    value: function shouldAttack() {
+      return this.zombie.alive && this.canDealDamage && this.isInAttackRange;
+    }
+  }, {
+    key: 'handleAttack',
+    value: function handleAttack() {
+      this.zombie.animations.play('attack', CONSTANTS.ZOMBIE_FIGHT_ANIMATION_FRAMERATE, false);
+      this.player.takeDamage(CONSTANTS.ZOMBIE_DAMAGE_VALUE);
+      this.canDealDamage = false;
+      this.zombie.game.time.events.add(Phaser.Timer.SECOND * CONSTANTS.ZOMBIE_DAMAGE_COOLDOWN, this.endCooldown, this);
+      this.zombie.game.camera.shake(0.005, 100, false);
+    }
+  }, {
+    key: 'endCooldown',
+    value: function endCooldown() {
+      this.canDealDamage = true;
+      this.zombie.animations.play('walk', CONSTANTS.ZOMBIE_WALK_ANIMATION_FRAMERATE, true);
     }
   }]);
 
@@ -2797,12 +2887,15 @@ var SeekingPlayerManager = function () {
     hearSensor.sensorType = 'hear';
 
     this.chasePlayerSignal = new Phaser.Signal();
+
+    this.shouldLookForThePlayer = true;
   }
 
   _createClass(SeekingPlayerManager, [{
     key: 'update',
     value: function update() {
-      if (this.canDetectPlayer()) {
+
+      if (this.shouldLookForThePlayer && this.canDetectPlayer()) {
         this.changeStateToChasing();
       }
     }
@@ -2881,6 +2974,11 @@ var SeekingPlayerManager = function () {
         this.lastKnownPlayerPosition = Object.assign({}, this.player.position);
       }
       return this.lastKnownPlayerPosition;
+    }
+  }, {
+    key: 'stopLookingForThePlayer',
+    value: function stopLookingForThePlayer() {
+      this.shouldLookForThePlayer = false;
     }
   }]);
 
@@ -3111,7 +3209,7 @@ var ZombiePathManager = function () {
       } else if (this.state === 'on-temporary-path') {
         return this.getTemporaryStepTarget();
       }
-      throw new Error('No current tile target defined');
+      return (0, _MapUtils.pixelsToTile)(this.zombie);
     }
   }, {
     key: 'getBackOnPath',
@@ -3389,18 +3487,27 @@ var Game = function (_Phaser$State) {
       this.player.body.collides([this.map.wallsCollisionGroup]);
 
       // init zombies
-      for (var i = 0; i < this.map.paths.length; i++) {
-        var newZombie = new _Zombie2.default(this.game, 'zombie');
 
-        newZombie.setTilePosition(this.map.paths[i][0]);
-        newZombie.initializeChasingSystem(this.player, this.map.walls);
+      var _loop = function _loop(i) {
+        var newZombie = new _Zombie2.default(_this2.game, 'zombie');
+
+        newZombie.setTilePosition(_this2.map.paths[i][0]);
+        newZombie.initializeChasingSystem(_this2.player, _this2.map.walls);
         // ^^ watch out this must be over 'collides'
-        newZombie.body.setCollisionGroup(this.zombiesCollisionGroup);
-        newZombie.body.collides([this.playerCollisionGroup, this.map.wallsCollisionGroup, this.journalsCollisionGroup, this.zombiesCollisionGroup]);
-        newZombie.initializePathSystem(this.map.getPath(i), wallsPositions);
+        newZombie.body.setCollisionGroup(_this2.zombiesCollisionGroup);
+        newZombie.body.collides([_this2.playerCollisionGroup, _this2.map.wallsCollisionGroup, _this2.journalsCollisionGroup, _this2.zombiesCollisionGroup]);
+        newZombie.initializePathSystem(_this2.map.getPath(i), wallsPositions);
         newZombie.startPathSystem();
 
-        this.zombies.add(newZombie);
+        _this2.player.onDeath.add(function () {
+          return newZombie.onPlayerDeath();
+        });
+
+        _this2.zombies.add(newZombie);
+      };
+
+      for (var i = 0; i < this.map.paths.length; i++) {
+        _loop(i);
       }
 
       this.player.body.collides([this.zombiesCollisionGroup]);
@@ -3414,11 +3521,11 @@ var Game = function (_Phaser$State) {
         return _this2.journals.onMouseWheel();
       };
 
-      for (var _i = 0; _i < journalsData.length; _i++) {
-        var content = journalsContent[journalsData[_i].name];
+      for (var i = 0; i < journalsData.length; i++) {
+        var content = journalsContent[journalsData[i].name];
         var newJournal = new _Journal2.default(this.game, content, 'computer');
-        newJournal.setCorner(journalsData[_i].cornerX, journalsData[_i].cornerY);
-        newJournal.setPosition(journalsData[_i].x, journalsData[_i].y);
+        newJournal.setCorner(journalsData[i].cornerX, journalsData[i].cornerY);
+        newJournal.setPosition(journalsData[i].x, journalsData[i].y);
         newJournal.enableJournal();
 
         newJournal.body.setCollisionGroup(this.journalsCollisionGroup);
