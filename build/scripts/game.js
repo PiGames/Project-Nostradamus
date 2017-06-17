@@ -1019,7 +1019,92 @@ var ProjectNostradamus = function (_Phaser$Game) {
 
 exports.default = ProjectNostradamus;
 
-},{"./levels/Level1":13,"./levels/Level2":14,"./states/Boot":27,"./states/Menu":29,"./states/Preload":30}],7:[function(require,module,exports){
+},{"./levels/Level1":14,"./levels/Level2":15,"./states/Boot":28,"./states/Menu":30,"./states/Preload":31}],7:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
+
+var _UserInterfaceConstants = require('../constants/UserInterfaceConstants');
+
+var _UserInterfaceUtils = require('../utils/UserInterfaceUtils');
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+var GameOverUI = function () {
+  function GameOverUI(game, mainMenuCallback, restartCallback) {
+    _classCallCheck(this, GameOverUI);
+
+    this.game = game;
+    this.mainMenuCallback = mainMenuCallback;
+    this.restartCallback = restartCallback;
+  }
+
+  _createClass(GameOverUI, [{
+    key: 'start',
+    value: function start() {
+      var _this = this;
+
+      var screenCenter = (0, _UserInterfaceUtils.getScreenCenter)(this.game);
+
+      this.backgroundLayer = (0, _UserInterfaceUtils.showBackgroundLayer)(this.game);
+      this.backgroundLayer.alpha = 0;
+      this.game.add.tween(this.backgroundLayer).to({ alpha: 0.5 }, _UserInterfaceConstants.END_SCREEN_FADE_IN_DURATION, 'Linear', true);
+
+      var textStyle = {
+        align: 'center',
+        fill: 'white',
+        font: 'bold 80px Arial'
+      };
+
+      var mainText = this.game.add.text(screenCenter.x, screenCenter.y, 'YOU DIED!', textStyle);
+      mainText.anchor.setTo(0.5);
+      mainText.alpha = 0;
+      var fadingInTween = this.game.add.tween(mainText).to({ alpha: 1 }, _UserInterfaceConstants.END_SCREEN_FADE_IN_DURATION, 'Linear', true);
+      fadingInTween.onComplete.add(function () {
+        return _this.showEndScreenButtons();
+      });
+    }
+  }, {
+    key: 'showEndScreenButtons',
+    value: function showEndScreenButtons() {
+      var _this2 = this;
+
+      var mainMenuButton = this.game.add.button(this.game.camera.x + 100, this.game.camera.y + this.game.camera.height - 100, 'main-menu-btn');
+      mainMenuButton.anchor.setTo(0, 1);
+      mainMenuButton.onInputUp.add(function () {
+        return _this2.mainMenuCallback();
+      });
+
+      var restartLevelButton = this.game.add.button(this.game.camera.x + this.game.camera.width - 100, this.game.camera.y + this.game.camera.height - 100, 'restart-btn');
+      restartLevelButton.anchor.setTo(1, 1);
+      restartLevelButton.onInputUp.add(function () {
+        return _this2.restartCallback();
+      });
+    }
+  }]);
+
+  return GameOverUI;
+}();
+
+exports.default = GameOverUI;
+
+},{"../constants/UserInterfaceConstants":11,"../utils/UserInterfaceUtils":36}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1034,7 +1119,7 @@ var JOURNAL_TEXT_FONT_SIZE = exports.JOURNAL_TEXT_FONT_SIZE = 16;
 var JOURNAL_SCROLL_BAR_WIDTH = exports.JOURNAL_SCROLL_BAR_WIDTH = 8;
 var MAGIC_OFFSET_FIXING_VALUE = exports.MAGIC_OFFSET_FIXING_VALUE = 7;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1053,7 +1138,7 @@ var PLAYER_HAND_ATTACK_ANGLE = exports.PLAYER_HAND_ATTACK_ANGLE = 60;
 var PLAYER_HAND_ATTACK_DAMAGE = exports.PLAYER_HAND_ATTACK_DAMAGE = 0.2;
 var PLAYER_DAMAGE_COOLDOWN = exports.PLAYER_DAMAGE_COOLDOWN = 0.1;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1064,7 +1149,7 @@ var TILE_HEIGHT = exports.TILE_HEIGHT = 64;
 var MAP_WIDTH = exports.MAP_WIDTH = 32;
 var MAP_HEIGHT = exports.MAP_HEIGHT = 32;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1072,7 +1157,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 var END_SCREEN_FADE_IN_DURATION = exports.END_SCREEN_FADE_IN_DURATION = 2500;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1097,7 +1182,7 @@ var ZOMBIE_DAMAGE_COOLDOWN = exports.ZOMBIE_DAMAGE_COOLDOWN = 0.2;
 var ZOMBIE_WARN_RANGE = exports.ZOMBIE_WARN_RANGE = 500;
 var ZOMBIE_DAMAGE_VALUE = exports.ZOMBIE_DAMAGE_VALUE = 0.1;
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
 
 var _ProjectNostradamus = require('./ProjectNostradamus');
@@ -1131,7 +1216,7 @@ document.onkeydown = ( e ) => {
 };
 */
 
-},{"./ProjectNostradamus":6}],13:[function(require,module,exports){
+},{"./ProjectNostradamus":6}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1204,7 +1289,7 @@ var Level1 = function (_Game) {
 
 exports.default = Level1;
 
-},{"../states/Game.js":28}],14:[function(require,module,exports){
+},{"../states/Game.js":29}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1277,7 +1362,7 @@ var Level2 = function (_Game) {
 
 exports.default = Level2;
 
-},{"../states/Game.js":28}],15:[function(require,module,exports){
+},{"../states/Game.js":29}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1504,7 +1589,7 @@ var ZombiesBoidsManager = function (_Phaser$Group) {
 
 exports.default = ZombiesBoidsManager;
 
-},{"../constants/TileMapConstants":9,"../utils/MapUtils.js":33}],16:[function(require,module,exports){
+},{"../constants/TileMapConstants":10,"../utils/MapUtils.js":34}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1609,7 +1694,7 @@ var Entity = function (_Phaser$Sprite) {
 
 exports.default = Entity;
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1715,7 +1800,7 @@ var Journal = function (_Phaser$Sprite) {
 
 exports.default = Journal;
 
-},{"../constants/ItemConstants":7,"../constants/TileMapConstants":9}],18:[function(require,module,exports){
+},{"../constants/ItemConstants":8,"../constants/TileMapConstants":10}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1757,12 +1842,18 @@ function _inherits(subClass, superClass) {
 var JournalsManager = function (_Phaser$Group) {
   _inherits(JournalsManager, _Phaser$Group);
 
-  function JournalsManager(game, messageText, player) {
+  function JournalsManager(game, player) {
     _classCallCheck(this, JournalsManager);
 
     var _this = _possibleConstructorReturn(this, (JournalsManager.__proto__ || Object.getPrototypeOf(JournalsManager)).call(this, game));
 
-    _this.messageText = messageText;
+    var style = { font: '24px Arial', fill: '#fff' };
+
+    _this.messageText = _this.game.add.text(0, 0, '', style);
+    _this.messageText.x = 24;
+    _this.messageText.y = _this.game.height - 24 - 32;
+    _this.messageText.fixedToCamera = true;
+
     _this.player = player;
 
     _this.activateKey = _this.game.input.keyboard.addKey(Phaser.Keyboard.E);
@@ -1913,6 +2004,12 @@ var JournalsManager = function (_Phaser$Group) {
       this.scrollBar.drawRect(0, this.scrollBarOffset, _ItemConstants.JOURNAL_SCROLL_BAR_WIDTH, this.scrollBarHeight);
       this.scrollBar.endFill();
     }
+  }, {
+    key: 'clearUI',
+    value: function clearUI() {
+      this.tryToHideJournal();
+      this.messageText.destroy();
+    }
   }]);
 
   return JournalsManager;
@@ -1920,7 +2017,7 @@ var JournalsManager = function (_Phaser$Group) {
 
 exports.default = JournalsManager;
 
-},{"../constants/ItemConstants":7,"../utils/UserInterfaceUtils":35}],19:[function(require,module,exports){
+},{"../constants/ItemConstants":8,"../utils/UserInterfaceUtils":36}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2038,6 +2135,9 @@ var Player = function (_Entity) {
     _this.drawHealthBar();
 
     _this.onDeath = new Phaser.Signal();
+
+    _this.body.onBeginContact.add(_this.onCollisionEnter, _this);
+    _this.body.onEndContact.add(_this.onCollisionLeave, _this);
     return _this;
   }
 
@@ -2221,7 +2321,7 @@ var Player = function (_Entity) {
 
 exports.default = Player;
 
-},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"./Entity":16}],20:[function(require,module,exports){
+},{"../constants/PlayerConstants":9,"../constants/TileMapConstants":10,"./Entity":17}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2409,7 +2509,7 @@ var TileMap = function (_Phaser$Tilemap) {
 
 exports.default = TileMap;
 
-},{"../utils/MapUtils.js":33}],21:[function(require,module,exports){
+},{"../utils/MapUtils.js":34}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2649,7 +2749,7 @@ var Zombie = function (_Entity) {
 
 exports.default = Zombie;
 
-},{"../constants/TileMapConstants":9,"../constants/ZombieConstants":11,"../utils/MapUtils":33,"./Entity":16,"./ZombieComponents/ChasingPlayerManager":22,"./ZombieComponents/SeekingPlayerManager":24,"./ZombieComponents/ZombiePathManager":25,"./ZombieComponents/ZombieRotationManager":26}],22:[function(require,module,exports){
+},{"../constants/TileMapConstants":10,"../constants/ZombieConstants":12,"../utils/MapUtils":34,"./Entity":17,"./ZombieComponents/ChasingPlayerManager":23,"./ZombieComponents/SeekingPlayerManager":25,"./ZombieComponents/ZombiePathManager":26,"./ZombieComponents/ZombieRotationManager":27}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2778,7 +2878,7 @@ var ChasingPlayerManager = function () {
 
 exports.default = ChasingPlayerManager;
 
-},{"../../constants/ZombieConstants":11}],23:[function(require,module,exports){
+},{"../../constants/ZombieConstants":12}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2836,7 +2936,7 @@ var PathFinder = function () {
 
 exports.default = PathFinder;
 
-},{"easystarjs":1}],24:[function(require,module,exports){
+},{"easystarjs":1}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2987,7 +3087,7 @@ var SeekingPlayerManager = function () {
 
 exports.default = SeekingPlayerManager;
 
-},{"../../constants/ZombieConstants":11,"../../utils/MathUtils":34}],25:[function(require,module,exports){
+},{"../../constants/ZombieConstants":12,"../../utils/MathUtils":35}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3232,7 +3332,7 @@ var ZombiePathManager = function () {
 
 exports.default = ZombiePathManager;
 
-},{"../../constants/ZombieConstants":11,"../../utils/DeterminePathCollisionUtils":31,"../../utils/HandlePathCollisionUtils":32,"../../utils/MapUtils":33,"./PathFinder":23}],26:[function(require,module,exports){
+},{"../../constants/ZombieConstants":12,"../../utils/DeterminePathCollisionUtils":32,"../../utils/HandlePathCollisionUtils":33,"../../utils/MapUtils":34,"./PathFinder":24}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3313,7 +3413,7 @@ var ZombieRotationManager = function () {
 
 exports.default = ZombieRotationManager;
 
-},{"../../constants/ZombieConstants":11,"../../utils/MapUtils":33}],27:[function(require,module,exports){
+},{"../../constants/ZombieConstants":12,"../../utils/MapUtils":34}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3382,7 +3482,7 @@ var Boot = function (_Phaser$State) {
 
 exports.default = Boot;
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3423,13 +3523,13 @@ var _BoidsManager = require('../objects/BoidsManager');
 
 var _BoidsManager2 = _interopRequireDefault(_BoidsManager);
 
+var _GameOverUI = require('../UI/GameOverUI');
+
+var _GameOverUI2 = _interopRequireDefault(_GameOverUI);
+
 var _PlayerConstants = require('../constants/PlayerConstants');
 
 var _TileMapConstants = require('../constants/TileMapConstants');
-
-var _UserInterfaceConstants = require('../constants/UserInterfaceConstants');
-
-var _UserInterfaceUtils = require('../utils/UserInterfaceUtils');
 
 var _MapUtils = require('../utils/MapUtils');
 
@@ -3470,63 +3570,74 @@ var Game = function (_Phaser$State) {
       var _this2 = this;
 
       this.map = new _TileMap2.default(this.game, 'map', _TileMapConstants.TILE_WIDTH, _TileMapConstants.TILE_HEIGHT);
-      var wallsPositions = (0, _MapUtils.getWallsPositions)(this.map.walls);
-      this.zombies = new _BoidsManager2.default(this.game, wallsPositions);
-      var playerPos = this.map.getPlayerInitialPosition();
-      this.player = new _Player2.default(this.game, playerPos.x, playerPos.y, 'player', _PlayerConstants.PLAYER_INITIAL_FRAME, this.zombies);
+      this.zombies = [];
 
-      var style = { font: '24px Arial', fill: '#fff' };
+      this.initPlayer();
+      this.initCollisionGroups();
+      this.initZombies();
+      this.initJournals();
+      this.setCollisionRelations();
+      this.initGameOverUI();
 
-      this.messageText = this.game.add.text(0, 0, '', style);
-      this.messageText.x = 24;
-      this.messageText.y = this.game.height - 24 - 32;
-      this.messageText.fixedToCamera = true;
-
-      this.journals = new _JournalsManager2.default(this.game, this.messageText, this.player);
-
+      this.player.onDeath.add(function () {
+        return _this2.handleGameEnd();
+      });
+    }
+  }, {
+    key: 'initCollisionGroups',
+    value: function initCollisionGroups() {
       this.playerCollisionGroup = this.game.physics.p2.createCollisionGroup(this.player);
       this.zombiesCollisionGroup = this.game.physics.p2.createCollisionGroup();
       this.journalsCollisionGroup = this.game.physics.p2.createCollisionGroup();
+    }
+  }, {
+    key: 'initPlayer',
+    value: function initPlayer() {
+      var playerPos = this.map.getPlayerInitialPosition();
 
-      // init player
+      this.player = new _Player2.default(this.game, playerPos.x, playerPos.y, 'player', _PlayerConstants.PLAYER_INITIAL_FRAME, this.zombies);
       this.game.camera.follow(this.player);
+    }
+  }, {
+    key: 'initZombies',
+    value: function initZombies() {
+      var _this3 = this;
 
-      this.map.collides([this.playerCollisionGroup]);
-      this.player.body.collides([this.map.wallsCollisionGroup]);
-
-      // init zombies
+      var wallsPositions = (0, _MapUtils.getWallsPositions)(this.map.walls);
+      this.zombies = new _BoidsManager2.default(this.game, wallsPositions);
 
       var _loop = function _loop(i) {
-        var newZombie = new _Zombie2.default(_this2.game, 'zombie');
+        var newZombie = new _Zombie2.default(_this3.game, 'zombie');
 
-        newZombie.setTilePosition(_this2.map.paths[i][0]);
-        newZombie.initializeChasingSystem(_this2.player, _this2.map.walls);
-        // ^^ watch out this must be over 'collides'
-        newZombie.body.setCollisionGroup(_this2.zombiesCollisionGroup);
-        newZombie.body.collides([_this2.playerCollisionGroup, _this2.map.wallsCollisionGroup, _this2.journalsCollisionGroup, _this2.zombiesCollisionGroup]);
-        newZombie.initializePathSystem(_this2.map.getPath(i), wallsPositions);
+        newZombie.setTilePosition(_this3.map.paths[i][0]);
+        newZombie.initializeChasingSystem(_this3.player, _this3.map.walls);
+        newZombie.body.setCollisionGroup(_this3.zombiesCollisionGroup);
+        newZombie.initializePathSystem(_this3.map.getPath(i), wallsPositions);
         newZombie.startPathSystem();
 
-        _this2.player.onDeath.add(function () {
+        _this3.player.onDeath.add(function () {
           return newZombie.onPlayerDeath();
         });
 
-        _this2.zombies.add(newZombie);
+        _this3.zombies.add(newZombie);
       };
 
       for (var i = 0; i < this.map.paths.length; i++) {
         _loop(i);
       }
+    }
+  }, {
+    key: 'initJournals',
+    value: function initJournals() {
+      var _this4 = this;
 
-      this.player.body.collides([this.zombiesCollisionGroup]);
-      this.map.collides([this.zombiesCollisionGroup]);
+      this.journals = new _JournalsManager2.default(this.game, this.player);
 
-      // init journals
       var journalsData = this.map.getJournals();
       var journalsContent = this.game.cache.getJSON('journals');
 
       this.game.input.mouse.mouseWheelCallback = function () {
-        return _this2.journals.onMouseWheel();
+        return _this4.journals.onMouseWheel();
       };
 
       for (var i = 0; i < journalsData.length; i++) {
@@ -3537,90 +3648,60 @@ var Game = function (_Phaser$State) {
         newJournal.enableJournal();
 
         newJournal.body.setCollisionGroup(this.journalsCollisionGroup);
-        newJournal.body.collides([this.playerCollisionGroup, this.zombiesCollisionGroup]);
 
         this.journals.add(newJournal);
       }
-      this.player.body.collides(this.journalsCollisionGroup);
 
       this.player.body.onBeginContact.add(function () {
         var _journals;
 
-        return (_journals = _this2.journals).onCollisionEnter.apply(_journals, arguments);
+        return (_journals = _this4.journals).onCollisionEnter.apply(_journals, arguments);
       });
       this.player.body.onEndContact.add(function () {
         var _journals2;
 
-        return (_journals2 = _this2.journals).onCollisionLeave.apply(_journals2, arguments);
+        return (_journals2 = _this4.journals).onCollisionLeave.apply(_journals2, arguments);
+      });
+    }
+  }, {
+    key: 'setCollisionRelations',
+    value: function setCollisionRelations() {
+      var _this5 = this;
+
+      this.map.collides([this.playerCollisionGroup, this.zombiesCollisionGroup]);
+      this.player.body.collides([this.map.wallsCollisionGroup, this.zombiesCollisionGroup, this.journalsCollisionGroup]);
+
+      this.zombies.forEach(function (zombie) {
+        zombie.body.collides([_this5.playerCollisionGroup, _this5.map.wallsCollisionGroup, _this5.journalsCollisionGroup, _this5.zombiesCollisionGroup]);
       });
 
-      this.player.body.onBeginContact.add(function () {
-        var _player;
-
-        return (_player = _this2.player).onCollisionEnter.apply(_player, arguments);
+      this.journals.forEach(function (journal) {
+        journal.body.collides([_this5.playerCollisionGroup, _this5.zombiesCollisionGroup]);
       });
-      this.player.body.onEndContact.add(function () {
-        var _player2;
+    }
+  }, {
+    key: 'initGameOverUI',
+    value: function initGameOverUI() {
+      var _this6 = this;
 
-        return (_player2 = _this2.player).onCollisionLeave.apply(_player2, arguments);
-      });
-
-      this.player.onDeath.add(function () {
-        return _this2.handleGameEnd();
-      });
+      var mainMenuCallback = function mainMenuCallback() {
+        return _this6.state.start('Menu');
+      };
+      var restartCallback = function restartCallback() {
+        return _this6.state.restart();
+      };
+      this.gameOverUI = new _GameOverUI2.default(this.game, mainMenuCallback, restartCallback);
     }
   }, {
     key: 'handleGameEnd',
     value: function handleGameEnd() {
       this.clearScreen();
-      this.showEndScreen();
+      this.gameOverUI.start();
     }
   }, {
     key: 'clearScreen',
     value: function clearScreen() {
-      this.messageText.destroy();
-    }
-  }, {
-    key: 'showEndScreen',
-    value: function showEndScreen() {
-      var _this3 = this;
-
-      var screenCenter = (0, _UserInterfaceUtils.getScreenCenter)(this.game);
-
-      this.backgroundLayer = (0, _UserInterfaceUtils.showBackgroundLayer)(this.game);
-      this.backgroundLayer.alpha = 0;
-      this.game.add.tween(this.backgroundLayer).to({ alpha: 0.5 }, _UserInterfaceConstants.END_SCREEN_FADE_IN_DURATION, 'Linear', true);
-
-      var textStyle = {
-        align: 'center',
-        fill: 'white',
-        font: 'bold 80px Arial'
-      };
-
-      var mainText = this.game.add.text(screenCenter.x, screenCenter.y, 'YOU DIED!', textStyle);
-      mainText.anchor.setTo(0.5);
-      mainText.alpha = 0;
-      var fadingInTween = this.game.add.tween(mainText).to({ alpha: 1 }, _UserInterfaceConstants.END_SCREEN_FADE_IN_DURATION, 'Linear', true);
-      fadingInTween.onComplete.add(function () {
-        return _this3.showEndScreenButtons();
-      });
-    }
-  }, {
-    key: 'showEndScreenButtons',
-    value: function showEndScreenButtons() {
-      var _this4 = this;
-
-      var mainMenuButton = this.game.add.button(this.game.camera.x + 100, this.game.camera.y + this.game.camera.height - 100, 'main-menu-btn');
-      mainMenuButton.anchor.setTo(0, 1);
-      mainMenuButton.onInputUp.add(function () {
-        return _this4.state.start('Menu');
-      });
-
-      var restartLevelButton = this.game.add.button(this.game.camera.x + this.game.camera.width - 100, this.game.camera.y + this.game.camera.height - 100, 'restart-btn');
-      restartLevelButton.anchor.setTo(1, 1);
-      restartLevelButton.onInputUp.add(function () {
-        return _this4.state.restart();
-      });
+      this.journals.clearUI();
     }
   }]);
 
@@ -3629,7 +3710,7 @@ var Game = function (_Phaser$State) {
 
 exports.default = Game;
 
-},{"../constants/PlayerConstants":8,"../constants/TileMapConstants":9,"../constants/UserInterfaceConstants":10,"../objects/BoidsManager":15,"../objects/Journal":17,"../objects/JournalsManager":18,"../objects/Player":19,"../objects/TileMap":20,"../objects/Zombie":21,"../utils/MapUtils":33,"../utils/UserInterfaceUtils":35}],29:[function(require,module,exports){
+},{"../UI/GameOverUI":7,"../constants/PlayerConstants":9,"../constants/TileMapConstants":10,"../objects/BoidsManager":16,"../objects/Journal":18,"../objects/JournalsManager":19,"../objects/Player":20,"../objects/TileMap":21,"../objects/Zombie":22,"../utils/MapUtils":34}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3698,7 +3779,7 @@ var Menu = function (_Phaser$State) {
 
 exports.default = Menu;
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3774,7 +3855,7 @@ var Preload = function (_Phaser$State) {
 
 exports.default = Preload;
 
-},{"../constants/PlayerConstants.js":8,"../constants/ZombieConstants.js":11}],31:[function(require,module,exports){
+},{"../constants/PlayerConstants.js":9,"../constants/ZombieConstants.js":12}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3854,7 +3935,7 @@ function isZombieInMovement(zombie) {
   return zombie.state !== _ZombiePathManager.STATES.CALCULATING_PATH && zombie.state !== _ZombiePathManager.STATES.NOT_STARTED;
 }
 
-},{"../objects/ZombieComponents/ZombiePathManager":25,"./MapUtils":33}],32:[function(require,module,exports){
+},{"../objects/ZombieComponents/ZombiePathManager":26,"./MapUtils":34}],33:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3940,7 +4021,7 @@ function getTileCandidates(tile) {
   return [{ x: tile.x, y: tile.y - 1 }, { x: tile.x, y: tile.y + 1 }, { x: tile.x - 1, y: tile.y }, { x: tile.x + 1, y: tile.y }];
 }
 
-},{"./MapUtils":33}],33:[function(require,module,exports){
+},{"./MapUtils":34}],34:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3997,7 +4078,7 @@ var getWallsPositions = exports.getWallsPositions = function getWallsPositions(l
   return wallsArr;
 };
 
-},{"../constants/TileMapConstants":9}],34:[function(require,module,exports){
+},{"../constants/TileMapConstants":10}],35:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4010,7 +4091,7 @@ function isInDegreeRange(entity, target, sightAngle) {
   return angleDelta <= sightAngle || angleDelta >= 360 - sightAngle;
 }
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4036,5 +4117,5 @@ function showBackgroundLayer(game) {
   return backgroundLayer;
 }
 
-},{}]},{},[12])
+},{}]},{},[13])
 //# sourceMappingURL=game.js.map

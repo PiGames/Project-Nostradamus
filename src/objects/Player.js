@@ -70,6 +70,9 @@ export default class Player extends Entity {
     this.drawHealthBar();
 
     this.onDeath = new Phaser.Signal();
+
+    this.body.onBeginContact.add( this.onCollisionEnter, this );
+    this.body.onEndContact.add( this.onCollisionLeave, this );
   }
 
   update() {

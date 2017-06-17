@@ -2,10 +2,16 @@ import { JOURNAL_TEXT_FIELD_WIDTH, JOURNAL_TEXT_FIELD_HEIGHT, JOURNAL_TEXT_SCROL
 import { showBackgroundLayer, getScreenCenter } from '../utils/UserInterfaceUtils';
 
 export default class JournalsManager extends Phaser.Group {
-  constructor( game, messageText, player ) {
+  constructor( game, player ) {
     super( game );
 
-    this.messageText = messageText;
+    const style = { font: '24px Arial', fill: '#fff' };
+
+    this.messageText = this.game.add.text( 0, 0, '', style );
+    this.messageText.x = 24;
+    this.messageText.y = this.game.height - 24 - 32;
+    this.messageText.fixedToCamera = true;
+
     this.player = player;
 
     this.activateKey = this.game.input.keyboard.addKey( Phaser.Keyboard.E );
@@ -130,5 +136,9 @@ export default class JournalsManager extends Phaser.Group {
     this.scrollBar.beginFill( 0xffffff );
     this.scrollBar.drawRect( 0, this.scrollBarOffset, JOURNAL_SCROLL_BAR_WIDTH, this.scrollBarHeight );
     this.scrollBar.endFill();
+  }
+  clearUI() {
+    this.tryToHideJournal();
+    this.messageText.destroy();
   }
 }
