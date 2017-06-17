@@ -4,6 +4,13 @@ import { getFreeTileAroundZombieExcludingOtherZombie } from '../../utils/HandleP
 import { tileToPixels, pixelsToTile } from '../../utils/MapUtils';
 import { MIN_DISTANCE_TO_TARGET } from '../../constants/ZombieConstants';
 
+export const STATES = {
+  NOT_STARTED: 0,
+  ON_STANDARD_PATH: 1,
+  ON_TEMPORARY_PATH: 2,
+  CALCULATING_PATH: 3,
+};
+
 export default class ZombiePathManager {
   constructor( zombie, targets, walls ) {
     this.zombie = zombie;
@@ -21,12 +28,12 @@ export default class ZombiePathManager {
     this.temporaryPath = [];
     this.temporaryStepIndex = 0;
 
-    this.state = 'not-started';
+    this.state = STATES.NOT_STARTED;
   }
   start( callback ) {
     // for now it assumes that zombie is placed on first path target
     this.calculatePathsBetweenTargets( () => {
-      this.state = 'on-standard-path';
+      this.state = STATES.ON_STANDARD_PATH;
       callback();
     } );
   }
@@ -48,13 +55,13 @@ export default class ZombiePathManager {
   }
   update() {
     switch ( this.state ) {
-    case 'on-standard-path':
+    case STATES.ON_STANDARD_PATH:
       this.moveOnStandardPath();
       break;
-    case 'on-temporary-path':
+    case STATES.ON_TEMPORARY_PATH:
       this.moveOnTemporaryPath();
       break;
-    case 'calculating-temporary-path':
+    case STATES.CALCULATING_PATH:
       this.zombie.body.velocity.x = 0;
       this.zombie.body.velocity.y = 0;
       break;
@@ -88,7 +95,7 @@ export default class ZombiePathManager {
     return this.pathsBetweenTargets[ this.currentPathIndex ].path[ this.currentStepIndex ];
   }
   changePathToTemporary( startTile ) {
-    this.state = 'calculating-temporary-path';
+    this.state = STATES.CALCULATING_PATH;
 
     const currentTarget = this.pathsBetweenTargets[ this.currentPathIndex ].target;
 
@@ -100,7 +107,7 @@ export default class ZombiePathManager {
       this.temporaryPath = path;
       this.temporaryStepIndex = 0;
 
-      this.state = 'on-temporary-path';
+      this.state = STATES.ON_TEMPORARY_PATH;
     } );
   }
   getTemporaryStepTarget() {
@@ -109,7 +116,7 @@ export default class ZombiePathManager {
   changePathToStandard() {
     this.currentPathIndex = ( this.currentPathIndex + 1 === this.pathsBetweenTargets.length ) ? 0 : this.currentPathIndex + 1;
     this.currentStepIndex = 0;
-    this.state = 'on-standard-path';
+    this.state = STATES.ON_STANDARD_PATH;
   }
   moveOnTemporaryPath() {
     const temporaryStepTarget = this.getTemporaryStepTarget();
@@ -140,9 +147,9 @@ export default class ZombiePathManager {
     }
   }
   getCurrentTileTarget() {
-    if ( this.state === 'on-standard-path' ) {
+    if ( this.state === STATES.ON_STANDARD_PATH ) {
       return this.getCurrentStepTarget();
-    } else if ( this.state === 'on-temporary-path' ) {
+    } else if ( this.state === STATES.ON_TEMPORARY_PATH ) {
       return this.getTemporaryStepTarget();
     }
     return pixelsToTile( this.zombie );

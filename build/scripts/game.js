@@ -2993,6 +2993,7 @@ exports.default = SeekingPlayerManager;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.STATES = undefined;
 
 var _createClass = function () {
   function defineProperties(target, props) {
@@ -3026,6 +3027,13 @@ function _classCallCheck(instance, Constructor) {
   }
 }
 
+var STATES = exports.STATES = {
+  NOT_STARTED: 0,
+  ON_STANDARD_PATH: 1,
+  ON_TEMPORARY_PATH: 2,
+  CALCULATING_PATH: 3
+};
+
 var ZombiePathManager = function () {
   function ZombiePathManager(zombie, targets, walls) {
     _classCallCheck(this, ZombiePathManager);
@@ -3045,7 +3053,7 @@ var ZombiePathManager = function () {
     this.temporaryPath = [];
     this.temporaryStepIndex = 0;
 
-    this.state = 'not-started';
+    this.state = STATES.NOT_STARTED;
   }
 
   _createClass(ZombiePathManager, [{
@@ -3055,7 +3063,7 @@ var ZombiePathManager = function () {
 
       // for now it assumes that zombie is placed on first path target
       this.calculatePathsBetweenTargets(function () {
-        _this.state = 'on-standard-path';
+        _this.state = STATES.ON_STANDARD_PATH;
         callback();
       });
     }
@@ -3086,13 +3094,13 @@ var ZombiePathManager = function () {
     key: 'update',
     value: function update() {
       switch (this.state) {
-        case 'on-standard-path':
+        case STATES.ON_STANDARD_PATH:
           this.moveOnStandardPath();
           break;
-        case 'on-temporary-path':
+        case STATES.ON_TEMPORARY_PATH:
           this.moveOnTemporaryPath();
           break;
-        case 'calculating-temporary-path':
+        case STATES.CALCULATING_PATH:
           this.zombie.body.velocity.x = 0;
           this.zombie.body.velocity.y = 0;
           break;
@@ -3138,7 +3146,7 @@ var ZombiePathManager = function () {
     value: function changePathToTemporary(startTile) {
       var _this3 = this;
 
-      this.state = 'calculating-temporary-path';
+      this.state = STATES.CALCULATING_PATH;
 
       var currentTarget = this.pathsBetweenTargets[this.currentPathIndex].target;
 
@@ -3150,7 +3158,7 @@ var ZombiePathManager = function () {
         _this3.temporaryPath = path;
         _this3.temporaryStepIndex = 0;
 
-        _this3.state = 'on-temporary-path';
+        _this3.state = STATES.ON_TEMPORARY_PATH;
       });
     }
   }, {
@@ -3163,7 +3171,7 @@ var ZombiePathManager = function () {
     value: function changePathToStandard() {
       this.currentPathIndex = this.currentPathIndex + 1 === this.pathsBetweenTargets.length ? 0 : this.currentPathIndex + 1;
       this.currentStepIndex = 0;
-      this.state = 'on-standard-path';
+      this.state = STATES.ON_STANDARD_PATH;
     }
   }, {
     key: 'moveOnTemporaryPath',
@@ -3204,9 +3212,9 @@ var ZombiePathManager = function () {
   }, {
     key: 'getCurrentTileTarget',
     value: function getCurrentTileTarget() {
-      if (this.state === 'on-standard-path') {
+      if (this.state === STATES.ON_STANDARD_PATH) {
         return this.getCurrentStepTarget();
-      } else if (this.state === 'on-temporary-path') {
+      } else if (this.state === STATES.ON_TEMPORARY_PATH) {
         return this.getTemporaryStepTarget();
       }
       return (0, _MapUtils.pixelsToTile)(this.zombie);
@@ -3776,6 +3784,8 @@ exports.willZombiesPathsInterfere = willZombiesPathsInterfere;
 
 var _MapUtils = require('./MapUtils');
 
+var _ZombiePathManager = require('../objects/ZombieComponents/ZombiePathManager');
+
 function willZombiesPathsInterfere(zombie1, zombie2) {
   if (!isZombieInMovement(zombie1) || !isZombieInMovement(zombie2)) {
     return false;
@@ -3792,10 +3802,10 @@ function willZombiesPathsInterfere(zombie1, zombie2) {
 function getZombieNextStepTarget(zombie) {
   var nextStepTarget = void 0;
   switch (zombie.state) {
-    case 'on-standard-path':
+    case _ZombiePathManager.STATES.ON_STANDARD_PATH:
       nextStepTarget = getZombieNextStandardStepTarget(zombie);
       break;
-    case 'on-temporary-path':
+    case _ZombiePathManager.STATES.ON_TEMPORARY_PATH:
       nextStepTarget = getZombieNextTemporaryStepTarget(zombie);
   }
   return nextStepTarget;
@@ -3833,18 +3843,18 @@ function getZombieNextTemporaryStepTarget(zombie) {
 
 function getZombieCurrentStepTarget(zombie) {
   switch (zombie.state) {
-    case 'on-standard-path':
+    case _ZombiePathManager.STATES.ON_STANDARD_PATH:
       return zombie.getCurrentStepTarget();
-    case 'on-temporary-path':
+    case _ZombiePathManager.STATES.ON_TEMPORARY_PATH:
       return zombie.getTemporaryStepTarget();
   }
 }
 
 function isZombieInMovement(zombie) {
-  return zombie.state !== 'calculating-temporary-path' && zombie.state !== 'not-started';
+  return zombie.state !== _ZombiePathManager.STATES.CALCULATING_PATH && zombie.state !== _ZombiePathManager.STATES.NOT_STARTED;
 }
 
-},{"./MapUtils":33}],32:[function(require,module,exports){
+},{"../objects/ZombieComponents/ZombiePathManager":25,"./MapUtils":33}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

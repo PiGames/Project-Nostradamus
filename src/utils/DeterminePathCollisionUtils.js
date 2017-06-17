@@ -1,4 +1,5 @@
 import { areTilesTheSame } from './MapUtils';
+import { STATES } from '../objects/ZombieComponents/ZombiePathManager';
 
 export function willZombiesPathsInterfere( zombie1, zombie2 ) {
   if ( !isZombieInMovement( zombie1 ) || !isZombieInMovement( zombie2 ) ) {
@@ -19,10 +20,10 @@ export function willZombiesPathsInterfere( zombie1, zombie2 ) {
 function getZombieNextStepTarget( zombie ) {
   let nextStepTarget;
   switch ( zombie.state ) {
-  case 'on-standard-path':
+  case STATES.ON_STANDARD_PATH:
     nextStepTarget = getZombieNextStandardStepTarget( zombie );
     break;
-  case 'on-temporary-path':
+  case STATES.ON_TEMPORARY_PATH:
     nextStepTarget = getZombieNextTemporaryStepTarget( zombie );
   }
   return nextStepTarget;
@@ -60,13 +61,13 @@ function getZombieNextTemporaryStepTarget( zombie ) {
 
 function getZombieCurrentStepTarget( zombie ) {
   switch ( zombie.state ) {
-  case 'on-standard-path':
+  case STATES.ON_STANDARD_PATH:
     return zombie.getCurrentStepTarget();
-  case 'on-temporary-path':
+  case STATES.ON_TEMPORARY_PATH:
     return zombie.getTemporaryStepTarget();
   }
 }
 
-function isZombieInMovement( zombie ){
-   return zombie.state !== 'calculating-temporary-path' && zombie.state !== 'not-started';
+function isZombieInMovement( zombie ) {
+  return zombie.state !== STATES.CALCULATING_PATH && zombie.state !== STATES.NOT_STARTED;
 }
