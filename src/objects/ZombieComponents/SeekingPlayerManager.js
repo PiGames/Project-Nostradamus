@@ -25,6 +25,8 @@ export default class SeekingPlayerManager {
     this.chasePlayerSignal = new Phaser.Signal();
 
     this.shouldLookForThePlayer = true;
+
+    this.isNotified = false;
   }
   update() {
 
@@ -34,23 +36,31 @@ export default class SeekingPlayerManager {
   }
 
   canDetectPlayer() {
-    if ( this.isPlayerDead ) {
+    if ( this.isPlayerDead || this.isPlayerSeparatedFromZombie( this.player.position ) ) {
       return false;
     }
 
-    /** Draw line between player and zombie and check if it can see him. If yes, chase him. */
+    if ( this.isNotified === true ) {
+      return true;
+    }
+
+    return this.canSeePlayer() || this.canHearPlayer();
+  }
+  isPlayerSeparatedFromZombie( playerPosition ) {
+       /** Draw line between player and zombie and check if it can see him. If yes, chase him. */
     const playerSeekingRay = new Phaser.Line();
     playerSeekingRay.start.set( this.zombie.x, this.zombie.y );
-    playerSeekingRay.end.set( this.player.x, this.player.y );
+    playerSeekingRay.end.set( playerPosition.x, playerPosition.y );
 
     const tileHits = this.walls.getRayCastTiles( playerSeekingRay, 0, false, false );
 
     for ( let i = 0; i < tileHits.length; i++ ) {
       if ( tileHits[ i ].index >= 0 ) {
-        return false;
+        return true;
       }
     }
-    return this.canSeePlayer() || this.canHearPlayer();
+
+    return false;
   }
   canSeePlayer() {
     return ( this.isPlayerInViewRange && isInDegreeRange( this.zombie, this.player, ZOMBIE_SIGHT_ANGLE ) );
@@ -95,5 +105,8 @@ export default class SeekingPlayerManager {
   }
   stopLookingForThePlayer() {
     this.shouldLookForThePlayer = false;
+  }
+  onStopChasing() {
+    this.isNotified = false;
   }
 }

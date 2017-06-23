@@ -107,7 +107,12 @@ export default class Zombie extends Entity {
   changeStateToChasing() {
     this.state = STATES.CHASING_PLAYER;
   }
+  startChasingByBeingNotified() {
+    this.seekingPlayerManager.isNotified = true;
+    this.changeStateToChasing();
+  }
   changeStateToWalking() {
+    this.seekingPlayerManager.onStopChasing();
     this.walkingOnPathManager.getBackOnPath();
     this.state = STATES.WALKING_ON_PATH;
   }

@@ -1019,7 +1019,7 @@ var ProjectNostradamus = function (_Phaser$Game) {
 
 exports.default = ProjectNostradamus;
 
-},{"./levels/Level1":14,"./levels/Level2":15,"./states/Boot":28,"./states/Menu":30,"./states/Preload":31}],7:[function(require,module,exports){
+},{"./levels/Level1":14,"./levels/Level2":15,"./states/Boot":29,"./states/Menu":31,"./states/Preload":32}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1104,7 +1104,7 @@ var GameOverUI = function () {
 
 exports.default = GameOverUI;
 
-},{"../constants/UserInterfaceConstants":11,"../utils/UserInterfaceUtils":36}],8:[function(require,module,exports){
+},{"../constants/UserInterfaceConstants":11,"../utils/UserInterfaceUtils":37}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1173,14 +1173,14 @@ var ZOMBIE_WALK_ANIMATION_FRAMERATE = exports.ZOMBIE_WALK_ANIMATION_FRAMERATE = 
 var ZOMBIE_FIGHT_ANIMATION_FRAMERATE = exports.ZOMBIE_FIGHT_ANIMATION_FRAMERATE = 10;
 var MIN_DISTANCE_TO_TARGET = exports.MIN_DISTANCE_TO_TARGET = 10;
 var ZOMBIE_SIGHT_ANGLE = exports.ZOMBIE_SIGHT_ANGLE = 45;
-var ZOMBIE_SIGHT_RANGE = exports.ZOMBIE_SIGHT_RANGE = 200;
+var ZOMBIE_SIGHT_RANGE = exports.ZOMBIE_SIGHT_RANGE = 400;
 var ZOMBIE_HEARING_RANGE = exports.ZOMBIE_HEARING_RANGE = 100;
 var ZOMBIE_ATTACK_RANGE = exports.ZOMBIE_ATTACK_RANGE = 50;
 var ZOMBIE_ROTATING_SPEED = exports.ZOMBIE_ROTATING_SPEED = 50;
 var ZOMBIE_DAMAGE_MULTIPLIER = exports.ZOMBIE_DAMAGE_MULTIPLIER = 1;
 var ZOMBIE_DAMAGE_COOLDOWN = exports.ZOMBIE_DAMAGE_COOLDOWN = 0.2;
-var ZOMBIE_WARN_RANGE = exports.ZOMBIE_WARN_RANGE = 500;
 var ZOMBIE_DAMAGE_VALUE = exports.ZOMBIE_DAMAGE_VALUE = 0.1;
+var ZOMBIE_NOTIFY_RANGE = exports.ZOMBIE_NOTIFY_RANGE = 500;
 
 },{}],13:[function(require,module,exports){
 'use strict';
@@ -1289,7 +1289,7 @@ var Level1 = function (_Game) {
 
 exports.default = Level1;
 
-},{"../states/Game.js":29}],15:[function(require,module,exports){
+},{"../states/Game.js":30}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1362,7 +1362,7 @@ var Level2 = function (_Game) {
 
 exports.default = Level2;
 
-},{"../states/Game.js":29}],16:[function(require,module,exports){
+},{"../states/Game.js":30}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1589,7 +1589,7 @@ var ZombiesBoidsManager = function (_Phaser$Group) {
 
 exports.default = ZombiesBoidsManager;
 
-},{"../constants/TileMapConstants":10,"../utils/MapUtils.js":34}],17:[function(require,module,exports){
+},{"../constants/TileMapConstants":10,"../utils/MapUtils.js":35}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2017,7 +2017,7 @@ var JournalsManager = function (_Phaser$Group) {
 
 exports.default = JournalsManager;
 
-},{"../constants/ItemConstants":8,"../utils/UserInterfaceUtils":36}],20:[function(require,module,exports){
+},{"../constants/ItemConstants":8,"../utils/UserInterfaceUtils":37}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2509,7 +2509,7 @@ var TileMap = function (_Phaser$Tilemap) {
 
 exports.default = TileMap;
 
-},{"../utils/MapUtils.js":34}],22:[function(require,module,exports){
+},{"../utils/MapUtils.js":35}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2715,8 +2715,15 @@ var Zombie = function (_Entity) {
       this.state = STATES.CHASING_PLAYER;
     }
   }, {
+    key: 'startChasingByBeingNotified',
+    value: function startChasingByBeingNotified() {
+      this.seekingPlayerManager.isNotified = true;
+      this.changeStateToChasing();
+    }
+  }, {
     key: 'changeStateToWalking',
     value: function changeStateToWalking() {
+      this.seekingPlayerManager.onStopChasing();
       this.walkingOnPathManager.getBackOnPath();
       this.state = STATES.WALKING_ON_PATH;
     }
@@ -2749,7 +2756,7 @@ var Zombie = function (_Entity) {
 
 exports.default = Zombie;
 
-},{"../constants/TileMapConstants":10,"../constants/ZombieConstants":12,"../utils/MapUtils":34,"./Entity":17,"./ZombieComponents/ChasingPlayerManager":23,"./ZombieComponents/SeekingPlayerManager":25,"./ZombieComponents/ZombiePathManager":26,"./ZombieComponents/ZombieRotationManager":27}],23:[function(require,module,exports){
+},{"../constants/TileMapConstants":10,"../constants/ZombieConstants":12,"../utils/MapUtils":35,"./Entity":17,"./ZombieComponents/ChasingPlayerManager":23,"./ZombieComponents/SeekingPlayerManager":26,"./ZombieComponents/ZombiePathManager":27,"./ZombieComponents/ZombieRotationManager":28}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2769,6 +2776,14 @@ var _createClass = function () {
 var _ZombieConstants = require('../../constants/ZombieConstants');
 
 var CONSTANTS = _interopRequireWildcard(_ZombieConstants);
+
+var _NotificationsManager = require('./NotificationsManager');
+
+var _NotificationsManager2 = _interopRequireDefault(_NotificationsManager);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
 
 function _interopRequireWildcard(obj) {
   if (obj && obj.__esModule) {
@@ -2804,13 +2819,20 @@ var ChasingPlayerManager = function () {
     var attackSensor = this.zombie.body.addCircle(CONSTANTS.ZOMBIE_ATTACK_RANGE);
     attackSensor.sensor = true;
     attackSensor.sensorType = 'attack';
+
+    this.notificationsManager = new _NotificationsManager2.default(this.zombie);
+
+    this.lastKnownPlayerPosition = Object.assign({}, this.player.position);
   }
 
   _createClass(ChasingPlayerManager, [{
     key: 'update',
     value: function update(lastKnownPlayerPosition) {
+      this.lastKnownPlayerPosition = lastKnownPlayerPosition;
       this.zombie.game.physics.arcade.moveToObject(this.zombie, lastKnownPlayerPosition, CONSTANTS.ZOMBIE_SPEED * CONSTANTS.ZOMBIE_SPEED_CHASING_MULTIPLIER);
       this.zombie.lookAt(lastKnownPlayerPosition.x, lastKnownPlayerPosition.y);
+
+      this.notificationsManager.update();
 
       if (this.shouldZombieStopChasingPlayer(lastKnownPlayerPosition)) {
         this.stopChasingPlayer();
@@ -2840,6 +2862,7 @@ var ChasingPlayerManager = function () {
       if (shapeA.sensorType === 'attack' && bodyA.sprite.key === 'player') {
         this.isInAttackRange = true;
       }
+      this.notificationsManager.onCollisionEnter(bodyA, bodyB, shapeA);
     }
   }, {
     key: 'onCollisionLeave',
@@ -2850,6 +2873,8 @@ var ChasingPlayerManager = function () {
       if (shapeA.sensorType === 'attack' && bodyA.sprite.key === 'player') {
         this.isInAttackRange = false;
       }
+
+      this.notificationsManager.onCollisionLeave(bodyA, bodyB, shapeA);
     }
   }, {
     key: 'shouldAttack',
@@ -2878,7 +2903,118 @@ var ChasingPlayerManager = function () {
 
 exports.default = ChasingPlayerManager;
 
-},{"../../constants/ZombieConstants":12}],24:[function(require,module,exports){
+},{"../../constants/ZombieConstants":12,"./NotificationsManager":24}],24:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
+
+var _ZombieConstants = require('../../constants/ZombieConstants');
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+var NotificationsManager = function () {
+  function NotificationsManager(zombie) {
+    _classCallCheck(this, NotificationsManager);
+
+    this.zombie = zombie;
+
+    var notifySensor = zombie.body.addCircle(_ZombieConstants.ZOMBIE_NOTIFY_RANGE);
+    notifySensor.sensor = true;
+    notifySensor.sensorType = 'notify';
+
+    this.zombiesToNotify = new Set();
+  }
+
+  _createClass(NotificationsManager, [{
+    key: 'isItNotifySensor',
+    value: function isItNotifySensor(shape, body) {
+      if (!body || !body.sprite) {
+        return false;
+      }
+      return shape.sensorType === 'notify' && body.sprite.key === 'zombie';
+    }
+  }, {
+    key: 'onCollisionEnter',
+    value: function onCollisionEnter(bodyA, bodyB, shapeA) {
+      if (this.isItNotifySensor(shapeA, bodyA)) {
+        this.zombiesToNotify.add(bodyA.sprite);
+      }
+    }
+  }, {
+    key: 'onCollisionLeave',
+    value: function onCollisionLeave(bodyA, bodyB, shapeA) {
+      if (this.isItNotifySensor(shapeA, bodyA)) {
+        this.zombiesToNotify.delete(bodyA.sprite);
+      }
+    }
+  }, {
+    key: 'update',
+    value: function update() {
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = this.zombiesToNotify[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var zombieToNotify = _step.value;
+
+          this.handleNotificationTry(zombieToNotify);
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+    }
+  }, {
+    key: 'handleNotificationTry',
+    value: function handleNotificationTry(zombieToNotify) {
+      if (zombieToNotify.isChasing() === false) {
+        this.notify(zombieToNotify);
+      }
+    }
+  }, {
+    key: 'notify',
+    value: function notify(zombieToNotify) {
+      console.log('try');
+      if (!zombieToNotify.seekingPlayerManager.isPlayerSeparatedFromZombie(this.zombie.chasingPlayerManager.lastKnownPlayerPosition)) {
+        console.log('chase', this.zombie.chasingPlayerManager.lastKnownPlayerPosition);
+        zombieToNotify.startChasingByBeingNotified(this.zombie.chasingPlayerManager.lastKnownPlayerPosition);
+      }
+    }
+  }]);
+
+  return NotificationsManager;
+}();
+
+exports.default = NotificationsManager;
+
+},{"../../constants/ZombieConstants":12}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2936,7 +3072,7 @@ var PathFinder = function () {
 
 exports.default = PathFinder;
 
-},{"easystarjs":1}],25:[function(require,module,exports){
+},{"easystarjs":1}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2989,6 +3125,8 @@ var SeekingPlayerManager = function () {
     this.chasePlayerSignal = new Phaser.Signal();
 
     this.shouldLookForThePlayer = true;
+
+    this.isNotified = false;
   }
 
   _createClass(SeekingPlayerManager, [{
@@ -3002,23 +3140,33 @@ var SeekingPlayerManager = function () {
   }, {
     key: 'canDetectPlayer',
     value: function canDetectPlayer() {
-      if (this.isPlayerDead) {
+      if (this.isPlayerDead || this.isPlayerSeparatedFromZombie(this.player.position)) {
         return false;
       }
 
+      if (this.isNotified === true) {
+        return true;
+      }
+
+      return this.canSeePlayer() || this.canHearPlayer();
+    }
+  }, {
+    key: 'isPlayerSeparatedFromZombie',
+    value: function isPlayerSeparatedFromZombie(playerPosition) {
       /** Draw line between player and zombie and check if it can see him. If yes, chase him. */
       var playerSeekingRay = new Phaser.Line();
       playerSeekingRay.start.set(this.zombie.x, this.zombie.y);
-      playerSeekingRay.end.set(this.player.x, this.player.y);
+      playerSeekingRay.end.set(playerPosition.x, playerPosition.y);
 
       var tileHits = this.walls.getRayCastTiles(playerSeekingRay, 0, false, false);
 
       for (var i = 0; i < tileHits.length; i++) {
         if (tileHits[i].index >= 0) {
-          return false;
+          return true;
         }
       }
-      return this.canSeePlayer() || this.canHearPlayer();
+
+      return false;
     }
   }, {
     key: 'canSeePlayer',
@@ -3080,6 +3228,11 @@ var SeekingPlayerManager = function () {
     value: function stopLookingForThePlayer() {
       this.shouldLookForThePlayer = false;
     }
+  }, {
+    key: 'onStopChasing',
+    value: function onStopChasing() {
+      this.isNotified = false;
+    }
   }]);
 
   return SeekingPlayerManager;
@@ -3087,7 +3240,7 @@ var SeekingPlayerManager = function () {
 
 exports.default = SeekingPlayerManager;
 
-},{"../../constants/ZombieConstants":12,"../../utils/MathUtils":35}],26:[function(require,module,exports){
+},{"../../constants/ZombieConstants":12,"../../utils/MathUtils":36}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3332,7 +3485,7 @@ var ZombiePathManager = function () {
 
 exports.default = ZombiePathManager;
 
-},{"../../constants/ZombieConstants":12,"../../utils/DeterminePathCollisionUtils":32,"../../utils/HandlePathCollisionUtils":33,"../../utils/MapUtils":34,"./PathFinder":24}],27:[function(require,module,exports){
+},{"../../constants/ZombieConstants":12,"../../utils/DeterminePathCollisionUtils":33,"../../utils/HandlePathCollisionUtils":34,"../../utils/MapUtils":35,"./PathFinder":25}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3413,7 +3566,7 @@ var ZombieRotationManager = function () {
 
 exports.default = ZombieRotationManager;
 
-},{"../../constants/ZombieConstants":12,"../../utils/MapUtils":34}],28:[function(require,module,exports){
+},{"../../constants/ZombieConstants":12,"../../utils/MapUtils":35}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3482,7 +3635,7 @@ var Boot = function (_Phaser$State) {
 
 exports.default = Boot;
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3710,7 +3863,7 @@ var Game = function (_Phaser$State) {
 
 exports.default = Game;
 
-},{"../UI/GameOverUI":7,"../constants/PlayerConstants":9,"../constants/TileMapConstants":10,"../objects/BoidsManager":16,"../objects/Journal":18,"../objects/JournalsManager":19,"../objects/Player":20,"../objects/TileMap":21,"../objects/Zombie":22,"../utils/MapUtils":34}],30:[function(require,module,exports){
+},{"../UI/GameOverUI":7,"../constants/PlayerConstants":9,"../constants/TileMapConstants":10,"../objects/BoidsManager":16,"../objects/Journal":18,"../objects/JournalsManager":19,"../objects/Player":20,"../objects/TileMap":21,"../objects/Zombie":22,"../utils/MapUtils":35}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3779,7 +3932,7 @@ var Menu = function (_Phaser$State) {
 
 exports.default = Menu;
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3855,7 +4008,7 @@ var Preload = function (_Phaser$State) {
 
 exports.default = Preload;
 
-},{"../constants/PlayerConstants.js":9,"../constants/ZombieConstants.js":12}],32:[function(require,module,exports){
+},{"../constants/PlayerConstants.js":9,"../constants/ZombieConstants.js":12}],33:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3935,7 +4088,7 @@ function isZombieInMovement(zombie) {
   return zombie.state !== _ZombiePathManager.STATES.CALCULATING_PATH && zombie.state !== _ZombiePathManager.STATES.NOT_STARTED;
 }
 
-},{"../objects/ZombieComponents/ZombiePathManager":26,"./MapUtils":34}],33:[function(require,module,exports){
+},{"../objects/ZombieComponents/ZombiePathManager":27,"./MapUtils":35}],34:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4021,7 +4174,7 @@ function getTileCandidates(tile) {
   return [{ x: tile.x, y: tile.y - 1 }, { x: tile.x, y: tile.y + 1 }, { x: tile.x - 1, y: tile.y }, { x: tile.x + 1, y: tile.y }];
 }
 
-},{"./MapUtils":34}],34:[function(require,module,exports){
+},{"./MapUtils":35}],35:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4078,7 +4231,7 @@ var getWallsPositions = exports.getWallsPositions = function getWallsPositions(l
   return wallsArr;
 };
 
-},{"../constants/TileMapConstants":10}],35:[function(require,module,exports){
+},{"../constants/TileMapConstants":10}],36:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4091,7 +4244,7 @@ function isInDegreeRange(entity, target, sightAngle) {
   return angleDelta <= sightAngle || angleDelta >= 360 - sightAngle;
 }
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

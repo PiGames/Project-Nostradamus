@@ -1,4 +1,5 @@
 import * as CONSTANTS from '../../constants/ZombieConstants';
+import NotificationsManager from './NotificationsManager';
 
 export default class ChasingPlayerManager {
   constructor( zombie, player ) {
@@ -14,10 +15,17 @@ export default class ChasingPlayerManager {
     const attackSensor = this.zombie.body.addCircle( CONSTANTS.ZOMBIE_ATTACK_RANGE );
     attackSensor.sensor = true;
     attackSensor.sensorType = 'attack';
+
+    this.notificationsManager = new NotificationsManager( this.zombie );
+
+    this.lastKnownPlayerPosition = Object.assign( {}, this.player.position );
   }
   update( lastKnownPlayerPosition ) {
+    this.lastKnownPlayerPosition = lastKnownPlayerPosition;
     this.zombie.game.physics.arcade.moveToObject( this.zombie, lastKnownPlayerPosition, CONSTANTS.ZOMBIE_SPEED * CONSTANTS.ZOMBIE_SPEED_CHASING_MULTIPLIER );
     this.zombie.lookAt( lastKnownPlayerPosition.x, lastKnownPlayerPosition.y );
+
+    this.notificationsManager.update();
 
     if ( this.shouldZombieStopChasingPlayer( lastKnownPlayerPosition ) ) {
       this.stopChasingPlayer();
@@ -42,6 +50,7 @@ export default class ChasingPlayerManager {
     if ( shapeA.sensorType === 'attack' && bodyA.sprite.key === 'player' ) {
       this.isInAttackRange = true;
     }
+    this.notificationsManager.onCollisionEnter( bodyA, bodyB, shapeA );
   }
   onCollisionLeave( bodyA, bodyB, shapeA ) {
     if ( bodyA == null || bodyA.sprite == null ) {
@@ -50,6 +59,8 @@ export default class ChasingPlayerManager {
     if ( shapeA.sensorType === 'attack' && bodyA.sprite.key === 'player' ) {
       this.isInAttackRange = false;
     }
+
+    this.notificationsManager.onCollisionLeave( bodyA, bodyB, shapeA );
   }
   shouldAttack() {
     return this.zombie.alive && this.canDealDamage && this.isInAttackRange;
