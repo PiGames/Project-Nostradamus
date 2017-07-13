@@ -20,6 +20,7 @@ export default class Game extends Phaser.State {
     this.initZombies();
     this.initJournals();
     this.setCollisionRelations();
+    this.player.setUpFlashlight( this.map.walls );
     this.initGameOverUI();
 
     this.player.onDeath.add( () => this.handleGameEnd() );

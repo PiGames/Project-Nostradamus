@@ -1,6 +1,8 @@
 import Entity from './Entity';
 import { PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, PLAYER_SNEAK_MULTIPLIER, PLAYER_SPRINT_MULTIPLIER, PLAYER_WALK_ANIMATION_FRAMERATE, PLAYER_FIGHT_ANIMATION_FRAMERATE, PLAYER_HAND_ATTACK_RANGE, PLAYER_HAND_ATTACK_ANGLE, PLAYER_HAND_ATTACK_DAMAGE, PLAYER_DAMAGE_COOLDOWN } from '../constants/PlayerConstants';
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
+import Flashlight from './Flashlight';
+
 
 export default class Player extends Entity {
   constructor( game, x, y, imageKey, frame, zombies ) {
@@ -73,6 +75,13 @@ export default class Player extends Entity {
 
     this.body.onBeginContact.add( this.onCollisionEnter, this );
     this.body.onEndContact.add( this.onCollisionLeave, this );
+
+    this.flashlight = null;
+
+  }
+
+  setUpFlashlight( walls ) {
+    this.flashlight = new Flashlight( this, walls );
   }
 
   update() {
@@ -80,6 +89,7 @@ export default class Player extends Entity {
     this.handleAnimation();
     this.lookAtMouse();
     this.handleAttack();
+    this.flashlight.update();
   }
 
   handleMovement() {
