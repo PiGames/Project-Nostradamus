@@ -80,8 +80,8 @@ export default class Player extends Entity {
 
   }
 
-  setUpFlashlight( walls ) {
-    this.flashlight = new Flashlight( this, walls );
+  setUpFlashlight( walls, zombies ) {
+    this.flashlight = new Flashlight( this, walls, zombies );
   }
 
   update() {

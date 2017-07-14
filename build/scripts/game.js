@@ -1110,9 +1110,11 @@ exports.default = GameOverUI;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var LIGHT_ANGLE = exports.LIGHT_ANGLE = Math.PI / 4;
+var LIGHT_ANGLE = exports.LIGHT_ANGLE = Math.PI / 2;
 var NUMBER_OF_RAYS = exports.NUMBER_OF_RAYS = 20;
 var RAY_LENGTH = exports.RAY_LENGTH = 100;
+var WORLD_SHADOW_ALPHA = exports.WORLD_SHADOW_ALPHA = 0.85;
+var LIGHT_ALPHA = exports.LIGHT_ALPHA = 0.2;
 
 },{}],9:[function(require,module,exports){
 "use strict";
@@ -1730,26 +1732,64 @@ function _classCallCheck(instance, Constructor) {
 }
 
 var Flashlight = function () {
-  function Flashlight(player, walls) {
+  function Flashlight(player, walls, zombies) {
     _classCallCheck(this, Flashlight);
 
     this.player = player;
     this.walls = walls;
-    this.maskGraphics = this.player.game.add.graphics(0, 0);
+
+    console.log(this.player.game);
+
+    this.shadowLayer = this.player.game.add.image(0, 0, 'layer-background');
+    this.shadowLayer.width = this.player.game.camera.width * 1.5;
+    this.shadowLayer.height = this.player.game.camera.height * 1.5;
+    this.shadowLayer.alpha = _FlashlightConstants.WORLD_SHADOW_ALPHA;
+
+    this.flickerLayer = this.player.game.add.image(0, 0, 'layer-background');
+    this.flickerLayer.width = _FlashlightConstants.RAY_LENGTH * 4.5;
+    this.flickerLayer.height = _FlashlightConstants.RAY_LENGTH * 4.5;
+    this.flickerLayer.anchor.setTo(0.5);
+
+    this.hideMaskGraphics = this.player.game.add.graphics(0, 0);
+    this.shadowLayer.mask = this.hideMaskGraphics;
+
+    this.showMaskGraphics = this.player.game.add.graphics(0, 0);
+    zombies.setAll('mask', this.showMaskGraphics);
+    this.zombies = zombies;
+
+    this.flickerLayer.mask = this.showMaskGraphics;
   }
 
   _createClass(Flashlight, [{
     key: 'update',
     value: function update() {
-      this.maskGraphics.clear();
-      this.maskGraphics.lineStyle(2, 0xffffff, 1);
+      this.updateLayersPosition();
+      this.updateHidingLayer();
+      this.updateShowingLayer();
+      this.makeFlickerEffect();
+    }
+  }, {
+    key: 'updateLayersPosition',
+    value: function updateLayersPosition() {
+      this.shadowLayer.x = this.player.game.camera.position.x - this.player.game.camera.width * 0.2;
+      this.shadowLayer.y = this.player.game.camera.position.y;
+
+      Object.assign(this.flickerLayer, this.player.position);
+    }
+  }, {
+    key: 'updateHidingLayer',
+    value: function updateHidingLayer() {
+      this.hideMaskGraphics.clear();
+      this.hideMaskGraphics.moveTo(this.shadowLayer.x, this.shadowLayer.y);
+      this.hideMaskGraphics.lineStyle(2, 0xffffff, 1);
+      this.hideMaskGraphics.beginFill(0x00000000);
+      this.hideMaskGraphics.lineTo(this.player.x, this.player.y);
 
       var mouseX = this.player.game.input.mousePointer.worldX;
       var mouseY = this.player.game.input.mousePointer.worldY;
       var mouseAngle = Math.atan2(this.player.y - mouseY, this.player.x - mouseX);
 
       for (var i = 0; i < _FlashlightConstants.NUMBER_OF_RAYS; i++) {
-        this.maskGraphics.moveTo(this.player.x, this.player.y);
         var rayAngle = mouseAngle - _FlashlightConstants.LIGHT_ANGLE / 2 + _FlashlightConstants.LIGHT_ANGLE / _FlashlightConstants.NUMBER_OF_RAYS * i;
         var lastX = this.player.x;
         var lastY = this.player.y;
@@ -1763,8 +1803,46 @@ var Flashlight = function () {
             break;
           }
         }
-        this.maskGraphics.lineTo(lastX, lastY);
+        this.hideMaskGraphics.lineTo(lastX, lastY);
       }
+      this.hideMaskGraphics.lineTo(this.player.x, this.player.y);
+      this.hideMaskGraphics.lineTo(this.shadowLayer.x, this.shadowLayer.y);
+      this.hideMaskGraphics.lineTo(this.shadowLayer.x + this.shadowLayer.width, 0);
+      this.hideMaskGraphics.lineTo(this.shadowLayer.x + this.shadowLayer.width, this.shadowLayer.y + this.shadowLayer.height);
+      this.hideMaskGraphics.lineTo(0, this.shadowLayer.y + this.shadowLayer.height);
+      this.hideMaskGraphics.lineTo(this.shadowLayer.x, this.shadowLayer.y);
+      this.hideMaskGraphics.endFill();
+    }
+  }, {
+    key: 'updateShowingLayer',
+    value: function updateShowingLayer() {
+      this.showMaskGraphics.clear();
+      this.showMaskGraphics.lineStyle(2, 0xffffff, 1);
+      this.showMaskGraphics.beginFill(0x00000000);
+      this.showMaskGraphics.moveTo(this.player.x, this.player.y);
+
+      var mouseX = this.player.game.input.mousePointer.worldX;
+      var mouseY = this.player.game.input.mousePointer.worldY;
+      var mouseAngle = Math.atan2(this.player.y - mouseY, this.player.x - mouseX);
+
+      for (var i = 0; i < _FlashlightConstants.NUMBER_OF_RAYS; i++) {
+        var rayAngle = mouseAngle - _FlashlightConstants.LIGHT_ANGLE / 2 + _FlashlightConstants.LIGHT_ANGLE / _FlashlightConstants.NUMBER_OF_RAYS * i;
+        var lastX = this.player.x;
+        var lastY = this.player.y;
+        for (var j = 1; j <= _FlashlightConstants.RAY_LENGTH; j++) {
+          var landingX = Math.round(this.player.x - 2 * j * Math.cos(rayAngle));
+          var landingY = Math.round(this.player.y - 2 * j * Math.sin(rayAngle));
+          if (!this.isTileBlocking(landingX, landingY)) {
+            lastX = landingX;
+            lastY = landingY;
+          } else {
+            break;
+          }
+        }
+        this.showMaskGraphics.lineTo(lastX, lastY);
+      }
+      this.showMaskGraphics.lineTo(this.player.x, this.player.y);
+      this.showMaskGraphics.endFill();
     }
   }, {
     key: 'isTileBlocking',
@@ -1782,6 +1860,12 @@ var Flashlight = function () {
       }
 
       return false;
+    }
+  }, {
+    key: 'makeFlickerEffect',
+    value: function makeFlickerEffect() {
+      var alpha = _FlashlightConstants.LIGHT_ALPHA + Math.random() * 0.1;
+      this.flickerLayer.alpha = alpha;
     }
   }]);
 
@@ -2246,8 +2330,8 @@ var Player = function (_Entity) {
 
   _createClass(Player, [{
     key: 'setUpFlashlight',
-    value: function setUpFlashlight(walls) {
-      this.flashlight = new _Flashlight2.default(this, walls);
+    value: function setUpFlashlight(walls, zombies) {
+      this.flashlight = new _Flashlight2.default(this, walls, zombies);
     }
   }, {
     key: 'update',
@@ -2846,6 +2930,7 @@ var Zombie = function (_Entity) {
     value: function takeDamage(damage) {
       _Entity3.default.prototype.takeDamage.call(this, [damage]);
       if (this.health <= 0) {
+        this._mask = null;
         this.destroy();
       }
     }
@@ -3839,7 +3924,7 @@ var Game = function (_Phaser$State) {
       this.initZombies();
       this.initJournals();
       this.setCollisionRelations();
-      this.player.setUpFlashlight(this.map.walls);
+      this.initFlashlight();
       this.initGameOverUI();
 
       this.player.onDeath.add(function () {
@@ -3941,6 +4026,11 @@ var Game = function (_Phaser$State) {
       this.journals.forEach(function (journal) {
         journal.body.collides([_this5.playerCollisionGroup, _this5.zombiesCollisionGroup]);
       });
+    }
+  }, {
+    key: 'initFlashlight',
+    value: function initFlashlight() {
+      this.player.setUpFlashlight(this.map.walls, this.zombies);
     }
   }, {
     key: 'initGameOverUI',

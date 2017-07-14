@@ -122,6 +122,7 @@ export default class Zombie extends Entity {
   takeDamage( damage ) {
     Entity.prototype.takeDamage.call( this, [ damage ] );
     if ( this.health <= 0 ) {
+      this._mask = null;
       this.destroy();
     }
   }
