@@ -1110,9 +1110,9 @@ exports.default = GameOverUI;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var LIGHT_ANGLE = exports.LIGHT_ANGLE = Math.PI / 2;
-var NUMBER_OF_RAYS = exports.NUMBER_OF_RAYS = 20;
-var RAY_LENGTH = exports.RAY_LENGTH = 100;
+var LIGHT_ANGLE = exports.LIGHT_ANGLE = Math.PI / 3;
+var NUMBER_OF_RAYS = exports.NUMBER_OF_RAYS = 50;
+var RAY_LENGTH = exports.RAY_LENGTH = 150;
 var WORLD_SHADOW_ALPHA = exports.WORLD_SHADOW_ALPHA = 0.85;
 var LIGHT_ALPHA = exports.LIGHT_ALPHA = 0.2;
 
