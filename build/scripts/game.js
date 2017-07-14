@@ -1764,8 +1764,7 @@ var Flashlight = function () {
     key: 'update',
     value: function update() {
       this.updateLayersPosition();
-      this.updateHidingLayer();
-      this.updateShowingLayer();
+      this.drawLayers();
       this.makeFlickerEffect();
     }
   }, {
@@ -1777,45 +1776,14 @@ var Flashlight = function () {
       Object.assign(this.flickerLayer, this.player.position);
     }
   }, {
-    key: 'updateHidingLayer',
-    value: function updateHidingLayer() {
+    key: 'drawLayers',
+    value: function drawLayers() {
       this.hideMaskGraphics.clear();
       this.hideMaskGraphics.moveTo(this.shadowLayer.x, this.shadowLayer.y);
       this.hideMaskGraphics.lineStyle(2, 0xffffff, 1);
       this.hideMaskGraphics.beginFill(0x00000000);
       this.hideMaskGraphics.lineTo(this.player.x, this.player.y);
 
-      var mouseX = this.player.game.input.mousePointer.worldX;
-      var mouseY = this.player.game.input.mousePointer.worldY;
-      var mouseAngle = Math.atan2(this.player.y - mouseY, this.player.x - mouseX);
-
-      for (var i = 0; i < _FlashlightConstants.NUMBER_OF_RAYS; i++) {
-        var rayAngle = mouseAngle - _FlashlightConstants.LIGHT_ANGLE / 2 + _FlashlightConstants.LIGHT_ANGLE / _FlashlightConstants.NUMBER_OF_RAYS * i;
-        var lastX = this.player.x;
-        var lastY = this.player.y;
-        for (var j = 1; j <= _FlashlightConstants.RAY_LENGTH; j++) {
-          var landingX = Math.round(this.player.x - 2 * j * Math.cos(rayAngle));
-          var landingY = Math.round(this.player.y - 2 * j * Math.sin(rayAngle));
-          if (!this.isTileBlocking(landingX, landingY)) {
-            lastX = landingX;
-            lastY = landingY;
-          } else {
-            break;
-          }
-        }
-        this.hideMaskGraphics.lineTo(lastX, lastY);
-      }
-      this.hideMaskGraphics.lineTo(this.player.x, this.player.y);
-      this.hideMaskGraphics.lineTo(this.shadowLayer.x, this.shadowLayer.y);
-      this.hideMaskGraphics.lineTo(this.shadowLayer.x + this.shadowLayer.width, 0);
-      this.hideMaskGraphics.lineTo(this.shadowLayer.x + this.shadowLayer.width, this.shadowLayer.y + this.shadowLayer.height);
-      this.hideMaskGraphics.lineTo(0, this.shadowLayer.y + this.shadowLayer.height);
-      this.hideMaskGraphics.lineTo(this.shadowLayer.x, this.shadowLayer.y);
-      this.hideMaskGraphics.endFill();
-    }
-  }, {
-    key: 'updateShowingLayer',
-    value: function updateShowingLayer() {
       this.showMaskGraphics.clear();
       this.showMaskGraphics.lineStyle(2, 0xffffff, 1);
       this.showMaskGraphics.beginFill(0x00000000);
@@ -1839,8 +1807,17 @@ var Flashlight = function () {
             break;
           }
         }
+        this.hideMaskGraphics.lineTo(lastX, lastY);
         this.showMaskGraphics.lineTo(lastX, lastY);
       }
+      this.hideMaskGraphics.lineTo(this.player.x, this.player.y);
+      this.hideMaskGraphics.lineTo(this.shadowLayer.x, this.shadowLayer.y);
+      this.hideMaskGraphics.lineTo(this.shadowLayer.x + this.shadowLayer.width, 0);
+      this.hideMaskGraphics.lineTo(this.shadowLayer.x + this.shadowLayer.width, this.shadowLayer.y + this.shadowLayer.height);
+      this.hideMaskGraphics.lineTo(0, this.shadowLayer.y + this.shadowLayer.height);
+      this.hideMaskGraphics.lineTo(this.shadowLayer.x, this.shadowLayer.y);
+      this.hideMaskGraphics.endFill();
+
       this.showMaskGraphics.lineTo(this.player.x, this.player.y);
       this.showMaskGraphics.endFill();
     }
