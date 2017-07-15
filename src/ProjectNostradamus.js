@@ -1,3 +1,4 @@
+import './filters.js';
 import Boot from './states/Boot';
 import Preload from './states/Preload';
 import Menu from './states/Menu';

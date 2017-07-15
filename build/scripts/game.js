@@ -952,6 +952,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+require('./filters.js');
+
 var _Boot = require('./states/Boot');
 
 var _Boot2 = _interopRequireDefault(_Boot);
@@ -1019,7 +1021,7 @@ var ProjectNostradamus = function (_Phaser$Game) {
 
 exports.default = ProjectNostradamus;
 
-},{"./levels/Level1":15,"./levels/Level2":16,"./states/Boot":31,"./states/Menu":33,"./states/Preload":34}],7:[function(require,module,exports){
+},{"./filters.js":14,"./levels/Level1":16,"./levels/Level2":17,"./states/Boot":32,"./states/Menu":34,"./states/Preload":35}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1104,7 +1106,7 @@ var GameOverUI = function () {
 
 exports.default = GameOverUI;
 
-},{"../constants/UserInterfaceConstants":12,"../utils/UserInterfaceUtils":39}],8:[function(require,module,exports){
+},{"../constants/UserInterfaceConstants":12,"../utils/UserInterfaceUtils":40}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1113,8 +1115,9 @@ Object.defineProperty(exports, "__esModule", {
 var LIGHT_ANGLE = exports.LIGHT_ANGLE = Math.PI / 3;
 var NUMBER_OF_RAYS = exports.NUMBER_OF_RAYS = 50;
 var RAY_LENGTH = exports.RAY_LENGTH = 150;
-var WORLD_SHADOW_ALPHA = exports.WORLD_SHADOW_ALPHA = 0.85;
+var WORLD_SHADOW_ALPHA = exports.WORLD_SHADOW_ALPHA = 0.38;
 var LIGHT_ALPHA = exports.LIGHT_ALPHA = 0.2;
+var FLICKERING_ALPHA_OFFSET = exports.FLICKERING_ALPHA_OFFSET = 0.08;
 
 },{}],9:[function(require,module,exports){
 "use strict";
@@ -1197,6 +1200,35 @@ var ZOMBIE_NOTIFY_RANGE = exports.ZOMBIE_NOTIFY_RANGE = 500;
 },{}],14:[function(require,module,exports){
 'use strict';
 
+Phaser.Filter.Glow = function (game) {
+  'use strict';
+
+  Phaser.Filter.call(this, game);
+  this.uniforms.alpha = { type: '1f', value: 1.0 };
+  //the shader, remove cosine/sine to make it a static glow
+  this.fragmentSrc = ['precision lowp float;', 'varying vec2 vTextureCoord;', 'varying vec4 vColor;', 'uniform sampler2D uSampler;', 'uniform float alpha;', 'uniform float time;', 'void main() {', 'vec4 sum = vec4(0);', 'vec2 texcoord = vTextureCoord;', 'for(int xx = -4; xx <= 4; xx++) {', 'for(int yy = -4; yy <= 4; yy++) {', 'float dist = sqrt(float(xx*xx) + float(yy*yy));', 'float factor = 0.0;', 'if (dist == 0.0) {', 'factor = 2.0;', '} else {', 'factor = 2.0/abs(float(dist));', '}', 'sum += texture2D(uSampler, texcoord + vec2(xx, yy) * 0.002) * (0.66);', '}', '}', 'gl_FragColor = sum * 0.025 + texture2D(uSampler, texcoord)*alpha;', '}'];
+};
+
+Phaser.Filter.Glow.prototype = Object.create(Phaser.Filter.prototype);
+Phaser.Filter.Glow.prototype.constructor = Phaser.Filter.Glow;
+Object.defineProperty(Phaser.Filter.Glow.prototype, 'alpha', {
+
+  get: function get() {
+    return this.uniforms.alpha.value;
+  },
+
+  set: function set(value) {
+    this.uniforms.alpha.value = value;
+  }
+
+});
+
+Phaser.Filter.Glow.prototype = Object.create(Phaser.Filter.prototype);
+Phaser.Filter.Glow.prototype.constructor = Phaser.Filter.Glow;
+
+},{}],15:[function(require,module,exports){
+'use strict';
+
 var _ProjectNostradamus = require('./ProjectNostradamus');
 
 var _ProjectNostradamus2 = _interopRequireDefault(_ProjectNostradamus);
@@ -1228,7 +1260,7 @@ document.onkeydown = ( e ) => {
 };
 */
 
-},{"./ProjectNostradamus":6}],15:[function(require,module,exports){
+},{"./ProjectNostradamus":6}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1301,7 +1333,7 @@ var Level1 = function (_Game) {
 
 exports.default = Level1;
 
-},{"../states/Game.js":32}],16:[function(require,module,exports){
+},{"../states/Game.js":33}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1374,7 +1406,7 @@ var Level2 = function (_Game) {
 
 exports.default = Level2;
 
-},{"../states/Game.js":32}],17:[function(require,module,exports){
+},{"../states/Game.js":33}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1601,7 +1633,7 @@ var ZombiesBoidsManager = function (_Phaser$Group) {
 
 exports.default = ZombiesBoidsManager;
 
-},{"../constants/TileMapConstants":11,"../utils/MapUtils.js":37}],18:[function(require,module,exports){
+},{"../constants/TileMapConstants":11,"../utils/MapUtils.js":38}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1706,7 +1738,7 @@ var Entity = function (_Phaser$Sprite) {
 
 exports.default = Entity;
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1738,56 +1770,56 @@ var Flashlight = function () {
     this.player = player;
     this.walls = walls;
 
-    console.log(this.player.game);
-
-    this.shadowLayer = this.player.game.add.image(0, 0, 'layer-background');
-    this.shadowLayer.width = this.player.game.camera.width * 1.5;
-    this.shadowLayer.height = this.player.game.camera.height * 1.5;
-    this.shadowLayer.alpha = _FlashlightConstants.WORLD_SHADOW_ALPHA;
-
     this.flickerLayer = this.player.game.add.image(0, 0, 'layer-background');
     this.flickerLayer.width = _FlashlightConstants.RAY_LENGTH * 4.5;
     this.flickerLayer.height = _FlashlightConstants.RAY_LENGTH * 4.5;
     this.flickerLayer.anchor.setTo(0.5);
 
+    this.glowFilter = new Phaser.Filter.Glow(this.player.game);
+
     this.hideMaskGraphics = this.player.game.add.graphics(0, 0);
-    this.shadowLayer.mask = this.hideMaskGraphics;
 
     this.showMaskGraphics = this.player.game.add.graphics(0, 0);
+    this.showMaskGraphics.filters = [this.glowFilter];
+
+    this.flickerLayer.mask = this.showMaskGraphics;
+
     zombies.setAll('mask', this.showMaskGraphics);
     this.zombies = zombies;
 
-    this.flickerLayer.mask = this.showMaskGraphics;
+    this.hideMaskGraphics.filters = [this.glowFilter];
+    this.hideMaskGraphics.isMask = false;
+    this.hideMaskGraphics.alpha = _FlashlightConstants.WORLD_SHADOW_ALPHA;
   }
 
   _createClass(Flashlight, [{
     key: 'update',
     value: function update() {
       this.updateLayersPosition();
-      this.drawLayers();
       this.makeFlickerEffect();
+      this.drawLayers();
     }
   }, {
     key: 'updateLayersPosition',
     value: function updateLayersPosition() {
-      this.shadowLayer.x = this.player.game.camera.position.x - this.player.game.camera.width * 0.2;
-      this.shadowLayer.y = this.player.game.camera.position.y;
-
       Object.assign(this.flickerLayer, this.player.position);
     }
   }, {
     key: 'drawLayers',
     value: function drawLayers() {
       this.hideMaskGraphics.clear();
-      this.hideMaskGraphics.moveTo(this.shadowLayer.x, this.shadowLayer.y);
-      this.hideMaskGraphics.lineStyle(2, 0xffffff, 1);
-      this.hideMaskGraphics.beginFill(0x00000000);
+      this.hideMaskGraphics.moveTo(this.player.game.camera.x - 100, this.player.game.camera.y);
+      this.hideMaskGraphics.beginFill(0x000000, 1);
+      this.hideMaskGraphics.lineStyle(0, 0x000000, 1);
+      this.hideMaskGraphics.lineTo(this.player.game.camera.x + this.player.game.camera.width + 100, this.player.game.camera.y);
+      this.hideMaskGraphics.lineTo(this.player.game.camera.x + this.player.game.camera.width + 100, this.player.game.camera.y + this.player.game.camera.height);
+      this.hideMaskGraphics.lineTo(this.player.game.camera.x - 100, this.player.game.camera.y + this.player.game.camera.height);
+      this.hideMaskGraphics.lineTo(this.player.game.camera.x - 100, this.player.game.camera.y);
       this.hideMaskGraphics.lineTo(this.player.x, this.player.y);
 
       this.showMaskGraphics.clear();
-      this.showMaskGraphics.lineStyle(2, 0xffffff, 1);
-      this.showMaskGraphics.beginFill(0x00000000);
       this.showMaskGraphics.moveTo(this.player.x, this.player.y);
+      this.showMaskGraphics.beginFill();
 
       var mouseX = this.player.game.input.mousePointer.worldX;
       var mouseY = this.player.game.input.mousePointer.worldY;
@@ -1811,11 +1843,6 @@ var Flashlight = function () {
         this.showMaskGraphics.lineTo(lastX, lastY);
       }
       this.hideMaskGraphics.lineTo(this.player.x, this.player.y);
-      this.hideMaskGraphics.lineTo(this.shadowLayer.x, this.shadowLayer.y);
-      this.hideMaskGraphics.lineTo(this.shadowLayer.x + this.shadowLayer.width, 0);
-      this.hideMaskGraphics.lineTo(this.shadowLayer.x + this.shadowLayer.width, this.shadowLayer.y + this.shadowLayer.height);
-      this.hideMaskGraphics.lineTo(0, this.shadowLayer.y + this.shadowLayer.height);
-      this.hideMaskGraphics.lineTo(this.shadowLayer.x, this.shadowLayer.y);
       this.hideMaskGraphics.endFill();
 
       this.showMaskGraphics.lineTo(this.player.x, this.player.y);
@@ -1841,7 +1868,7 @@ var Flashlight = function () {
   }, {
     key: 'makeFlickerEffect',
     value: function makeFlickerEffect() {
-      var alpha = _FlashlightConstants.LIGHT_ALPHA + Math.random() * 0.1;
+      var alpha = _FlashlightConstants.LIGHT_ALPHA + Math.random() * _FlashlightConstants.FLICKERING_ALPHA_OFFSET;
       this.flickerLayer.alpha = alpha;
     }
   }]);
@@ -1851,7 +1878,7 @@ var Flashlight = function () {
 
 exports.default = Flashlight;
 
-},{"../constants/FlashlightConstants":8}],20:[function(require,module,exports){
+},{"../constants/FlashlightConstants":8}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1957,7 +1984,7 @@ var Journal = function (_Phaser$Sprite) {
 
 exports.default = Journal;
 
-},{"../constants/ItemConstants":9,"../constants/TileMapConstants":11}],21:[function(require,module,exports){
+},{"../constants/ItemConstants":9,"../constants/TileMapConstants":11}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2174,7 +2201,7 @@ var JournalsManager = function (_Phaser$Group) {
 
 exports.default = JournalsManager;
 
-},{"../constants/ItemConstants":9,"../utils/UserInterfaceUtils":39}],22:[function(require,module,exports){
+},{"../constants/ItemConstants":9,"../utils/UserInterfaceUtils":40}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2309,6 +2336,7 @@ var Player = function (_Entity) {
     key: 'setUpFlashlight',
     value: function setUpFlashlight(walls, zombies) {
       this.flashlight = new _Flashlight2.default(this, walls, zombies);
+      this.isFlashlightInitialized = true;
     }
   }, {
     key: 'update',
@@ -2317,7 +2345,9 @@ var Player = function (_Entity) {
       this.handleAnimation();
       this.lookAtMouse();
       this.handleAttack();
-      this.flashlight.update();
+      if (this.isFlashlightInitialized === true) {
+        this.flashlight.update();
+      }
     }
   }, {
     key: 'handleMovement',
@@ -2491,7 +2521,7 @@ var Player = function (_Entity) {
 
 exports.default = Player;
 
-},{"../constants/PlayerConstants":10,"../constants/TileMapConstants":11,"./Entity":18,"./Flashlight":19}],23:[function(require,module,exports){
+},{"../constants/PlayerConstants":10,"../constants/TileMapConstants":11,"./Entity":19,"./Flashlight":20}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2679,7 +2709,7 @@ var TileMap = function (_Phaser$Tilemap) {
 
 exports.default = TileMap;
 
-},{"../utils/MapUtils.js":37}],24:[function(require,module,exports){
+},{"../utils/MapUtils.js":38}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2927,7 +2957,7 @@ var Zombie = function (_Entity) {
 
 exports.default = Zombie;
 
-},{"../constants/TileMapConstants":11,"../constants/ZombieConstants":13,"../utils/MapUtils":37,"./Entity":18,"./ZombieComponents/ChasingPlayerManager":25,"./ZombieComponents/SeekingPlayerManager":28,"./ZombieComponents/ZombiePathManager":29,"./ZombieComponents/ZombieRotationManager":30}],25:[function(require,module,exports){
+},{"../constants/TileMapConstants":11,"../constants/ZombieConstants":13,"../utils/MapUtils":38,"./Entity":19,"./ZombieComponents/ChasingPlayerManager":26,"./ZombieComponents/SeekingPlayerManager":29,"./ZombieComponents/ZombiePathManager":30,"./ZombieComponents/ZombieRotationManager":31}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3074,7 +3104,7 @@ var ChasingPlayerManager = function () {
 
 exports.default = ChasingPlayerManager;
 
-},{"../../constants/ZombieConstants":13,"./NotificationsManager":26}],26:[function(require,module,exports){
+},{"../../constants/ZombieConstants":13,"./NotificationsManager":27}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3185,7 +3215,7 @@ var NotificationsManager = function () {
 
 exports.default = NotificationsManager;
 
-},{"../../constants/ZombieConstants":13}],27:[function(require,module,exports){
+},{"../../constants/ZombieConstants":13}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3243,7 +3273,7 @@ var PathFinder = function () {
 
 exports.default = PathFinder;
 
-},{"easystarjs":1}],28:[function(require,module,exports){
+},{"easystarjs":1}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3411,7 +3441,7 @@ var SeekingPlayerManager = function () {
 
 exports.default = SeekingPlayerManager;
 
-},{"../../constants/ZombieConstants":13,"../../utils/MathUtils":38}],29:[function(require,module,exports){
+},{"../../constants/ZombieConstants":13,"../../utils/MathUtils":39}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3656,7 +3686,7 @@ var ZombiePathManager = function () {
 
 exports.default = ZombiePathManager;
 
-},{"../../constants/ZombieConstants":13,"../../utils/DeterminePathCollisionUtils":35,"../../utils/HandlePathCollisionUtils":36,"../../utils/MapUtils":37,"./PathFinder":27}],30:[function(require,module,exports){
+},{"../../constants/ZombieConstants":13,"../../utils/DeterminePathCollisionUtils":36,"../../utils/HandlePathCollisionUtils":37,"../../utils/MapUtils":38,"./PathFinder":28}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3737,7 +3767,7 @@ var ZombieRotationManager = function () {
 
 exports.default = ZombieRotationManager;
 
-},{"../../constants/ZombieConstants":13,"../../utils/MapUtils":37}],31:[function(require,module,exports){
+},{"../../constants/ZombieConstants":13,"../../utils/MapUtils":38}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3806,7 +3836,7 @@ var Boot = function (_Phaser$State) {
 
 exports.default = Boot;
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4040,7 +4070,7 @@ var Game = function (_Phaser$State) {
 
 exports.default = Game;
 
-},{"../UI/GameOverUI":7,"../constants/PlayerConstants":10,"../constants/TileMapConstants":11,"../objects/BoidsManager":17,"../objects/Journal":20,"../objects/JournalsManager":21,"../objects/Player":22,"../objects/TileMap":23,"../objects/Zombie":24,"../utils/MapUtils":37}],33:[function(require,module,exports){
+},{"../UI/GameOverUI":7,"../constants/PlayerConstants":10,"../constants/TileMapConstants":11,"../objects/BoidsManager":18,"../objects/Journal":21,"../objects/JournalsManager":22,"../objects/Player":23,"../objects/TileMap":24,"../objects/Zombie":25,"../utils/MapUtils":38}],34:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4109,7 +4139,7 @@ var Menu = function (_Phaser$State) {
 
 exports.default = Menu;
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4185,7 +4215,7 @@ var Preload = function (_Phaser$State) {
 
 exports.default = Preload;
 
-},{"../constants/PlayerConstants.js":10,"../constants/ZombieConstants.js":13}],35:[function(require,module,exports){
+},{"../constants/PlayerConstants.js":10,"../constants/ZombieConstants.js":13}],36:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4265,7 +4295,7 @@ function isZombieInMovement(zombie) {
   return zombie.state !== _ZombiePathManager.STATES.CALCULATING_PATH && zombie.state !== _ZombiePathManager.STATES.NOT_STARTED;
 }
 
-},{"../objects/ZombieComponents/ZombiePathManager":29,"./MapUtils":37}],36:[function(require,module,exports){
+},{"../objects/ZombieComponents/ZombiePathManager":30,"./MapUtils":38}],37:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4351,7 +4381,7 @@ function getTileCandidates(tile) {
   return [{ x: tile.x, y: tile.y - 1 }, { x: tile.x, y: tile.y + 1 }, { x: tile.x - 1, y: tile.y }, { x: tile.x + 1, y: tile.y }];
 }
 
-},{"./MapUtils":37}],37:[function(require,module,exports){
+},{"./MapUtils":38}],38:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4408,7 +4438,7 @@ var getWallsPositions = exports.getWallsPositions = function getWallsPositions(l
   return wallsArr;
 };
 
-},{"../constants/TileMapConstants":11}],38:[function(require,module,exports){
+},{"../constants/TileMapConstants":11}],39:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4421,7 +4451,7 @@ function isInDegreeRange(entity, target, sightAngle) {
   return angleDelta <= sightAngle || angleDelta >= 360 - sightAngle;
 }
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4447,5 +4477,5 @@ function showBackgroundLayer(game) {
   return backgroundLayer;
 }
 
-},{}]},{},[14])
+},{}]},{},[15])
 //# sourceMappingURL=game.js.map

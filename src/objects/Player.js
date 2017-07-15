@@ -82,6 +82,7 @@ export default class Player extends Entity {
 
   setUpFlashlight( walls, zombies ) {
     this.flashlight = new Flashlight( this, walls, zombies );
+    this.isFlashlightInitialized = true;
   }
 
   update() {
@@ -89,7 +90,9 @@ export default class Player extends Entity {
     this.handleAnimation();
     this.lookAtMouse();
     this.handleAttack();
-    this.flashlight.update();
+    if ( this.isFlashlightInitialized === true ) {
+      this.flashlight.update();
+    }
   }
 
   handleMovement() {

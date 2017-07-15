@@ -1,53 +1,53 @@
-import { RAY_LENGTH, LIGHT_ANGLE, NUMBER_OF_RAYS, WORLD_SHADOW_ALPHA, LIGHT_ALPHA } from '../constants/FlashlightConstants';
+import { RAY_LENGTH, LIGHT_ANGLE, NUMBER_OF_RAYS, WORLD_SHADOW_ALPHA, LIGHT_ALPHA, FLICKERING_ALPHA_OFFSET } from '../constants/FlashlightConstants';
 
 export default class Flashlight {
   constructor( player, walls, zombies ) {
     this.player = player;
     this.walls = walls;
 
-    console.log( this.player.game );
-
-    this.shadowLayer = this.player.game.add.image( 0, 0, 'layer-background' );
-    this.shadowLayer.width = this.player.game.camera.width * 1.5;
-    this.shadowLayer.height = this.player.game.camera.height * 1.5;
-    this.shadowLayer.alpha = WORLD_SHADOW_ALPHA;
-
     this.flickerLayer = this.player.game.add.image( 0, 0, 'layer-background' );
     this.flickerLayer.width = RAY_LENGTH * 4.5;
     this.flickerLayer.height = RAY_LENGTH * 4.5;
     this.flickerLayer.anchor.setTo( 0.5 );
 
+    this.glowFilter = new Phaser.Filter.Glow( this.player.game );
+
     this.hideMaskGraphics = this.player.game.add.graphics( 0, 0 );
-    this.shadowLayer.mask = this.hideMaskGraphics;
 
     this.showMaskGraphics = this.player.game.add.graphics( 0, 0 );
+    this.showMaskGraphics.filters = [ this.glowFilter ];
+
+    this.flickerLayer.mask = this.showMaskGraphics;
+
     zombies.setAll( 'mask', this.showMaskGraphics );
     this.zombies = zombies;
 
-    this.flickerLayer.mask = this.showMaskGraphics;
+    this.hideMaskGraphics.filters = [ this.glowFilter ];
+    this.hideMaskGraphics.isMask = false;
+    this.hideMaskGraphics.alpha = WORLD_SHADOW_ALPHA;
   }
   update() {
     this.updateLayersPosition();
-    this.drawLayers();
     this.makeFlickerEffect();
+    this.drawLayers();
   }
   updateLayersPosition() {
-    this.shadowLayer.x = this.player.game.camera.position.x - this.player.game.camera.width * 0.2;
-    this.shadowLayer.y = this.player.game.camera.position.y;
-
     Object.assign( this.flickerLayer, this.player.position );
   }
   drawLayers() {
     this.hideMaskGraphics.clear();
-    this.hideMaskGraphics.moveTo( this.shadowLayer.x, this.shadowLayer.y );
-    this.hideMaskGraphics.lineStyle( 2, 0xffffff, 1 );
-    this.hideMaskGraphics.beginFill( 0x00000000 );
+    this.hideMaskGraphics.moveTo( this.player.game.camera.x - 100, this.player.game.camera.y );
+    this.hideMaskGraphics.beginFill( 0x000000, 1 );
+    this.hideMaskGraphics.lineStyle( 0, 0x000000, 1 );
+    this.hideMaskGraphics.lineTo( this.player.game.camera.x + this.player.game.camera.width + 100, this.player.game.camera.y );
+    this.hideMaskGraphics.lineTo( this.player.game.camera.x + this.player.game.camera.width + 100, this.player.game.camera.y + this.player.game.camera.height );
+    this.hideMaskGraphics.lineTo( this.player.game.camera.x - 100, this.player.game.camera.y + this.player.game.camera.height );
+    this.hideMaskGraphics.lineTo( this.player.game.camera.x - 100, this.player.game.camera.y );
     this.hideMaskGraphics.lineTo( this.player.x, this.player.y );
 
     this.showMaskGraphics.clear();
-    this.showMaskGraphics.lineStyle( 2, 0xffffff, 1 );
-    this.showMaskGraphics.beginFill( 0x00000000 );
     this.showMaskGraphics.moveTo( this.player.x, this.player.y );
+    this.showMaskGraphics.beginFill();
 
     const mouseX = this.player.game.input.mousePointer.worldX;
     const mouseY = this.player.game.input.mousePointer.worldY;
@@ -69,14 +69,8 @@ export default class Flashlight {
       }
       this.hideMaskGraphics.lineTo( lastX, lastY );
       this.showMaskGraphics.lineTo( lastX, lastY );
-
     }
     this.hideMaskGraphics.lineTo( this.player.x, this.player.y );
-    this.hideMaskGraphics.lineTo( this.shadowLayer.x, this.shadowLayer.y );
-    this.hideMaskGraphics.lineTo( this.shadowLayer.x + this.shadowLayer.width, 0 );
-    this.hideMaskGraphics.lineTo( this.shadowLayer.x + this.shadowLayer.width, this.shadowLayer.y + this.shadowLayer.height );
-    this.hideMaskGraphics.lineTo( 0, this.shadowLayer.y + this.shadowLayer.height );
-    this.hideMaskGraphics.lineTo( this.shadowLayer.x, this.shadowLayer.y );
     this.hideMaskGraphics.endFill();
 
     this.showMaskGraphics.lineTo( this.player.x, this.player.y );
@@ -98,7 +92,7 @@ export default class Flashlight {
     return false;
   }
   makeFlickerEffect() {
-    const alpha = LIGHT_ALPHA + Math.random() * 0.1;
+    const alpha = LIGHT_ALPHA + Math.random() * FLICKERING_ALPHA_OFFSET;
     this.flickerLayer.alpha = alpha;
   }
 }
