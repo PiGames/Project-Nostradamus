@@ -1775,21 +1775,15 @@ var Flashlight = function () {
     this.flickerLayer.height = _FlashlightConstants.RAY_LENGTH * 4.5;
     this.flickerLayer.anchor.setTo(0.5);
 
-    this.glowFilter = new Phaser.Filter.Glow(this.player.game);
+    this.showMaskGraphics = this.player.game.add.graphics(0, 0);
+    this.flickerLayer.mask = this.showMaskGraphics;
+    zombies.setAll('mask', this.showMaskGraphics);
 
     this.hideMaskGraphics = this.player.game.add.graphics(0, 0);
-
-    this.showMaskGraphics = this.player.game.add.graphics(0, 0);
-    this.showMaskGraphics.filters = [this.glowFilter];
-
-    this.flickerLayer.mask = this.showMaskGraphics;
-
-    zombies.setAll('mask', this.showMaskGraphics);
-    this.zombies = zombies;
-
-    this.hideMaskGraphics.filters = [this.glowFilter];
     this.hideMaskGraphics.isMask = false;
     this.hideMaskGraphics.alpha = _FlashlightConstants.WORLD_SHADOW_ALPHA;
+    this.glowFilter = new Phaser.Filter.Glow(this.player.game);
+    this.hideMaskGraphics.filters = [this.glowFilter];
   }
 
   _createClass(Flashlight, [{
