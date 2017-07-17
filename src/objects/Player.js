@@ -1,7 +1,7 @@
 import Entity from './Entity';
 import { PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, PLAYER_SNEAK_MULTIPLIER, PLAYER_SPRINT_MULTIPLIER, PLAYER_WALK_ANIMATION_FRAMERATE, PLAYER_FIGHT_ANIMATION_FRAMERATE, PLAYER_HAND_ATTACK_RANGE, PLAYER_HAND_ATTACK_ANGLE, PLAYER_HAND_ATTACK_DAMAGE, PLAYER_DAMAGE_COOLDOWN } from '../constants/PlayerConstants';
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
-import Flashlight from './Flashlight';
+import Flashlight from './LightsComponents/Flashlight';
 
 
 export default class Player extends Entity {
@@ -80,9 +80,8 @@ export default class Player extends Entity {
 
   }
 
-  setUpFlashlight( walls, zombies ) {
-    this.flashlight = new Flashlight( this, walls, zombies );
-    this.isFlashlightInitialized = true;
+  setUpFlashlight( walls ) {
+    this.flashlight = new Flashlight( this, walls );
   }
 
   update() {
@@ -90,9 +89,6 @@ export default class Player extends Entity {
     this.handleAnimation();
     this.lookAtMouse();
     this.handleAttack();
-    if ( this.isFlashlightInitialized === true ) {
-      this.flashlight.update();
-    }
   }
 
   handleMovement() {

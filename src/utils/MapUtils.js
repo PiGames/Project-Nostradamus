@@ -36,3 +36,19 @@ export const getWallsPositions = ( layer ) => {
 
   return wallsArr;
 };
+
+export function isTileBlocking( begin, end, walls ) {
+  const ray = new Phaser.Line();
+  ray.start.set( begin.x, begin.y );
+  ray.end.set( end.x, end.y );
+
+  const tileHits = walls.getRayCastTiles( ray, 0, false, false );
+
+  for ( let i = 0; i < tileHits.length; i++ ) {
+    if ( tileHits[ i ].index >= 0 ) {
+      return true;
+    }
+  }
+
+  return false;
+}

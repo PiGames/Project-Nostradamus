@@ -5,6 +5,8 @@ import JournalsManager from '../objects/JournalsManager';
 import Journal from '../objects/Journal';
 import BoidsManager from '../objects/BoidsManager';
 import GameOverUI from '../UI/GameOverUI';
+import LightsManager from '../objects/LightsComponents/LightsManager';
+import TorchLight from '../objects/LightsComponents/TorchLight';
 
 import { PLAYER_INITIAL_FRAME } from '../constants/PlayerConstants';
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
@@ -90,7 +92,16 @@ export default class Game extends Phaser.State {
     } );
   }
   initFlashlight() {
-    this.player.setUpFlashlight( this.map.walls, this.zombies );
+    this.lightsManager = new LightsManager( this.game, this.map.walls );
+    this.player.setUpFlashlight( this.map.walls );
+    this.lightsManager.add( this.player.flashlight );
+
+    this.journals.forEach( journal => {
+      this.lightsManager.add( journal.light );
+    } );
+
+    this.lightsManager.add( new TorchLight( { x: 64 + 32, y: 6 * 64 + 32 } ) );
+
   }
   initGameOverUI() {
     const mainMenuCallback = () => this.state.start( 'Menu' );
@@ -103,5 +114,10 @@ export default class Game extends Phaser.State {
   }
   clearScreen() {
     this.journals.clearUI();
+  }
+  update() {
+    if ( this.lightsManager ) {
+      this.lightsManager.update();
+    }
   }
 }

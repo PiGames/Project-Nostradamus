@@ -1,5 +1,6 @@
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 import { COMPUTER_WIDTH, COMPUTER_HEIGHT } from '../constants/ItemConstants';
+import JournalLight from './LightsComponents/JournalLight';
 
 export default class Journal extends Phaser.Sprite {
   constructor( game, content, imageKey ) {
@@ -11,6 +12,8 @@ export default class Journal extends Phaser.Sprite {
     this.hasPlayerApproached = false;
 
     this.content = content;
+
+    this.light = null;
   }
   setCorner( cornerX, cornerY ) {
     this.cornerX = cornerX;
@@ -49,5 +52,6 @@ export default class Journal extends Phaser.Sprite {
     rectangleSensor.sensor = true;
 
     this.anchor.setTo( 0.5 );
+    this.light = new JournalLight( this );
   }
 }

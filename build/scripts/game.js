@@ -1021,7 +1021,7 @@ var ProjectNostradamus = function (_Phaser$Game) {
 
 exports.default = ProjectNostradamus;
 
-},{"./filters.js":14,"./levels/Level1":16,"./levels/Level2":17,"./states/Boot":32,"./states/Menu":34,"./states/Preload":35}],7:[function(require,module,exports){
+},{"./filters.js":15,"./levels/Level1":17,"./levels/Level2":18,"./states/Boot":38,"./states/Menu":40,"./states/Preload":41}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1106,7 +1106,7 @@ var GameOverUI = function () {
 
 exports.default = GameOverUI;
 
-},{"../constants/UserInterfaceConstants":12,"../utils/UserInterfaceUtils":40}],8:[function(require,module,exports){
+},{"../constants/UserInterfaceConstants":13,"../utils/UserInterfaceUtils":47}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1117,7 +1117,7 @@ var NUMBER_OF_RAYS = exports.NUMBER_OF_RAYS = 50;
 var RAY_LENGTH = exports.RAY_LENGTH = 150;
 var WORLD_SHADOW_ALPHA = exports.WORLD_SHADOW_ALPHA = 0.38;
 var LIGHT_ALPHA = exports.LIGHT_ALPHA = 0.2;
-var FLICKERING_ALPHA_OFFSET = exports.FLICKERING_ALPHA_OFFSET = 0.08;
+var FLICKERING_POWER = exports.FLICKERING_POWER = 0.04;
 
 },{}],9:[function(require,module,exports){
 "use strict";
@@ -1133,6 +1133,9 @@ var JOURNAL_TEXT_SCROLL_STEP = exports.JOURNAL_TEXT_SCROLL_STEP = 32;
 var JOURNAL_TEXT_FONT_SIZE = exports.JOURNAL_TEXT_FONT_SIZE = 16;
 var JOURNAL_SCROLL_BAR_WIDTH = exports.JOURNAL_SCROLL_BAR_WIDTH = 8;
 var MAGIC_OFFSET_FIXING_VALUE = exports.MAGIC_OFFSET_FIXING_VALUE = 7;
+var NUMBER_OF_RAYS = exports.NUMBER_OF_RAYS = 25;
+var RAY_LENGTH = exports.RAY_LENGTH = 25;
+var FLICKERING_POWER = exports.FLICKERING_POWER = 0.03;
 
 },{}],10:[function(require,module,exports){
 "use strict";
@@ -1170,9 +1173,18 @@ var MAP_HEIGHT = exports.MAP_HEIGHT = 32;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var END_SCREEN_FADE_IN_DURATION = exports.END_SCREEN_FADE_IN_DURATION = 2500;
+var RAY_LENGTH = exports.RAY_LENGTH = 120;
+var FLICKERING_POWER = exports.FLICKERING_POWER = 0.04;
 
 },{}],13:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var END_SCREEN_FADE_IN_DURATION = exports.END_SCREEN_FADE_IN_DURATION = 2500;
+
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1197,7 +1209,7 @@ var ZOMBIE_DAMAGE_COOLDOWN = exports.ZOMBIE_DAMAGE_COOLDOWN = 0.2;
 var ZOMBIE_DAMAGE_VALUE = exports.ZOMBIE_DAMAGE_VALUE = 0.1;
 var ZOMBIE_NOTIFY_RANGE = exports.ZOMBIE_NOTIFY_RANGE = 500;
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 
 Phaser.Filter.Glow = function (game) {
@@ -1226,7 +1238,7 @@ Object.defineProperty(Phaser.Filter.Glow.prototype, 'alpha', {
 Phaser.Filter.Glow.prototype = Object.create(Phaser.Filter.prototype);
 Phaser.Filter.Glow.prototype.constructor = Phaser.Filter.Glow;
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict';
 
 var _ProjectNostradamus = require('./ProjectNostradamus');
@@ -1260,7 +1272,7 @@ document.onkeydown = ( e ) => {
 };
 */
 
-},{"./ProjectNostradamus":6}],16:[function(require,module,exports){
+},{"./ProjectNostradamus":6}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1333,7 +1345,7 @@ var Level1 = function (_Game) {
 
 exports.default = Level1;
 
-},{"../states/Game.js":33}],17:[function(require,module,exports){
+},{"../states/Game.js":39}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1406,7 +1418,7 @@ var Level2 = function (_Game) {
 
 exports.default = Level2;
 
-},{"../states/Game.js":33}],18:[function(require,module,exports){
+},{"../states/Game.js":39}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1633,7 +1645,7 @@ var ZombiesBoidsManager = function (_Phaser$Group) {
 
 exports.default = ZombiesBoidsManager;
 
-},{"../constants/TileMapConstants":11,"../utils/MapUtils.js":38}],19:[function(require,module,exports){
+},{"../constants/TileMapConstants":11,"../utils/MapUtils.js":45}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1738,141 +1750,7 @@ var Entity = function (_Phaser$Sprite) {
 
 exports.default = Entity;
 
-},{}],20:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-  };
-}();
-
-var _FlashlightConstants = require('../constants/FlashlightConstants');
-
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-
-var Flashlight = function () {
-  function Flashlight(player, walls, zombies) {
-    _classCallCheck(this, Flashlight);
-
-    this.player = player;
-    this.walls = walls;
-
-    this.flickerLayer = this.player.game.add.image(0, 0, 'layer-background');
-    this.flickerLayer.width = _FlashlightConstants.RAY_LENGTH * 4.5;
-    this.flickerLayer.height = _FlashlightConstants.RAY_LENGTH * 4.5;
-    this.flickerLayer.anchor.setTo(0.5);
-
-    this.showMaskGraphics = this.player.game.add.graphics(0, 0);
-    this.flickerLayer.mask = this.showMaskGraphics;
-    zombies.setAll('mask', this.showMaskGraphics);
-
-    this.hideMaskGraphics = this.player.game.add.graphics(0, 0);
-    this.hideMaskGraphics.isMask = false;
-    this.hideMaskGraphics.alpha = _FlashlightConstants.WORLD_SHADOW_ALPHA;
-    this.glowFilter = new Phaser.Filter.Glow(this.player.game);
-    this.hideMaskGraphics.filters = [this.glowFilter];
-  }
-
-  _createClass(Flashlight, [{
-    key: 'update',
-    value: function update() {
-      this.updateLayersPosition();
-      this.makeFlickerEffect();
-      this.drawLayers();
-    }
-  }, {
-    key: 'updateLayersPosition',
-    value: function updateLayersPosition() {
-      Object.assign(this.flickerLayer, this.player.position);
-    }
-  }, {
-    key: 'drawLayers',
-    value: function drawLayers() {
-      this.hideMaskGraphics.clear();
-      this.hideMaskGraphics.moveTo(this.player.game.camera.x - 100, this.player.game.camera.y);
-      this.hideMaskGraphics.beginFill(0x000000, 1);
-      this.hideMaskGraphics.lineStyle(0, 0x000000, 1);
-      this.hideMaskGraphics.lineTo(this.player.game.camera.x + this.player.game.camera.width + 100, this.player.game.camera.y);
-      this.hideMaskGraphics.lineTo(this.player.game.camera.x + this.player.game.camera.width + 100, this.player.game.camera.y + this.player.game.camera.height);
-      this.hideMaskGraphics.lineTo(this.player.game.camera.x - 100, this.player.game.camera.y + this.player.game.camera.height);
-      this.hideMaskGraphics.lineTo(this.player.game.camera.x - 100, this.player.game.camera.y);
-      this.hideMaskGraphics.lineTo(this.player.x, this.player.y);
-
-      this.showMaskGraphics.clear();
-      this.showMaskGraphics.moveTo(this.player.x, this.player.y);
-      this.showMaskGraphics.beginFill();
-
-      var mouseX = this.player.game.input.mousePointer.worldX;
-      var mouseY = this.player.game.input.mousePointer.worldY;
-      var mouseAngle = Math.atan2(this.player.y - mouseY, this.player.x - mouseX);
-
-      for (var i = 0; i < _FlashlightConstants.NUMBER_OF_RAYS; i++) {
-        var rayAngle = mouseAngle - _FlashlightConstants.LIGHT_ANGLE / 2 + _FlashlightConstants.LIGHT_ANGLE / _FlashlightConstants.NUMBER_OF_RAYS * i;
-        var lastX = this.player.x;
-        var lastY = this.player.y;
-        for (var j = 1; j <= _FlashlightConstants.RAY_LENGTH; j++) {
-          var landingX = Math.round(this.player.x - 2 * j * Math.cos(rayAngle));
-          var landingY = Math.round(this.player.y - 2 * j * Math.sin(rayAngle));
-          if (!this.isTileBlocking(landingX, landingY)) {
-            lastX = landingX;
-            lastY = landingY;
-          } else {
-            break;
-          }
-        }
-        this.hideMaskGraphics.lineTo(lastX, lastY);
-        this.showMaskGraphics.lineTo(lastX, lastY);
-      }
-      this.hideMaskGraphics.lineTo(this.player.x, this.player.y);
-      this.hideMaskGraphics.endFill();
-
-      this.showMaskGraphics.lineTo(this.player.x, this.player.y);
-      this.showMaskGraphics.endFill();
-    }
-  }, {
-    key: 'isTileBlocking',
-    value: function isTileBlocking(targetX, targetY) {
-      var playerSeekingRay = new Phaser.Line();
-      playerSeekingRay.start.set(targetX, targetY);
-      playerSeekingRay.end.set(this.player.x, this.player.y);
-
-      var tileHits = this.walls.getRayCastTiles(playerSeekingRay, 0, false, false);
-
-      for (var i = 0; i < tileHits.length; i++) {
-        if (tileHits[i].index >= 0) {
-          return true;
-        }
-      }
-
-      return false;
-    }
-  }, {
-    key: 'makeFlickerEffect',
-    value: function makeFlickerEffect() {
-      var alpha = _FlashlightConstants.LIGHT_ALPHA + Math.random() * _FlashlightConstants.FLICKERING_ALPHA_OFFSET;
-      this.flickerLayer.alpha = alpha;
-    }
-  }]);
-
-  return Flashlight;
-}();
-
-exports.default = Flashlight;
-
-},{"../constants/FlashlightConstants":8}],21:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1892,6 +1770,14 @@ var _createClass = function () {
 var _TileMapConstants = require('../constants/TileMapConstants');
 
 var _ItemConstants = require('../constants/ItemConstants');
+
+var _JournalLight = require('./LightsComponents/JournalLight');
+
+var _JournalLight2 = _interopRequireDefault(_JournalLight);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -1924,6 +1810,8 @@ var Journal = function (_Phaser$Sprite) {
     _this.hasPlayerApproached = false;
 
     _this.content = content;
+
+    _this.light = null;
     return _this;
   }
 
@@ -1970,6 +1858,7 @@ var Journal = function (_Phaser$Sprite) {
       rectangleSensor.sensor = true;
 
       this.anchor.setTo(0.5);
+      this.light = new _JournalLight2.default(this);
     }
   }]);
 
@@ -1978,7 +1867,7 @@ var Journal = function (_Phaser$Sprite) {
 
 exports.default = Journal;
 
-},{"../constants/ItemConstants":9,"../constants/TileMapConstants":11}],22:[function(require,module,exports){
+},{"../constants/ItemConstants":9,"../constants/TileMapConstants":11,"./LightsComponents/JournalLight":24}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2195,7 +2084,572 @@ var JournalsManager = function (_Phaser$Group) {
 
 exports.default = JournalsManager;
 
-},{"../constants/ItemConstants":9,"../utils/UserInterfaceUtils":40}],23:[function(require,module,exports){
+},{"../constants/ItemConstants":9,"../utils/UserInterfaceUtils":47}],23:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
+
+var _FlashlightConstants = require('../../constants/FlashlightConstants');
+
+var _Lightable2 = require('./Lightable');
+
+var _Lightable3 = _interopRequireDefault(_Lightable2);
+
+var _MapUtils = require('../../utils/MapUtils');
+
+var _LightUtils = require('../../utils/LightUtils');
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+function _possibleConstructorReturn(self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }return call && (typeof call === "object" || typeof call === "function") ? call : self;
+}
+
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+}
+
+var Flashlight = function (_Lightable) {
+  _inherits(Flashlight, _Lightable);
+
+  function Flashlight(player, walls) {
+    _classCallCheck(this, Flashlight);
+
+    var _this = _possibleConstructorReturn(this, (Flashlight.__proto__ || Object.getPrototypeOf(Flashlight)).call(this, false));
+
+    _this.player = player;
+    _this.walls = walls;
+    return _this;
+  }
+
+  _createClass(Flashlight, [{
+    key: 'getLightShapePoints',
+    value: function getLightShapePoints() {
+      var shapePoints = [];
+
+      var mouseX = this.player.game.input.mousePointer.worldX;
+      var mouseY = this.player.game.input.mousePointer.worldY;
+      var mouseAngle = Math.atan2(this.player.y - mouseY, this.player.x - mouseX);
+
+      var flashlightLength = 8;
+
+      var minAngle = mouseAngle - _FlashlightConstants.LIGHT_ANGLE / 2;
+      var flashlightStartPoint = {
+        x: Math.round(this.player.x - 2 * flashlightLength * Math.cos(minAngle)),
+        y: Math.round(this.player.y - 2 * flashlightLength * Math.sin(minAngle))
+      };
+      shapePoints.push(flashlightStartPoint);
+
+      for (var i = 0; i < _FlashlightConstants.NUMBER_OF_RAYS; i++) {
+        var rayAngle = mouseAngle - _FlashlightConstants.LIGHT_ANGLE / 2 + _FlashlightConstants.LIGHT_ANGLE / _FlashlightConstants.NUMBER_OF_RAYS * i;
+        var lastX = this.player.x;
+        var lastY = this.player.y;
+        for (var j = 1; j <= _FlashlightConstants.RAY_LENGTH; j++) {
+          var begin = this.player.position;
+          var end = {
+            x: Math.round(this.player.x - 2 * j * Math.cos(rayAngle)),
+            y: Math.round(this.player.y - 2 * j * Math.sin(rayAngle))
+          };
+
+          if (!(0, _MapUtils.isTileBlocking)(begin, end, this.walls)) {
+            lastX = end.x;
+            lastY = end.y;
+          } else {
+            break;
+          }
+        }
+
+        shapePoints.push({ x: lastX, y: lastY });
+      }
+
+      var maxAngle = mouseAngle + _FlashlightConstants.LIGHT_ANGLE / 2;
+      var flashlightEndPoint = {
+        x: Math.round(this.player.x - 2 * flashlightLength * Math.cos(maxAngle)),
+        y: Math.round(this.player.y - 2 * flashlightLength * Math.sin(maxAngle))
+      };
+      shapePoints.push(flashlightEndPoint);
+
+      return (0, _LightUtils.optimizeShape)(shapePoints);
+    }
+  }, {
+    key: 'getFillStyle',
+    value: function getFillStyle(ctx, offset) {
+      var rayLength = _FlashlightConstants.RAY_LENGTH * (1 + Math.random() * _FlashlightConstants.FLICKERING_POWER);
+      var gradient = ctx.createRadialGradient(this.player.x - offset.x, this.player.y - offset.y, _FlashlightConstants.RAY_LENGTH * 0.75 * 2, this.player.x - offset.x, this.player.y - offset.y, rayLength * 2);
+      gradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
+
+      return gradient;
+    }
+  }]);
+
+  return Flashlight;
+}(_Lightable3.default);
+
+exports.default = Flashlight;
+
+},{"../../constants/FlashlightConstants":8,"../../utils/LightUtils":44,"../../utils/MapUtils":45,"./Lightable":25}],24:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
+
+var _RoundLight2 = require('./RoundLight');
+
+var _RoundLight3 = _interopRequireDefault(_RoundLight2);
+
+var _ItemConstants = require('../../constants/ItemConstants');
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+function _possibleConstructorReturn(self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }return call && (typeof call === "object" || typeof call === "function") ? call : self;
+}
+
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+}
+
+var JournalLight = function (_RoundLight) {
+  _inherits(JournalLight, _RoundLight);
+
+  function JournalLight(position) {
+    _classCallCheck(this, JournalLight);
+
+    return _possibleConstructorReturn(this, (JournalLight.__proto__ || Object.getPrototypeOf(JournalLight)).call(this, position, _ItemConstants.RAY_LENGTH));
+  }
+
+  _createClass(JournalLight, [{
+    key: 'getFillStyle',
+    value: function getFillStyle(ctx, offset) {
+      var rayLength = _ItemConstants.RAY_LENGTH * (1 + Math.random() * _ItemConstants.FLICKERING_POWER);
+      var gradient = ctx.createRadialGradient(this.x - offset.x, this.y - offset.y, rayLength * 0.4 * 2, this.x - offset.x, this.y - offset.y, rayLength * 2);
+      gradient.addColorStop(0, 'rgba(208, 255, 175, 1)');
+      gradient.addColorStop(1, 'rgba(208, 255, 175, 0.0)');
+
+      return gradient;
+    }
+  }]);
+
+  return JournalLight;
+}(_RoundLight3.default);
+
+exports.default = JournalLight;
+
+},{"../../constants/ItemConstants":9,"./RoundLight":27}],25:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+var ID_COUNTER = 0;
+
+// sort of a interface
+
+var Lightable = function () {
+  function Lightable() {
+    var isStatic = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+    _classCallCheck(this, Lightable);
+
+    this.id = ID_COUNTER++;
+    this.isStatic = isStatic;
+  }
+
+  _createClass(Lightable, [{
+    key: "getLightShapePoints",
+    value: function getLightShapePoints() {
+      // virtual method
+      // it means it should by overwritten in derived class
+      return [];
+    }
+  }, {
+    key: "getFillStyle",
+    value: function getFillStyle() {
+      // virtual method
+      return 0xffffff;
+    }
+  }]);
+
+  return Lightable;
+}();
+
+exports.default = Lightable;
+
+},{}],26:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
+
+var _Lightable = require('./Lightable');
+
+var _Lightable2 = _interopRequireDefault(_Lightable);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+var LightManager = function () {
+  function LightManager(game, walls) {
+    _classCallCheck(this, LightManager);
+
+    this.game = game;
+    this.walls = walls;
+
+    this.cachedLights = [];
+    this.dynamicallyRenderedLightables = [];
+
+    this.shadowTexture = this.game.add.bitmapData(this.game.camera.width + 200, this.game.camera.height + 200);
+
+    this.lightImage = this.game.add.image(0, 0, this.shadowTexture);
+    this.lightImage.blendMode = Phaser.blendModes.MULTIPLY;
+  }
+
+  _createClass(LightManager, [{
+    key: 'add',
+    value: function add(lightable) {
+      if (!(lightable instanceof _Lightable2.default)) {
+        return;
+      }
+
+      if (lightable.isStatic) {
+        var lightShape = lightable.getLightShapePoints(this.walls);
+        var getFillStyle = lightable.getFillStyle.bind(lightable);
+        this.cachedLights.push({ lightShape: lightShape, getFillStyle: getFillStyle });
+      } else {
+        this.dynamicallyRenderedLightables.push(lightable);
+      }
+    }
+  }, {
+    key: 'update',
+    value: function update() {
+      this.updateImagePosition();
+      this.render();
+    }
+  }, {
+    key: 'updateImagePosition',
+    value: function updateImagePosition() {
+      this.lightImage.x = this.game.camera.x - 100;
+      this.lightImage.y = this.game.camera.y - 100;
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this = this;
+
+      this.shadowTexture.dirty = true;
+      this.shadowTexture.clear();
+
+      var ctx = this.shadowTexture.ctx;
+      ctx.fillStyle = '#050505';
+      ctx.fillRect(0, 0, this.game.camera.width + 200, this.game.camera.height + 200);
+
+      this.dynamicallyRenderedLightables.forEach(function (lightable) {
+        ctx.beginPath();
+        ctx.fillStyle = lightable.getFillStyle(ctx, _this.lightImage.position);
+        var shapePointsNotOffseted = lightable.getLightShapePoints(_this.walls);
+        var shapePoints = shapePointsNotOffseted.map(function (point) {
+          return { x: point.x - _this.lightImage.x, y: point.y - _this.lightImage.y };
+        });
+
+        ctx.moveTo(shapePoints[0].x, shapePoints[0].y);
+
+        for (var i = 1; i < shapePoints.length; i++) {
+          ctx.lineTo(shapePoints[i].x, shapePoints[i].y);
+        }
+
+        ctx.lineTo(shapePoints[0].x, shapePoints[0].y);
+        ctx.fill();
+      });
+
+      this.cachedLights.forEach(function (light) {
+        ctx.beginPath();
+        ctx.fillStyle = light.getFillStyle(ctx, _this.lightImage.position);
+        var shapePoints = light.lightShape.map(function (point) {
+          return { x: point.x - _this.lightImage.x, y: point.y - _this.lightImage.y };
+        });
+
+        ctx.moveTo(shapePoints[0].x, shapePoints[0].y);
+
+        for (var i = 1; i < shapePoints.length; i++) {
+          ctx.lineTo(shapePoints[i].x, shapePoints[i].y);
+        }
+
+        ctx.lineTo(shapePoints[0].x, shapePoints[0].y);
+        ctx.fill();
+      });
+    }
+  }]);
+
+  return LightManager;
+}();
+
+exports.default = LightManager;
+
+},{"./Lightable":25}],27:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
+
+var _Lightable2 = require('./Lightable');
+
+var _Lightable3 = _interopRequireDefault(_Lightable2);
+
+var _MapUtils = require('../../utils/MapUtils');
+
+var _LightUtils = require('../../utils/LightUtils');
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+function _possibleConstructorReturn(self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }return call && (typeof call === "object" || typeof call === "function") ? call : self;
+}
+
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+}
+
+var NUMBER_OF_RAYS = 80;
+
+var JournalLight = function (_Lightable) {
+  _inherits(JournalLight, _Lightable);
+
+  function JournalLight(_ref, rayLength) {
+    var x = _ref.x,
+        y = _ref.y;
+
+    _classCallCheck(this, JournalLight);
+
+    var _this = _possibleConstructorReturn(this, (JournalLight.__proto__ || Object.getPrototypeOf(JournalLight)).call(this, true));
+
+    _this.x = x;
+    _this.y = y;
+    _this.rayLength = rayLength;
+    return _this;
+  }
+
+  _createClass(JournalLight, [{
+    key: 'getLightShapePoints',
+    value: function getLightShapePoints(walls) {
+      var shapePoints = [];
+
+      shapePoints.push({ x: this.x, y: this.y });
+
+      for (var i = 0; i <= NUMBER_OF_RAYS; i++) {
+        var rayAngle = Math.PI * 2 / NUMBER_OF_RAYS * i;
+        var lastX = this.x;
+        var lastY = this.y;
+        for (var j = 1; j <= this.rayLength; j++) {
+          var begin = { x: this.x, y: this.y };
+          var end = {
+            x: Math.round(this.x - 2 * j * Math.cos(rayAngle)),
+            y: Math.round(this.y - 2 * j * Math.sin(rayAngle))
+          };
+
+          if (!(0, _MapUtils.isTileBlocking)(begin, end, walls)) {
+            lastX = end.x;
+            lastY = end.y;
+          } else {
+            break;
+          }
+        }
+
+        shapePoints.push({ x: lastX, y: lastY });
+      }
+      shapePoints.push({ x: this.x, y: this.y });
+
+      return (0, _LightUtils.optimizeShape)(shapePoints);
+    }
+  }, {
+    key: 'getFillStyle',
+    value: function getFillStyle() {
+      return '0xffffff';
+    }
+  }]);
+
+  return JournalLight;
+}(_Lightable3.default);
+
+exports.default = JournalLight;
+
+},{"../../utils/LightUtils":44,"../../utils/MapUtils":45,"./Lightable":25}],28:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+}();
+
+var _RoundLight2 = require('./RoundLight');
+
+var _RoundLight3 = _interopRequireDefault(_RoundLight2);
+
+var _TorchConstants = require('../../constants/TorchConstants');
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+function _possibleConstructorReturn(self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }return call && (typeof call === "object" || typeof call === "function") ? call : self;
+}
+
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+}
+
+var TorchlLight = function (_RoundLight) {
+  _inherits(TorchlLight, _RoundLight);
+
+  function TorchlLight(position) {
+    _classCallCheck(this, TorchlLight);
+
+    return _possibleConstructorReturn(this, (TorchlLight.__proto__ || Object.getPrototypeOf(TorchlLight)).call(this, position, _TorchConstants.RAY_LENGTH));
+  }
+
+  _createClass(TorchlLight, [{
+    key: 'getFillStyle',
+    value: function getFillStyle(ctx, offset) {
+      var rayLength = _TorchConstants.RAY_LENGTH * (1 + Math.random() * _TorchConstants.FLICKERING_POWER);
+      var gradient = ctx.createRadialGradient(this.x - offset.x, this.y - offset.y, _TorchConstants.RAY_LENGTH * 0.4 * 2, this.x - offset.x, this.y - offset.y, rayLength * 2);
+      gradient.addColorStop(0, 'rgba(243,20,49, 1)');
+      gradient.addColorStop(1, 'rgba(243,20,49, 0.0)');
+
+      return gradient;
+    }
+  }]);
+
+  return TorchlLight;
+}(_RoundLight3.default);
+
+exports.default = TorchlLight;
+
+},{"../../constants/TorchConstants":12,"./RoundLight":27}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2220,7 +2674,7 @@ var _PlayerConstants = require('../constants/PlayerConstants');
 
 var _TileMapConstants = require('../constants/TileMapConstants');
 
-var _Flashlight = require('./Flashlight');
+var _Flashlight = require('./LightsComponents/Flashlight');
 
 var _Flashlight2 = _interopRequireDefault(_Flashlight);
 
@@ -2328,9 +2782,8 @@ var Player = function (_Entity) {
 
   _createClass(Player, [{
     key: 'setUpFlashlight',
-    value: function setUpFlashlight(walls, zombies) {
-      this.flashlight = new _Flashlight2.default(this, walls, zombies);
-      this.isFlashlightInitialized = true;
+    value: function setUpFlashlight(walls) {
+      this.flashlight = new _Flashlight2.default(this, walls);
     }
   }, {
     key: 'update',
@@ -2339,9 +2792,6 @@ var Player = function (_Entity) {
       this.handleAnimation();
       this.lookAtMouse();
       this.handleAttack();
-      if (this.isFlashlightInitialized === true) {
-        this.flashlight.update();
-      }
     }
   }, {
     key: 'handleMovement',
@@ -2515,7 +2965,7 @@ var Player = function (_Entity) {
 
 exports.default = Player;
 
-},{"../constants/PlayerConstants":10,"../constants/TileMapConstants":11,"./Entity":19,"./Flashlight":20}],24:[function(require,module,exports){
+},{"../constants/PlayerConstants":10,"../constants/TileMapConstants":11,"./Entity":20,"./LightsComponents/Flashlight":23}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2703,7 +3153,7 @@ var TileMap = function (_Phaser$Tilemap) {
 
 exports.default = TileMap;
 
-},{"../utils/MapUtils.js":38}],25:[function(require,module,exports){
+},{"../utils/MapUtils.js":45}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2951,7 +3401,7 @@ var Zombie = function (_Entity) {
 
 exports.default = Zombie;
 
-},{"../constants/TileMapConstants":11,"../constants/ZombieConstants":13,"../utils/MapUtils":38,"./Entity":19,"./ZombieComponents/ChasingPlayerManager":26,"./ZombieComponents/SeekingPlayerManager":29,"./ZombieComponents/ZombiePathManager":30,"./ZombieComponents/ZombieRotationManager":31}],26:[function(require,module,exports){
+},{"../constants/TileMapConstants":11,"../constants/ZombieConstants":14,"../utils/MapUtils":45,"./Entity":20,"./ZombieComponents/ChasingPlayerManager":32,"./ZombieComponents/SeekingPlayerManager":35,"./ZombieComponents/ZombiePathManager":36,"./ZombieComponents/ZombieRotationManager":37}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3098,7 +3548,7 @@ var ChasingPlayerManager = function () {
 
 exports.default = ChasingPlayerManager;
 
-},{"../../constants/ZombieConstants":13,"./NotificationsManager":27}],27:[function(require,module,exports){
+},{"../../constants/ZombieConstants":14,"./NotificationsManager":33}],33:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3209,7 +3659,7 @@ var NotificationsManager = function () {
 
 exports.default = NotificationsManager;
 
-},{"../../constants/ZombieConstants":13}],28:[function(require,module,exports){
+},{"../../constants/ZombieConstants":14}],34:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3267,7 +3717,7 @@ var PathFinder = function () {
 
 exports.default = PathFinder;
 
-},{"easystarjs":1}],29:[function(require,module,exports){
+},{"easystarjs":1}],35:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3435,7 +3885,7 @@ var SeekingPlayerManager = function () {
 
 exports.default = SeekingPlayerManager;
 
-},{"../../constants/ZombieConstants":13,"../../utils/MathUtils":39}],30:[function(require,module,exports){
+},{"../../constants/ZombieConstants":14,"../../utils/MathUtils":46}],36:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3680,7 +4130,7 @@ var ZombiePathManager = function () {
 
 exports.default = ZombiePathManager;
 
-},{"../../constants/ZombieConstants":13,"../../utils/DeterminePathCollisionUtils":36,"../../utils/HandlePathCollisionUtils":37,"../../utils/MapUtils":38,"./PathFinder":28}],31:[function(require,module,exports){
+},{"../../constants/ZombieConstants":14,"../../utils/DeterminePathCollisionUtils":42,"../../utils/HandlePathCollisionUtils":43,"../../utils/MapUtils":45,"./PathFinder":34}],37:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3761,7 +4211,7 @@ var ZombieRotationManager = function () {
 
 exports.default = ZombieRotationManager;
 
-},{"../../constants/ZombieConstants":13,"../../utils/MapUtils":38}],32:[function(require,module,exports){
+},{"../../constants/ZombieConstants":14,"../../utils/MapUtils":45}],38:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3830,7 +4280,7 @@ var Boot = function (_Phaser$State) {
 
 exports.default = Boot;
 
-},{}],33:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3874,6 +4324,14 @@ var _BoidsManager2 = _interopRequireDefault(_BoidsManager);
 var _GameOverUI = require('../UI/GameOverUI');
 
 var _GameOverUI2 = _interopRequireDefault(_GameOverUI);
+
+var _LightsManager = require('../objects/LightsComponents/LightsManager');
+
+var _LightsManager2 = _interopRequireDefault(_LightsManager);
+
+var _TorchLight = require('../objects/LightsComponents/TorchLight');
+
+var _TorchLight2 = _interopRequireDefault(_TorchLight);
 
 var _PlayerConstants = require('../constants/PlayerConstants');
 
@@ -4031,18 +4489,28 @@ var Game = function (_Phaser$State) {
   }, {
     key: 'initFlashlight',
     value: function initFlashlight() {
-      this.player.setUpFlashlight(this.map.walls, this.zombies);
+      var _this6 = this;
+
+      this.lightsManager = new _LightsManager2.default(this.game, this.map.walls);
+      this.player.setUpFlashlight(this.map.walls);
+      this.lightsManager.add(this.player.flashlight);
+
+      this.journals.forEach(function (journal) {
+        _this6.lightsManager.add(journal.light);
+      });
+
+      this.lightsManager.add(new _TorchLight2.default({ x: 64 + 32, y: 6 * 64 + 32 }));
     }
   }, {
     key: 'initGameOverUI',
     value: function initGameOverUI() {
-      var _this6 = this;
+      var _this7 = this;
 
       var mainMenuCallback = function mainMenuCallback() {
-        return _this6.state.start('Menu');
+        return _this7.state.start('Menu');
       };
       var restartCallback = function restartCallback() {
-        return _this6.state.restart();
+        return _this7.state.restart();
       };
       this.gameOverUI = new _GameOverUI2.default(this.game, mainMenuCallback, restartCallback);
     }
@@ -4057,6 +4525,13 @@ var Game = function (_Phaser$State) {
     value: function clearScreen() {
       this.journals.clearUI();
     }
+  }, {
+    key: 'update',
+    value: function update() {
+      if (this.lightsManager) {
+        this.lightsManager.update();
+      }
+    }
   }]);
 
   return Game;
@@ -4064,7 +4539,7 @@ var Game = function (_Phaser$State) {
 
 exports.default = Game;
 
-},{"../UI/GameOverUI":7,"../constants/PlayerConstants":10,"../constants/TileMapConstants":11,"../objects/BoidsManager":18,"../objects/Journal":21,"../objects/JournalsManager":22,"../objects/Player":23,"../objects/TileMap":24,"../objects/Zombie":25,"../utils/MapUtils":38}],34:[function(require,module,exports){
+},{"../UI/GameOverUI":7,"../constants/PlayerConstants":10,"../constants/TileMapConstants":11,"../objects/BoidsManager":19,"../objects/Journal":21,"../objects/JournalsManager":22,"../objects/LightsComponents/LightsManager":26,"../objects/LightsComponents/TorchLight":28,"../objects/Player":29,"../objects/TileMap":30,"../objects/Zombie":31,"../utils/MapUtils":45}],40:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4133,7 +4608,7 @@ var Menu = function (_Phaser$State) {
 
 exports.default = Menu;
 
-},{}],35:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4209,7 +4684,7 @@ var Preload = function (_Phaser$State) {
 
 exports.default = Preload;
 
-},{"../constants/PlayerConstants.js":10,"../constants/ZombieConstants.js":13}],36:[function(require,module,exports){
+},{"../constants/PlayerConstants.js":10,"../constants/ZombieConstants.js":14}],42:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4289,7 +4764,7 @@ function isZombieInMovement(zombie) {
   return zombie.state !== _ZombiePathManager.STATES.CALCULATING_PATH && zombie.state !== _ZombiePathManager.STATES.NOT_STARTED;
 }
 
-},{"../objects/ZombieComponents/ZombiePathManager":30,"./MapUtils":38}],37:[function(require,module,exports){
+},{"../objects/ZombieComponents/ZombiePathManager":36,"./MapUtils":45}],43:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4375,13 +4850,32 @@ function getTileCandidates(tile) {
   return [{ x: tile.x, y: tile.y - 1 }, { x: tile.x, y: tile.y + 1 }, { x: tile.x - 1, y: tile.y }, { x: tile.x + 1, y: tile.y }];
 }
 
-},{"./MapUtils":38}],38:[function(require,module,exports){
+},{"./MapUtils":45}],44:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var optimizeShape = exports.optimizeShape = function optimizeShape(shape) {
+  return shape.filter(function (point, index) {
+    if (index === 0 || index === shape.length - 1) {
+      return true;
+    }
+    if (point.x === shape[index - 1].x && point.x === shape[index + 1].x || point.y === shape[index - 1].y && point.y === shape[index + 1].y) {
+      return false;
+    }
+    return true;
+  });
+};
+
+},{}],45:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getWallsPositions = exports.pixelsToTile = exports.tileToPixels = exports.pixelsToTileY = exports.pixelsToTileX = exports.areTilesTheSame = undefined;
+exports.isTileBlocking = isTileBlocking;
 
 var _TileMapConstants = require('../constants/TileMapConstants');
 
@@ -4432,7 +4926,23 @@ var getWallsPositions = exports.getWallsPositions = function getWallsPositions(l
   return wallsArr;
 };
 
-},{"../constants/TileMapConstants":11}],39:[function(require,module,exports){
+function isTileBlocking(begin, end, walls) {
+  var ray = new Phaser.Line();
+  ray.start.set(begin.x, begin.y);
+  ray.end.set(end.x, end.y);
+
+  var tileHits = walls.getRayCastTiles(ray, 0, false, false);
+
+  for (var i = 0; i < tileHits.length; i++) {
+    if (tileHits[i].index >= 0) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+},{"../constants/TileMapConstants":11}],46:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4445,7 +4955,7 @@ function isInDegreeRange(entity, target, sightAngle) {
   return angleDelta <= sightAngle || angleDelta >= 360 - sightAngle;
 }
 
-},{}],40:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4471,5 +4981,5 @@ function showBackgroundLayer(game) {
   return backgroundLayer;
 }
 
-},{}]},{},[15])
+},{}]},{},[16])
 //# sourceMappingURL=game.js.map
