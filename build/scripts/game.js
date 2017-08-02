@@ -1113,8 +1113,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 var LIGHT_ANGLE = exports.LIGHT_ANGLE = Math.PI / 3;
-var NUMBER_OF_RAYS = exports.NUMBER_OF_RAYS = 50;
-var RAY_LENGTH = exports.RAY_LENGTH = 150;
+var NUMBER_OF_RAYS = exports.NUMBER_OF_RAYS = 30;
+var RAY_LENGTH = exports.RAY_LENGTH = 75;
 var WORLD_SHADOW_ALPHA = exports.WORLD_SHADOW_ALPHA = 0.38;
 var LIGHT_ALPHA = exports.LIGHT_ALPHA = 0.2;
 var FLICKERING_POWER = exports.FLICKERING_POWER = 0.04;
