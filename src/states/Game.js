@@ -122,6 +122,7 @@ export default class Game extends Phaser.State {
   }
   clearScreen() {
     this.journals.clearUI();
+    this.playerUI.destroy();
   }
   update() {
     if ( this.lightsManager ) {
