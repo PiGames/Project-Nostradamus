@@ -2,7 +2,12 @@ import Entity from './Entity';
 import { PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, PLAYER_SNEAK_MULTIPLIER, PLAYER_SPRINT_MULTIPLIER, PLAYER_WALK_ANIMATION_FRAMERATE, PLAYER_FIGHT_ANIMATION_FRAMERATE, PLAYER_HAND_ATTACK_RANGE, PLAYER_HAND_ATTACK_ANGLE, PLAYER_HAND_ATTACK_DAMAGE, PLAYER_DAMAGE_COOLDOWN } from '../constants/PlayerConstants';
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 import Flashlight from './LightsComponents/Flashlight';
+import ShootingSystem from './PlayerComponents/ShootingSystem';
 
+const ATTACK_SYSTEMS = {
+  HAND_ATTACK_SYSTEM: 0,
+  SHOOTING_SYSTEM: 1,
+};
 
 export default class Player extends Entity {
   constructor( game, x, y, imageKey, frame, zombies ) {
@@ -77,7 +82,9 @@ export default class Player extends Entity {
     this.body.onEndContact.add( this.onCollisionLeave, this );
 
     this.flashlight = null;
-
+    this.shootingSystem = new ShootingSystem( this );
+    this.activeAttackSystem = ATTACK_SYSTEMS.SHOOTING_SYSTEM;
+    this.shootingSystem.activate();
   }
 
   setUpFlashlight( walls ) {
@@ -162,9 +169,6 @@ export default class Player extends Entity {
   }
 
   handleAnimation() {
-    if ( this.game.input.activePointer.leftButton.isDown ) {
-      this.animations.play( 'fight', PLAYER_FIGHT_ANIMATION_FRAMERATE, false );
-    }
     if ( ( this.body.velocity.x !== 0 || this.body.velocity.y !== 0 ) && !this.animations.getAnimation( 'fight' ).isPlaying ) {
       this.animations.play( 'walk', PLAYER_WALK_ANIMATION_FRAMERATE, true );
     } else {
@@ -185,8 +189,21 @@ export default class Player extends Entity {
   }
 
   handleAttack() {
+    switch ( this.activeAttackSystem ) {
+    case ATTACK_SYSTEMS.HAND_ATTACK_SYSTEM:
+      this.handleHandAttack();
+      break;
+    case ATTACK_SYSTEMS.SHOOTING_SYSTEM:
+      this.handleShooting();
+      break;
+    }
+  }
+
+  handleHandAttack() {
     let didDealDamage = false;
     if ( this.game.input.activePointer.leftButton.isDown && this.canDealDamage ) {
+      this.animations.play( 'fight', PLAYER_FIGHT_ANIMATION_FRAMERATE, false );
+
       this.zombiesInAttackRange.forEach( ( v ) => {
         if ( v.alive ) {
           if ( this.isInDegreeRange( this, v, PLAYER_HAND_ATTACK_ANGLE ) ) {
@@ -201,6 +218,10 @@ export default class Player extends Entity {
         this.game.time.events.add( Phaser.Timer.SECOND * PLAYER_DAMAGE_COOLDOWN, this.endCooldown, this );
       }
     }
+  }
+
+  handleShooting() {
+    this.shootingSystem.update();
   }
 
   takeDamage( damage ) {

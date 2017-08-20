@@ -22,7 +22,7 @@ export default class Game extends Phaser.State {
     this.initZombies();
     this.initJournals();
     this.setCollisionRelations();
-    this.initFlashlight();
+    this.initLightSystem();
     this.initGameOverUI();
 
     this.player.onDeath.add( () => this.handleGameEnd() );
@@ -91,7 +91,7 @@ export default class Game extends Phaser.State {
       journal.body.collides( [ this.playerCollisionGroup, this.zombiesCollisionGroup ] );
     } );
   }
-  initFlashlight() {
+  initLightSystem() {
     this.lightsManager = new LightsManager( this.game, this.map.walls );
     this.player.setUpFlashlight( this.map.walls );
     this.lightsManager.add( this.player.flashlight );
