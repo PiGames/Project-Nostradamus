@@ -5,6 +5,7 @@ import JournalsManager from '../objects/JournalsManager';
 import Journal from '../objects/Journal';
 import BoidsManager from '../objects/BoidsManager';
 import GameOverUI from '../UI/GameOverUI';
+import PlayerUI from '../UI/PlayerUI';
 import LightsManager from '../objects/LightsComponents/LightsManager';
 import TorchLight from '../objects/LightsComponents/TorchLight';
 
@@ -23,6 +24,7 @@ export default class Game extends Phaser.State {
     this.initJournals();
     this.setCollisionRelations();
     this.initFlashlight();
+    this.initPlayerUI();
     this.initGameOverUI();
 
     this.player.onDeath.add( () => this.handleGameEnd() );
@@ -103,6 +105,12 @@ export default class Game extends Phaser.State {
     this.lightsManager.add( new TorchLight( { x: 64 + 32, y: 6 * 64 + 32 } ) );
 
   }
+  initPlayerUI() {
+    this.playerUI = new PlayerUI( this.game );
+    this.playerUI.setPlayerHealth( this.player.health );
+    this.player.onHealthUpdate.add( this.playerUI.setPlayerHealth.bind( this.playerUI ) );
+    this.player.onMovementModeUpdate.add( this.playerUI.setPlayerMovementInfo.bind( this.playerUI ) );
+  }
   initGameOverUI() {
     const mainMenuCallback = () => this.state.start( 'Menu' );
     const restartCallback = () => this.state.restart();
@@ -119,5 +127,8 @@ export default class Game extends Phaser.State {
     if ( this.lightsManager ) {
       this.lightsManager.update();
     }
+  }
+  render() {
+    this.playerUI.render();
   }
 }

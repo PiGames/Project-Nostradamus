@@ -23,11 +23,6 @@ export default class Player extends Entity {
 
     this.canDealDamage = true;
 
-    this.healthbar = this.game.add.graphics( 0, 0 );
-    this.healthbar.anchor.x = 1;
-    this.healthbar.anchor.y = 1;
-    this.healthbar.fixedToCamera = true;
-
     this.zombiesInAttackRange = [];
 
     this.attackSensor = this.body.addCircle( PLAYER_HAND_ATTACK_RANGE );
@@ -46,38 +41,20 @@ export default class Player extends Entity {
 
     this.isSneakPressed = false;
 
-    const style = { font: '16px Arial', fill: '#fff' };
-
-
-    this.sneakText = this.game.add.text( 0, 0, 'Sneaking: off', style );
-    this.sneakText.x = this.game.width - ( this.sneakText.width + 24 );
-    this.sneakText.y = this.game.height - ( this.sneakText.height + 24 + 32 );
-    this.sneakText.fixedToCamera = true;
-    this.sneakText.stroke = '#000';
-    this.sneakText.strokeThickness = 3;
-
-    this.sprintText = this.game.add.text( 0, 0, 'Sprinting: off', style );
-    this.sprintText.x = this.game.width - ( this.sprintText.width + 24 );
-    this.sprintText.y = this.game.height - ( this.sprintText.height + 24 + 32 + this.sneakText.height );
-    this.sprintText.fixedToCamera = true;
-    this.sprintText.stroke = '#000';
-    this.sprintText.strokeThickness = 3;
-
     this.animations.add( 'walk', [ 0, 1, 2, 3, 4, 5 ] );
     this.animations.add( 'fight', [ 6, 7, 8, 9, 0 ] );
 
     this.body.clearShapes();
     this.body.addCircle( Math.min( PLAYER_WIDTH, PLAYER_HEIGHT ) );
 
-    this.drawHealthBar();
-
     this.onDeath = new Phaser.Signal();
+    this.onMovementModeUpdate = new Phaser.Signal();
+    this.onHealthUpdate = new Phaser.Signal();
 
     this.body.onBeginContact.add( this.onCollisionEnter, this );
     this.body.onEndContact.add( this.onCollisionLeave, this );
 
     this.flashlight = null;
-
   }
 
   setUpFlashlight( walls ) {
@@ -128,8 +105,7 @@ export default class Player extends Entity {
       this.isSneaking = true;
     }
 
-    this.sneakText.setText( 'Sneaking: ' + ( ( this.isSneaking ) ? 'on' : 'off' ) );
-    this.sprintText.setText( 'Sprinting: ' + ( ( this.isSprinting ) ? 'on' : 'off' ) );
+    this.onMovementModeUpdate.dispatch( this.isSneaking, this.isSprinting );
 
     this.body.velocity.x *= specialEffectMultiplier;
     this.body.velocity.y *= specialEffectMultiplier;
@@ -207,7 +183,7 @@ export default class Player extends Entity {
     if ( !this.godMode ) {
       Entity.prototype.takeDamage.call( this, [ damage ] );
     }
-    this.drawHealthBar();
+    this.onHealthUpdate.dispatch( this.health );
 
     if ( this.health <= 0 ) {
       this.handleDeath();
@@ -216,29 +192,5 @@ export default class Player extends Entity {
 
   handleDeath() {
     this.onDeath.dispatch();
-    this.healthbar.destroy();
-    this.sneakText.destroy();
-    this.sprintText.destroy();
-  }
-
-  drawHealthBar() {
-    const width = 300;
-    const height = 32;
-
-    this.healthbar.clear();
-    if ( this.godMode ) {
-      this.healthbar.beginFill( 0xFFD700, 0.85 );
-    } else {
-      this.healthbar.beginFill( 0xFF0000, 0.85 );
-    }
-    this.healthbar.drawRect( this.game.width - ( width + 24 ), this.game.height - ( height + 24 ), width * Math.max( this.health, 0 ), height );
-    this.healthbar.endFill();
-    if ( this.godMode ) {
-      this.healthbar.lineStyle( 2, 0xCEAD00, 1 );
-    } else {
-      this.healthbar.lineStyle( 2, 0x880000, 1 );
-    }
-    this.healthbar.drawRect( this.game.width - ( width + 24 ), this.game.height - ( height + 24 ), width, height );
-    this.healthbar.lineStyle( 0 );
   }
 }
