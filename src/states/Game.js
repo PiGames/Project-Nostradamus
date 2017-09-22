@@ -8,15 +8,25 @@ import GameOverUI from '../UI/GameOverUI';
 import PlayerUI from '../UI/PlayerUI';
 import LightsManager from '../objects/LightsComponents/LightsManager';
 import TorchLight from '../objects/LightsComponents/TorchLight';
+import StatusLight from '../objects/LightsComponents/StatusLight';
 
 import { PLAYER_INITIAL_FRAME } from '../constants/PlayerConstants';
-import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
+import { TILE_SIZE } from '../constants/TileMapConstants';
 import { getWallsPositions } from '../utils/MapUtils';
 
 export default class Game extends Phaser.State {
   create() {
-    this.map = new TileMap( this.game, 'map', TILE_WIDTH, TILE_HEIGHT );
+    this.drawBackground();
+    this.map = new TileMap( this.game, 'map', TILE_SIZE, TILE_SIZE );
     this.zombies = [];
+    this.roomlights = [];
+
+    this.handleClick = this.handleClick.bind( this );
+    this.lightsKey = this.game.input.keyboard.addKey( Phaser.Keyboard.L );
+    this.lightsKey.onUp.add( this.handleClick );
+
+    this.lightsKeyWasPressed = false;
+    this.lightsKeyLast = false;
 
     this.initPlayer();
     this.initCollisionGroups();
@@ -29,6 +39,18 @@ export default class Game extends Phaser.State {
 
     this.player.onDeath.add( () => this.handleGameEnd() );
   }
+
+  drawBackground() {
+    const background = this.game.add.tileSprite( 0, 0, this.game.width, this.game.height, 'background' );
+    background.fixedToCamera = true;
+  }
+
+  handleClick() {
+    this.roomlights.forEach( light => {
+      light.toggleLight();
+    } );
+  }
+
   initCollisionGroups() {
     this.playerCollisionGroup = this.game.physics.p2.createCollisionGroup( this.player );
     this.zombiesCollisionGroup = this.game.physics.p2.createCollisionGroup();
@@ -102,14 +124,27 @@ export default class Game extends Phaser.State {
       this.lightsManager.add( journal.light );
     } );
 
-    this.lightsManager.add( new TorchLight( { x: 64 + 32, y: 6 * 64 + 32 } ) );
+    this.map.getLights().forEach( ( light ) => {
+      let tl;
 
+      if ( light.type === 'ceiling' ) {
+        tl = new TorchLight( { x: light.x, y: light.y }, light );
+        this.roomlights.push( tl );
+      } else if ( light.type === 'status' ) {
+        tl = new StatusLight( { x: light.x, y: light.y }, light );
+      } else {
+        tl = new TorchLight( { x: light.x, y: light.y }, light );
+      }
+
+      this.lightsManager.add( tl );
+    } );
   }
   initPlayerUI() {
     this.playerUI = new PlayerUI( this.game );
     this.playerUI.setPlayerHealth( this.player.health );
     this.player.onHealthUpdate.add( this.playerUI.setPlayerHealth.bind( this.playerUI ) );
     this.player.onMovementModeUpdate.add( this.playerUI.setPlayerMovementInfo.bind( this.playerUI ) );
+    this.player.onFlashlightToggle.add( this.player.flashlight.toggleLight );
   }
   initGameOverUI() {
     const mainMenuCallback = () => this.state.start( 'Menu' );

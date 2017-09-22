@@ -4,7 +4,7 @@ import ZombieRotationManager from './ZombieComponents/ZombieRotationManager';
 import SeekingPlayerManager from './ZombieComponents/SeekingPlayerManager';
 import ChasingPlayerManager from './ZombieComponents/ChasingPlayerManager';
 import { tileToPixels } from '../utils/MapUtils';
-import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
+import { TILE_SIZE } from '../constants/TileMapConstants';
 import { ZOMBIE_WALK_ANIMATION_FRAMERATE } from '../constants/ZombieConstants';
 
 /* eslint-disable no-inline-comments */
@@ -36,7 +36,7 @@ export default class Zombie extends Entity {
   initCollider() {
     this.body.clearShapes();
 
-    this.body.addCircle( Math.max( TILE_WIDTH, TILE_HEIGHT ) * 0.25 );
+    this.body.addCircle( TILE_SIZE * 0.25 );
   }
   initAnimations() {
     this.animations.add( 'walk', [ 0, 1, 2, 3, 4, 5 ], 0 );

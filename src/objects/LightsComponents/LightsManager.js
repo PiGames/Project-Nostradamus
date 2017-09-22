@@ -21,7 +21,8 @@ export default class LightManager {
     if ( lightable.isStatic ) {
       const lightShape = lightable.getLightShapePoints( this.walls );
       const getFillStyle = lightable.getFillStyle.bind( lightable );
-      this.cachedLights.push( { lightShape, getFillStyle } );
+      const isDisabled = lightable.isDisabled.bind( lightable );
+      this.cachedLights.push( { lightShape, getFillStyle, isDisabled } );
     } else {
       this.dynamicallyRenderedLightables.push( lightable );
     }
@@ -39,43 +40,47 @@ export default class LightManager {
     this.shadowTexture.clear();
 
     const ctx = this.shadowTexture.ctx;
-    ctx.fillStyle = '#050505';
+    ctx.fillStyle = '#222';
     ctx.fillRect( 0, 0, this.game.camera.width + 200, this.game.camera.height + 200 );
 
     this.dynamicallyRenderedLightables.forEach( lightable => {
-      ctx.beginPath();
-      ctx.fillStyle = lightable.getFillStyle( ctx, this.lightImage.position );
-      const shapePointsNotOffseted = lightable.getLightShapePoints( this.walls );
-      const shapePoints = shapePointsNotOffseted.map( point => (
-        { x: point.x - this.lightImage.x, y: point.y - this.lightImage.y }
-      ) );
+      if ( lightable.isDisabled() !== true ) {
+        ctx.beginPath();
+        ctx.fillStyle = lightable.getFillStyle( ctx, this.lightImage.position );
+        const shapePointsNotOffseted = lightable.getLightShapePoints( this.walls );
+        const shapePoints = shapePointsNotOffseted.map( point => (
+          { x: point.x - this.lightImage.x, y: point.y - this.lightImage.y }
+        ) );
 
 
-      ctx.moveTo( shapePoints[ 0 ].x, shapePoints[ 0 ].y );
+        ctx.moveTo( shapePoints[ 0 ].x, shapePoints[ 0 ].y );
 
-      for ( let i = 1; i < shapePoints.length; i++ ) {
-        ctx.lineTo( shapePoints[ i ].x, shapePoints[ i ].y );
+        for ( let i = 1; i < shapePoints.length; i++ ) {
+          ctx.lineTo( shapePoints[ i ].x, shapePoints[ i ].y );
+        }
+
+        ctx.lineTo( shapePoints[ 0 ].x, shapePoints[ 0 ].y );
+        ctx.fill();
       }
-
-      ctx.lineTo( shapePoints[ 0 ].x, shapePoints[ 0 ].y );
-      ctx.fill();
     } );
 
     this.cachedLights.forEach( light => {
-      ctx.beginPath();
-      ctx.fillStyle = light.getFillStyle( ctx, this.lightImage.position );
-      const shapePoints = light.lightShape.map( point => (
-        { x: point.x - this.lightImage.x, y: point.y - this.lightImage.y }
-      ) );
+      if ( light.isDisabled() !== true ) {
+        ctx.beginPath();
+        ctx.fillStyle = light.getFillStyle( ctx, this.lightImage.position );
+        const shapePoints = light.lightShape.map( point => (
+          { x: point.x - this.lightImage.x, y: point.y - this.lightImage.y }
+        ) );
 
-      ctx.moveTo( shapePoints[ 0 ].x, shapePoints[ 0 ].y );
+        ctx.moveTo( shapePoints[ 0 ].x, shapePoints[ 0 ].y );
 
-      for ( let i = 1; i < shapePoints.length; i++ ) {
-        ctx.lineTo( shapePoints[ i ].x, shapePoints[ i ].y );
+        for ( let i = 1; i < shapePoints.length; i++ ) {
+          ctx.lineTo( shapePoints[ i ].x, shapePoints[ i ].y );
+        }
+
+        ctx.lineTo( shapePoints[ 0 ].x, shapePoints[ 0 ].y );
+        ctx.fill();
       }
-
-      ctx.lineTo( shapePoints[ 0 ].x, shapePoints[ 0 ].y );
-      ctx.fill();
     } );
   }
 }

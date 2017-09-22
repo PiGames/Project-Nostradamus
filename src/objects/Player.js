@@ -1,12 +1,12 @@
 import Entity from './Entity';
-import { PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, PLAYER_SNEAK_MULTIPLIER, PLAYER_SPRINT_MULTIPLIER, PLAYER_WALK_ANIMATION_FRAMERATE, PLAYER_FIGHT_ANIMATION_FRAMERATE, PLAYER_HAND_ATTACK_RANGE, PLAYER_HAND_ATTACK_ANGLE, PLAYER_HAND_ATTACK_DAMAGE, PLAYER_DAMAGE_COOLDOWN } from '../constants/PlayerConstants';
-import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
+import { PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_WIDTH_BOUNDS, PLAYER_HEIGHT_BOUNDS, PLAYER_SPEED, PLAYER_SNEAK_MULTIPLIER, PLAYER_SPRINT_MULTIPLIER, PLAYER_WALK_ANIMATION_FRAMERATE, PLAYER_FIGHT_ANIMATION_FRAMERATE, PLAYER_HAND_ATTACK_RANGE, PLAYER_HAND_ATTACK_ANGLE, PLAYER_HAND_ATTACK_DAMAGE, PLAYER_DAMAGE_COOLDOWN } from '../constants/PlayerConstants';
+import { TILE_SIZE } from '../constants/TileMapConstants';
 import Flashlight from './LightsComponents/Flashlight';
 
 
 export default class Player extends Entity {
   constructor( game, x, y, imageKey, frame, zombies ) {
-    super( game, x + TILE_WIDTH / 2, y + TILE_HEIGHT / 2, imageKey, frame );
+    super( game, x + TILE_SIZE / 2, y + TILE_SIZE / 2, imageKey, frame, false );
 
     this.width = PLAYER_WIDTH;
     this.height = PLAYER_HEIGHT;
@@ -37,7 +37,10 @@ export default class Player extends Entity {
       sneakToggle: this.game.input.keyboard.addKey( Phaser.Keyboard.CAPS_LOCK ),
       sneak: this.game.input.keyboard.addKey( Phaser.Keyboard.ALT ),
       sprint: this.game.input.keyboard.addKey( Phaser.Keyboard.SHIFT ),
+      toggleLight: this.game.input.keyboard.addKey( Phaser.Keyboard.F ),
     };
+
+    this.cursors.toggleLight.onUp.add( () => this.onFlashlightToggle.dispatch() );
 
     this.isSneakPressed = false;
 
@@ -45,11 +48,12 @@ export default class Player extends Entity {
     this.animations.add( 'fight', [ 6, 7, 8, 9, 0 ] );
 
     this.body.clearShapes();
-    this.body.addCircle( Math.min( PLAYER_WIDTH, PLAYER_HEIGHT ) );
+    this.body.addCircle( Math.min( PLAYER_WIDTH_BOUNDS, PLAYER_HEIGHT_BOUNDS ) );
 
     this.onDeath = new Phaser.Signal();
     this.onMovementModeUpdate = new Phaser.Signal();
     this.onHealthUpdate = new Phaser.Signal();
+    this.onFlashlightToggle = new Phaser.Signal();
 
     this.body.onBeginContact.add( this.onCollisionEnter, this );
     this.body.onEndContact.add( this.onCollisionLeave, this );

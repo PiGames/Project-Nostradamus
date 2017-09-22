@@ -7,6 +7,7 @@
     "Phaser": true,
     "Set": true
   },
+  "parser": "babel-eslint",
   "parserOptions": {
 		"sourceType": "module",
 		"ecmaFeatures": {

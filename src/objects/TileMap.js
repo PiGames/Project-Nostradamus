@@ -1,4 +1,5 @@
 import { pixelsToTile } from '../utils/MapUtils.js';
+import { TILE_SIZE } from '../constants/TileMapConstants.js';
 
 export default class TileMap extends Phaser.Tilemap {
   constructor( game, key, tileWidth, tileHeight ) {
@@ -9,15 +10,18 @@ export default class TileMap extends Phaser.Tilemap {
 
     this.ground = this.createLayer( 'background' );
     this.walls = this.createLayer( 'walls' );
+    this.lightThrough = this.createLayer( 'lightThrough' );
 
     this.paths = [];
     this.journals = [];
 
     this.setCollisionByExclusion( [], true, this.walls );
+    this.setCollisionByExclusion( [], true, this.lightThrough );
 
     this.ground.resizeWorld();
 
     this.wallsBodiesArray = game.physics.p2.convertTilemap( this, this.walls );
+    this.lightBodiesArray = game.physics.p2.convertTilemap( this, this.lightThrough );
 
     this.wallsCollisionGroup = this.game.physics.p2.createCollisionGroup();
 
@@ -25,10 +29,18 @@ export default class TileMap extends Phaser.Tilemap {
       body.setCollisionGroup( this.wallsCollisionGroup );
     }
 
+    for ( const body of this.lightBodiesArray ) {
+      body.setCollisionGroup( this.wallsCollisionGroup );
+    }
+
     this.createPathPoints();
   }
   collides( collisionGroup, callback ) {
     for ( const body of this.wallsBodiesArray ) {
+      body.collides( collisionGroup, callback );
+    }
+
+    for ( const body of this.lightBodiesArray ) {
       body.collides( collisionGroup, callback );
     }
   }
@@ -63,6 +75,11 @@ export default class TileMap extends Phaser.Tilemap {
 
     return journals;
   }
+
+  getLights() {
+    return this.objects[ 'Lights' ].map( l => ( { x: l.x + TILE_SIZE / 2, y: l.y + TILE_SIZE / 2, ...l.properties } ) );
+  }
+
   getPlayerInitialPosition() {
     const player = this.objects[ 'PlayerPos' ][ 0 ];
     const posObj = {

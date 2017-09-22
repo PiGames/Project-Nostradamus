@@ -62,8 +62,8 @@ export default class Flashlight extends Lightable {
     const gradient = ctx.createRadialGradient(
         this.player.x - offset.x, this.player.y - offset.y, RAY_LENGTH * 0.75 * 2,
         this.player.x - offset.x, this.player.y - offset.y, rayLength * 2 );
-    gradient.addColorStop( 0, 'rgba(255, 255, 255, 1.0)' );
-    gradient.addColorStop( 1, 'rgba(255, 255, 255, 0.0)' );
+    gradient.addColorStop( 0, 'rgba(255, 255, 255, 1)' );
+    gradient.addColorStop( 1, 'rgba(255, 255, 255, 0)' );
 
     return gradient;
   }

@@ -1,8 +1,8 @@
-import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
+import { TILE_SIZE } from '../constants/TileMapConstants';
 import { pixelsToTile, tileToPixels } from '../utils/MapUtils.js';
 
 export default class ZombiesBoidsManager extends Phaser.Group {
-  constructor( game, mapGrid, boidsDistance = Math.max( TILE_WIDTH, TILE_HEIGHT ), distanceBetweenBoidsAndWalls = boidsDistance ) {
+  constructor( game, mapGrid, boidsDistance = TILE_SIZE, distanceBetweenBoidsAndWalls = boidsDistance ) {
     super( game );
     this.entities = this.children;
     this.mapGrid = mapGrid;

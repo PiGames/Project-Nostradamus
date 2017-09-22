@@ -1,10 +1,11 @@
 class Entity extends Phaser.Sprite {
-  constructor( game, x, y, imageKey, frame ) {
+  constructor( game, x, y, imageKey, frame, debug ) {
     super( game, x, y, imageKey, frame );
 
     this.anchor.setTo( 0.5, 0.5 );
+    this.debug = debug;
 
-    this.game.physics.p2.enable( this );
+    this.game.physics.p2.enable( this, this.debug );
     this.body.collideWorldBounds = true;
 
     this.game.world.add( this );
