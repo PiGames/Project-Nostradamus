@@ -1,7 +1,6 @@
-import { RAY_LENGTH, LIGHT_ANGLE, NUMBER_OF_RAYS, FLICKERING_POWER } from '../../constants/FlashlightConstants';
+import { RAY_LENGTH, FLICKERING_POWER } from '../../constants/FlashlightConstants';
 import Lightable from './Lightable';
-import { isTileBlocking } from '../../utils/MapUtils';
-import { optimizeShape } from '../../utils/LightUtils';
+import { isTileBlocking, getTileCornersArray } from '../../utils/MapUtils';
 
 
 export default class Flashlight extends Lightable {
@@ -9,53 +8,60 @@ export default class Flashlight extends Lightable {
     super( false );
     this.player = player;
     this.walls = walls;
+    this.camera = this.player.game.camera;
+    console.log( this.camera );
+
   }
   getLightShapePoints() {
     const shapePoints = [];
 
-    const mouseX = this.player.game.input.mousePointer.worldX;
-    const mouseY = this.player.game.input.mousePointer.worldY;
-    const mouseAngle = Math.atan2( this.player.y - mouseY, this.player.x - mouseX );
 
-    const flashlightLength = 8;
+    const tilesInCameraBounds = this.walls.getTiles( this.camera.x, this.camera.y, this.camera.width, this.camera.height );
 
-    const minAngle = mouseAngle - ( LIGHT_ANGLE / 2 );
-    const flashlightStartPoint = {
-      x: Math.round( this.player.x - ( 2 * flashlightLength ) * Math.cos( minAngle ) ),
-      y: Math.round( this.player.y - ( 2 * flashlightLength ) * Math.sin( minAngle ) ),
-    };
-    shapePoints.push( flashlightStartPoint );
+    const wallsInCameraBounds = tilesInCameraBounds.filter( ( tile ) => tile.collideDown );
 
-    for ( let i = 0; i < NUMBER_OF_RAYS; i++ ) {
-      const rayAngle = mouseAngle - ( LIGHT_ANGLE / 2 ) + ( LIGHT_ANGLE / NUMBER_OF_RAYS ) * i;
-      let lastX = this.player.x;
-      let lastY = this.player.y;
-      for ( let j = 1; j <= RAY_LENGTH; j++ ) {
-        const begin = this.player.position;
-        const end = {
-          x: Math.round( this.player.x - ( 2 * j ) * Math.cos( rayAngle ) ),
-          y: Math.round( this.player.y - ( 2 * j ) * Math.sin( rayAngle ) ),
-        };
+    const corners = wallsInCameraBounds.reduce( ( tiles, tile ) => {
+      const tileCorners = getTileCornersArray( tile );
+      tiles.push( ...tileCorners );
+      return tiles;
+    }, [] );
 
-        if ( !isTileBlocking( begin, end, this.walls ) ) {
-          lastX = end.x;
-          lastY = end.y;
-        } else {
-          break;
-        }
+    const visibleCorners = corners.filter( ( corner ) =>
+    !isTileBlocking( this.player.position, corner, this.walls )
+  );
+
+    visibleCorners.sort( ( cornerA, cornerB ) => {
+
+      const [ angleA, angleB ] = [ cornerA, cornerB ].map( ( corner ) => {
+        return this.player.game.physics.arcade.angleBetween( this.player, corner );
+      } );
+
+      if ( angleA < angleB ) {
+        return -1;
+      } else if ( angleA === angleB ) {
+        return 0;
+      } else {
+        return 1;
       }
 
-      shapePoints.push( { x: lastX, y: lastY } );
-    }
+    } );
 
-    const maxAngle = mouseAngle + ( LIGHT_ANGLE / 2 );
-    const flashlightEndPoint = {
-      x: Math.round( this.player.x - ( 2 * flashlightLength ) * Math.cos( maxAngle ) ),
-      y: Math.round( this.player.y - ( 2 * flashlightLength ) * Math.sin( maxAngle ) ),
-    };
-    shapePoints.push( flashlightEndPoint );
+    const existingAngles = [];
 
-    return optimizeShape( shapePoints );
+    const filteredVisibleCorners = visibleCorners.filter( ( corner ) => {
+      const angle = this.player.game.physics.arcade.angleBetween( this.player, corner );
+      if ( existingAngles.indexOf( angle ) === -1 ) {
+        existingAngles.push( angle );
+        return true;
+      }
+      return false;
+    } );
+
+    filteredVisibleCorners.forEach( ( corner ) => {
+      shapePoints.push( corner );
+    } );
+
+    return shapePoints;
   }
   getFillStyle( ctx, offset ) {
     const rayLength = RAY_LENGTH * ( 1 + Math.random() * FLICKERING_POWER );

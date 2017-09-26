@@ -52,3 +52,10 @@ export function isTileBlocking( begin, end, walls ) {
 
   return false;
 }
+
+export const getTileCornersArray = ( tile ) => [
+    { x: tile.x * TILE_SIZE, y: tile.y * TILE_SIZE },
+    { x: ( tile.x + 1 ) * TILE_SIZE, y: tile.y * TILE_SIZE },
+    { x: tile.x * TILE_SIZE, y: ( tile.y + 1 ) * TILE_SIZE },
+    { x: ( tile.x + 1 ) * TILE_SIZE, y: ( tile.y + 1 ) * TILE_SIZE },
+];
