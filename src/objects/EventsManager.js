@@ -1,6 +1,7 @@
 class EventsManager {
   constructor() {
     this.signals = {};
+    this.debug = true;
   }
 
   isNameUsed( name ) {
@@ -10,9 +11,9 @@ class EventsManager {
 
   checkForExistance( name, cb ) {
     if ( this.isNameUsed( name ) ) {
-      cb;
+      cb();
     } else {
-      throw new Error( 'Event with this name does not exist' );
+      throw new Error( `Event with this name does not exist [${name}]` );
     }
   }
 
@@ -20,9 +21,16 @@ class EventsManager {
     if ( !this.isNameUsed( name ) ) {
       const newSignal = new Phaser.Signal( ...args );
       this.signals[ name ] = newSignal;
+
+      if ( this.debug ) {
+        this.on( name, () => {
+          console.log( `Dispatched [%c${name}%c]`, 'font-weight: bold; color: #da0', 'font-weight: normal; color: #000' );
+        } );
+      }
+
       return newSignal;
     } else {
-      throw new Error( 'Event with this name has already been created' );
+      throw new Error( `Event with this name has already been created [${name}]` );
     }
   }
 

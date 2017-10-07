@@ -1,12 +1,13 @@
 import * as CONSTANTS from '../../constants/ZombieConstants';
 import NotificationsManager from './NotificationsManager';
+import EventsManager from '../EventsManager';
 
 export default class ChasingPlayerManager {
   constructor( zombie, player ) {
     this.zombie = zombie;
     this.player = player;
 
-    this.stopChasingPlayerSignal = new Phaser.Signal();
+    EventsManager.create( `stopChasingPlayer-${ zombie.id }` );
 
     // attack system init
     this.canDealDamage = true;
@@ -41,7 +42,7 @@ export default class ChasingPlayerManager {
      && distanceToTarget <= CONSTANTS.MIN_DISTANCE_TO_TARGET;
   }
   stopChasingPlayer() {
-    this.stopChasingPlayerSignal.dispatch();
+    EventsManager.dispatch( `stopChasingPlayer-${this.zombie.id}` );
   }
   onCollisionEnter( bodyA, bodyB, shapeA ) {
     if ( bodyA == null || bodyA.sprite == null ) {
