@@ -719,10 +719,6 @@ browser-resolve@^1.11.0, browser-resolve@^1.7.0:
   dependencies:
     resolve "1.1.7"
 
-"browser-sync-client-transition@gist:e6ad215ccff2c6788c584770df9f0f09":
-  version "1.0.0"
-  resolved "https://gist.github.com/e6ad215ccff2c6788c584770df9f0f09.git#6ad19f34510c79f5d9fddb3fe8c8287ef7a88f9a"
-
 browser-sync-client@2.4.5:
   version "2.4.5"
   resolved "https://registry.yarnpkg.com/browser-sync-client/-/browser-sync-client-2.4.5.tgz#976afab1a54f255baa38fe22ae3c0d3753ad337b"

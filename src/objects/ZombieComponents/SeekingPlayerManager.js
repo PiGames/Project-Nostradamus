@@ -1,5 +1,6 @@
 import { ZOMBIE_SIGHT_ANGLE, ZOMBIE_SIGHT_RANGE, ZOMBIE_HEARING_RANGE } from '../../constants/ZombieConstants';
 import { isInDegreeRange } from '../../utils/MathUtils';
+import EventsManager from '../EventsManager';
 
 export default class SeekingPlayerManager {
   constructor( zombie, player, walls ) {
@@ -22,7 +23,7 @@ export default class SeekingPlayerManager {
     hearSensor.sensor = true;
     hearSensor.sensorType = 'hear';
 
-    this.chasePlayerSignal = new Phaser.Signal();
+    EventsManager.create( `chasePlayer-${ zombie.id }` );
 
     this.shouldLookForThePlayer = true;
 
@@ -95,7 +96,7 @@ export default class SeekingPlayerManager {
   }
   changeStateToChasing() {
     this.lastKnownPlayerPosition = Object.assign( {}, this.player.position );
-    this.chasePlayerSignal.dispatch();
+    EventsManager.dispatch( `chasePlayer-${this.zombie.id}` );
   }
   getLastKnownPlayerPosition() {
     if ( this.canDetectPlayer() ) {
