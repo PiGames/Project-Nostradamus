@@ -1,4 +1,4 @@
-import { TILE_SIZE, MAP_WIDTH } from '../constants/TileMapConstants';
+import { TILE_SIZE } from '../constants/TileMapConstants';
 
 export const areTilesTheSame = ( tile1, tile2 ) => tile1.x === tile2.x && tile1.y === tile2.y;
 
@@ -16,25 +16,25 @@ export const pixelsToTile = ( coords ) => ( {
 } );
 
 export const getWallsPositions = ( layer ) => {
-  const walls = layer.getTiles( 0, 0, 2048, 2048 );
-  const wallsArr = [];
+  const { width: mapWidth, height: mapHeight } = layer.game.world;
+  const walls = layer.getTiles( 0, 0, mapWidth, mapHeight );
 
-  let currentY = [];
+  const mapHeightInTiles = Math.floor(mapHeight / TILE_SIZE);
 
-  walls.forEach( ( v, i ) => {
-    if ( v.index !== -1 ) {
-      currentY.push( 1 );
-    } else {
-      currentY.push( 0 );
+  const wallsData = walls.reduce( ( columns, tile ) => {
+    const lastColumn = columns[columns.length - 1];
+    const tileData = tile.index !== -1 ? 1 : 0;
+
+    if( lastColumn.length === mapHeightInTiles - 1 ) {
+      columns.push([tileData]);
+      return columns;
     }
 
-    if ( i % MAP_WIDTH === ( MAP_WIDTH - 1 ) ) {
-      wallsArr.push( currentY );
-      currentY = [];
-    }
-  } );
+    lastColumn.push(tileData);
+    return columns;
+  }, [[]]);
 
-  return wallsArr;
+  return wallsData;
 };
 
 export function isTileBlocking( begin, end, walls ) {
