@@ -5,3 +5,4 @@ Your code should pass an eslint test.
 Branch naming:
 * `feature/` – creating a new feature
 * `fix/` – making a fix
+* `refactor/` – refactoring code
