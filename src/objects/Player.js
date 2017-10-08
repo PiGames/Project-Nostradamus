@@ -47,7 +47,7 @@ export default class Player extends Entity {
     this.body.clearShapes();
     this.body.addCircle( Math.min( PLAYER_WIDTH, PLAYER_HEIGHT ) );
 
-    EventsManager.create( 'death' );
+    EventsManager.create( 'playerDeath' );
     EventsManager.create( 'movementModeUpdate' );
     EventsManager.create( 'healthUpdate' );
 
@@ -196,6 +196,6 @@ export default class Player extends Entity {
   }
 
   handleDeath() {
-    EventsManager.dispatch( 'death' );
+    EventsManager.dispatch( 'playerDeath' );
   }
 }
