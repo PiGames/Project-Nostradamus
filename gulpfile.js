@@ -1,25 +1,25 @@
-var del = require('del');
-var gulp = require('gulp');
-var path = require('path');
-var argv = require('yargs').argv;
-var gutil = require('gulp-util');
-var source = require('vinyl-source-stream');
-var buffer = require('gulp-buffer');
-var uglify = require('gulp-uglify');
-var stripDebug = require('gulp-strip-debug');
-var gulpif = require('gulp-if');
-var exorcist = require('exorcist');
-var babelify = require('babelify');
-var browserify = require('browserify');
-var browserSync = require('browser-sync');
-var ghPages = require('gulp-gh-pages');
+var del = require( 'del' );
+var gulp = require( 'gulp' );
+var path = require( 'path' );
+var argv = require( 'yargs' ).argv;
+var gutil = require( 'gulp-util' );
+var source = require( 'vinyl-source-stream' );
+var buffer = require( 'gulp-buffer' );
+var uglify = require( 'gulp-uglify' );
+var stripDebug = require( 'gulp-strip-debug' );
+var gulpif = require( 'gulp-if' );
+var exorcist = require( 'exorcist' );
+var babelify = require( 'babelify' );
+var browserify = require( 'browserify' );
+var browserSync = require( 'browser-sync' );
+var ghPages = require( 'gulp-gh-pages' );
 
 /**
  * Using different folders/file names? Change these constants:
  */
 
 var PHASER_PATH = './node_modules/phaser/build/';
-var BUILD_PATH = './build';
+var BUILD_PATH = './dist';
 var SCRIPTS_PATH = BUILD_PATH + '/scripts';
 var SOURCE_PATH = './src';
 var STATIC_PATH = './static';
@@ -32,18 +32,18 @@ var keepFiles = false;
  * Simple way to check for development/production mode.
  */
 function isProduction() {
-    return argv.production;
+  return argv.production;
 }
 
 /**
  * Logs the current build mode on the console.
  */
 function logBuildMode() {
-    if (isProduction()) {
-        gutil.log(gutil.colors.green('Running production build...'));
-    } else {
-        gutil.log(gutil.colors.yellow('Running development build...'));
-    }
+  if ( isProduction() ) {
+    gutil.log( gutil.colors.green( 'Running production build...' ) );
+  } else {
+    gutil.log( gutil.colors.yellow( 'Running development build...' ) );
+  }
 }
 
 /**
@@ -53,11 +53,11 @@ function logBuildMode() {
  * Note: keepFiles is set to true by gulp.watch (see serve()) and reseted here to avoid conflicts.
  */
 function cleanBuild() {
-    if (!keepFiles) {
-        del(['build/**/*.*']);
-    } else {
-        keepFiles = false;
-    }
+  if ( !keepFiles ) {
+    del( [ BUILD_PATH + '/**/*.*' ] );
+  } else {
+    keepFiles = false;
+  }
 }
 
 /**
@@ -65,16 +65,16 @@ function cleanBuild() {
  * Check out README.md for more info on the '/static' folder.
  */
 function copyStatic() {
-    gulp.src('LICENSE.md')
-      .pipe(gulp.dest(BUILD_PATH))
-      .on('error', function(error) {
-        if (error.code !== 'ENOENT'){
-          gutil.log(gutil.colors.red('[Build Error]', error.message));
-          this.emit('end');
+  gulp.src( 'LICENSE.md' )
+      .pipe( gulp.dest( BUILD_PATH ) )
+      .on( 'error', function( error ) {
+        if ( error.code !== 'ENOENT' ) {
+          gutil.log( gutil.colors.red( '[Build Error]', error.message ) );
+          this.emit( 'end' );
         }
-      });
-    return gulp.src(STATIC_PATH + '/**/*')
-        .pipe(gulp.dest(BUILD_PATH));
+      } );
+  return gulp.src( STATIC_PATH + '/**/*' )
+        .pipe( gulp.dest( BUILD_PATH ) );
 }
 
 /**
@@ -83,18 +83,18 @@ function copyStatic() {
  */
 function copyPhaser() {
 
-    var srcList = ['phaser.min.js'];
+  var srcList = [ 'phaser.min.js' ];
 
-    if (!isProduction()) {
-        srcList.push('phaser.map', 'phaser.js');
-    }
+  if ( !isProduction() ) {
+    srcList.push( 'phaser.map', 'phaser.js' );
+  }
 
-    srcList = srcList.map(function(file) {
-        return PHASER_PATH + file;
-    });
+  srcList = srcList.map( function( file ) {
+    return PHASER_PATH + file;
+  } );
 
-    return gulp.src(srcList)
-        .pipe(gulp.dest(SCRIPTS_PATH));
+  return gulp.src( srcList )
+        .pipe( gulp.dest( SCRIPTS_PATH ) );
 
 }
 
@@ -109,32 +109,32 @@ function copyPhaser() {
  */
 function build() {
 
-    var sourcemapPath = SCRIPTS_PATH + '/' + OUTPUT_FILE + '.map';
-    logBuildMode();
+  var sourcemapPath = SCRIPTS_PATH + '/' + OUTPUT_FILE + '.map';
+  logBuildMode();
 
-    return browserify({
-            paths: [path.join(__dirname, 'src')],
-            entries: ENTRY_FILE,
-            debug: true,
-            transform: [
-                [
-                    babelify, {
-                        presets: ["es2015", "stage-2"]
-                    }
-                ]
-            ]
-        })
-        .transform(babelify)
-        .bundle().on('error', function(error) {
-            gutil.log(gutil.colors.red('[Build Error]', error.message));
-            this.emit('end');
-        })
-        .pipe(gulpif(!isProduction(), exorcist(sourcemapPath)))
-        .pipe(source(OUTPUT_FILE))
-        .pipe(buffer())
-        .pipe(gulpif(isProduction(), stripDebug()))
-        .pipe(gulpif(isProduction(), uglify()))
-        .pipe(gulp.dest(SCRIPTS_PATH));
+  return browserify( {
+    paths: [ path.join( __dirname, 'src' ) ],
+    entries: ENTRY_FILE,
+    debug: true,
+    transform: [
+      [
+        babelify, {
+          presets: [ 'es2015', 'stage-2' ],
+        },
+      ],
+    ],
+  } )
+        .transform( babelify )
+        .bundle().on( 'error', function( error ) {
+          gutil.log( gutil.colors.red( '[Build Error]', error.message ) );
+          this.emit( 'end' );
+        } )
+        .pipe( gulpif( !isProduction(), exorcist( sourcemapPath ) ) )
+        .pipe( source( OUTPUT_FILE ) )
+        .pipe( buffer() )
+        .pipe( gulpif( isProduction(), stripDebug() ) )
+        .pipe( gulpif( isProduction(), uglify() ) )
+        .pipe( gulp.dest( SCRIPTS_PATH ) );
 
 }
 
@@ -144,34 +144,34 @@ function build() {
  */
 function serve() {
 
-    var options = {
-        server: {
-            baseDir: BUILD_PATH,
-        },
-        open: argv.open || argv.o // Change it to true if you wish to allow Browsersync to open a browser window.
-    };
+  var options = {
+    server: {
+      baseDir: BUILD_PATH,
+    },
+    open: argv.open || argv.o, // Change it to true if you wish to allow Browsersync to open a browser window.
+  };
 
-    browserSync(options);
+  browserSync( options );
 
     // Watches for changes in files inside the './src' folder.
-    gulp.watch(SOURCE_PATH + '/**/*.js', ['watch-js']);
+  gulp.watch( SOURCE_PATH + '/**/*.js', [ 'watch-js' ] );
 
     // Watches for changes in files inside the './static' folder. Also sets 'keepFiles' to true (see cleanBuild()).
-    gulp.watch(STATIC_PATH + '/**/*', ['watch-static']).on('change', function() {
-        keepFiles = true;
-    });
+  gulp.watch( STATIC_PATH + '/**/*', [ 'watch-static' ] ).on( 'change', function() {
+    keepFiles = true;
+  } );
 
 }
 
 
-gulp.task('cleanBuild', cleanBuild);
-gulp.task('copyStatic', ['cleanBuild'], copyStatic);
-gulp.task('copyPhaser', ['copyStatic'], copyPhaser);
-gulp.task('build', ['copyPhaser'], build);
-gulp.task('fastBuild', build);
-gulp.task('serve', ['build'], serve);
-gulp.task('watch-js', ['fastBuild'], browserSync.reload); // Rebuilds and reloads the project when executed.
-gulp.task('watch-static', ['copyPhaser'], browserSync.reload);
+gulp.task( 'cleanBuild', cleanBuild );
+gulp.task( 'copyStatic', [ 'cleanBuild' ], copyStatic );
+gulp.task( 'copyPhaser', [ 'copyStatic' ], copyPhaser );
+gulp.task( 'build', [ 'copyPhaser' ], build );
+gulp.task( 'fastBuild', build );
+gulp.task( 'serve', [ 'build' ], serve );
+gulp.task( 'watch-js', [ 'fastBuild' ], browserSync.reload ); // Rebuilds and reloads the project when executed.
+gulp.task( 'watch-static', [ 'copyPhaser' ], browserSync.reload );
 
 /**
  * The tasks are executed in the following order:
@@ -180,25 +180,25 @@ gulp.task('watch-static', ['copyPhaser'], browserSync.reload);
  * Read more about task dependencies in Gulp:
  * https://medium.com/@dave_lunny/task-dependencies-in-gulp-b885c1ab48f0
  */
-gulp.task('default', ['serve']);
+gulp.task( 'default', [ 'serve' ] );
 
-gulp.task( "deploy-for-testers", () => {
+gulp.task( 'deploy-for-testers', () => {
   const msg = argv.message || argv.m || null;
   let options = {};
   if ( argv.ssh ) {
-    options = { remoteUrl: "git@github.com:PiGames/PN-for-testers.git", branch: "master", force: true };
+    options = { remoteUrl: 'git@github.com:PiGames/PN-for-testers.git', branch: 'master', force: true };
   } else {
-    options = { remoteUrl: "https://github.com/PiGames/PN-for-testers.git", branch: "master", force: true };
+    options = { remoteUrl: 'https://github.com/PiGames/PN-for-testers.git', branch: 'master', force: true };
   }
 
   if ( msg !== null ) {
     options.message = msg;
   }
 
-  return gulp.src( "./build/**/*" ).pipe( ghPages( options ) );
+  return gulp.src( BUILD_PATH + './dist/**/*' ).pipe( ghPages( options ) );
 } );
 
-gulp.task( "deploy", () => {
+gulp.task( 'deploy', () => {
   if ( argv.confirm ) {
     const msg = argv.message || argv.m || null;
     const options = { force: true };
@@ -206,8 +206,8 @@ gulp.task( "deploy", () => {
       options.message = msg;
     }
 
-    return gulp.src( "./build/**/*" ).pipe( ghPages( options ) );
+    return gulp.src( BUILD_PATH + '/**/*' ).pipe( ghPages( options ) );
   } else {
-    gutil.log( gutil.colors.red("To deploy to master on main repository confirm it with --confirm argument") );
+    gutil.log( gutil.colors.red( 'To deploy to master on main repository confirm it with --confirm argument' ) );
   }
 } );

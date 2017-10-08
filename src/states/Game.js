@@ -29,7 +29,7 @@ export default class Game extends Phaser.State {
     this.initPlayerUI();
     this.initGameOverUI();
 
-    EventsManager.on( 'death', () => this.handleGameEnd() );
+    EventsManager.on( 'playerDeath', () => this.handleGameEnd() );
   }
   initCollisionGroups() {
     this.playerCollisionGroup = this.game.physics.p2.createCollisionGroup( this.player );
@@ -57,7 +57,7 @@ export default class Game extends Phaser.State {
       newZombie.initializePathSystem( this.map.getPath( i ), wallsPositions );
       newZombie.startPathSystem();
 
-      EventsManager.on( 'death', () => newZombie.onPlayerDeath() );
+      EventsManager.on( 'playerDeath', () => newZombie.onPlayerDeath() );
 
       this.zombies.add( newZombie );
     }
