@@ -8,10 +8,12 @@ import GameOverUI from '../UI/GameOverUI';
 import PlayerUI from '../UI/PlayerUI';
 import LightsManager from '../objects/LightsComponents/LightsManager';
 import TorchLight from '../objects/LightsComponents/TorchLight';
+import EventsManager from '../objects/EventsManager';
 
 import { PLAYER_INITIAL_FRAME } from '../constants/PlayerConstants';
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 import { getWallsPositions } from '../utils/MapUtils';
+import { IdCreator } from '../utils/IdCreator';
 
 export default class Game extends Phaser.State {
   create() {
@@ -27,7 +29,7 @@ export default class Game extends Phaser.State {
     this.initPlayerUI();
     this.initGameOverUI();
 
-    this.player.onDeath.add( () => this.handleGameEnd() );
+    EventsManager.on( 'playerDeath', () => this.handleGameEnd() );
   }
   initCollisionGroups() {
     this.playerCollisionGroup = this.game.physics.p2.createCollisionGroup( this.player );
@@ -44,8 +46,10 @@ export default class Game extends Phaser.State {
     const wallsPositions = getWallsPositions( this.map.walls );
     this.zombies = new BoidsManager( this.game, wallsPositions );
 
+    const createNewId = IdCreator();
+
     for ( let i = 0; i < this.map.paths.length; i++ ) {
-      const newZombie = new Zombie( this.game, 'zombie' );
+      const newZombie = new Zombie( this.game, 'zombie', createNewId() );
 
       newZombie.setTilePosition( this.map.paths[ i ][ 0 ] );
       newZombie.initializeChasingSystem( this.player, this.map.walls );
@@ -53,7 +57,7 @@ export default class Game extends Phaser.State {
       newZombie.initializePathSystem( this.map.getPath( i ), wallsPositions );
       newZombie.startPathSystem();
 
-      this.player.onDeath.add( () => newZombie.onPlayerDeath() );
+      EventsManager.on( 'playerDeath', () => newZombie.onPlayerDeath() );
 
       this.zombies.add( newZombie );
     }
@@ -108,8 +112,8 @@ export default class Game extends Phaser.State {
   initPlayerUI() {
     this.playerUI = new PlayerUI( this.game );
     this.playerUI.setPlayerHealth( this.player.health );
-    this.player.onHealthUpdate.add( this.playerUI.setPlayerHealth.bind( this.playerUI ) );
-    this.player.onMovementModeUpdate.add( this.playerUI.setPlayerMovementInfo.bind( this.playerUI ) );
+    EventsManager.on( 'healthUpdate', this.playerUI.setPlayerHealth.bind( this.playerUI ) );
+    EventsManager.on( 'movementModeUpdate', this.playerUI.setPlayerMovementInfo.bind( this.playerUI ) );
   }
   initGameOverUI() {
     const mainMenuCallback = () => this.state.start( 'Menu' );

@@ -3,6 +3,7 @@ import ZombiePathManager from './ZombieComponents/ZombiePathManager';
 import ZombieRotationManager from './ZombieComponents/ZombieRotationManager';
 import SeekingPlayerManager from './ZombieComponents/SeekingPlayerManager';
 import ChasingPlayerManager from './ZombieComponents/ChasingPlayerManager';
+import EventsManager from './EventsManager';
 import { tileToPixels } from '../utils/MapUtils';
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 import { ZOMBIE_WALK_ANIMATION_FRAMERATE } from '../constants/ZombieConstants';
@@ -17,8 +18,10 @@ const STATES = {
 };
 
 export default class Zombie extends Entity {
-  constructor( game, key, x = 0, y = 0 ) {
-    super( game, x, y, key );
+  constructor( game, key, id ) {
+    super( game, 0, 0, key );
+
+    this.id = id;
 
     this.initCollider();
     this.initAnimations();
@@ -57,10 +60,10 @@ export default class Zombie extends Entity {
   }
   initializeChasingSystem( player, walls ) {
     this.seekingPlayerManager = new SeekingPlayerManager( this, player, walls );
-    this.seekingPlayerManager.chasePlayerSignal.add( this.changeStateToChasing, this );
+    EventsManager.on( `chasePlayer-${this.id}`, this.changeStateToChasing, this );
 
     this.chasingPlayerManager = new ChasingPlayerManager( this, player );
-    this.chasingPlayerManager.stopChasingPlayerSignal.add( this.changeStateToWalking, this );
+    EventsManager.on( `stopChasingPlayer-${this.id}`, this.changeStateToWalking, this );
   }
   update() {
     switch ( this.state ) {

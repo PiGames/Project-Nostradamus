@@ -2,7 +2,7 @@ import Entity from './Entity';
 import { PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, PLAYER_SNEAK_MULTIPLIER, PLAYER_SPRINT_MULTIPLIER, PLAYER_WALK_ANIMATION_FRAMERATE, PLAYER_FIGHT_ANIMATION_FRAMERATE, PLAYER_HAND_ATTACK_RANGE, PLAYER_HAND_ATTACK_ANGLE, PLAYER_HAND_ATTACK_DAMAGE, PLAYER_DAMAGE_COOLDOWN } from '../constants/PlayerConstants';
 import { TILE_WIDTH, TILE_HEIGHT } from '../constants/TileMapConstants';
 import Flashlight from './LightsComponents/Flashlight';
-
+import EventsManager from './EventsManager';
 
 export default class Player extends Entity {
   constructor( game, x, y, imageKey, frame, zombies ) {
@@ -47,9 +47,9 @@ export default class Player extends Entity {
     this.body.clearShapes();
     this.body.addCircle( Math.min( PLAYER_WIDTH, PLAYER_HEIGHT ) );
 
-    this.onDeath = new Phaser.Signal();
-    this.onMovementModeUpdate = new Phaser.Signal();
-    this.onHealthUpdate = new Phaser.Signal();
+    EventsManager.create( 'playerDeath' );
+    EventsManager.create( 'movementModeUpdate' );
+    EventsManager.create( 'healthUpdate' );
 
     this.body.onBeginContact.add( this.onCollisionEnter, this );
     this.body.onEndContact.add( this.onCollisionLeave, this );
@@ -83,7 +83,11 @@ export default class Player extends Entity {
       this.body.velocity.x = PLAYER_SPEED;
     }
 
-    this.handleMovementSpecialModes();
+    const wasKeyPressed = Object.keys( this.cursors ).find( key => this.cursors[ key ].isDown );
+
+    if ( wasKeyPressed !== undefined ) {
+      this.handleMovementSpecialModes();
+    }
 
     this.normalizeVelocity();
   }
@@ -105,7 +109,7 @@ export default class Player extends Entity {
       this.isSneaking = true;
     }
 
-    this.onMovementModeUpdate.dispatch( this.isSneaking, this.isSprinting );
+    EventsManager.dispatch( 'movementModeUpdate', this.isSneaking, this.isSprinting );
 
     this.body.velocity.x *= specialEffectMultiplier;
     this.body.velocity.y *= specialEffectMultiplier;
@@ -183,7 +187,8 @@ export default class Player extends Entity {
     if ( !this.godMode ) {
       Entity.prototype.takeDamage.call( this, [ damage ] );
     }
-    this.onHealthUpdate.dispatch( this.health );
+
+    EventsManager.dispatch( 'healthUpdate', this.health );
 
     if ( this.health <= 0 ) {
       this.handleDeath();
@@ -191,6 +196,6 @@ export default class Player extends Entity {
   }
 
   handleDeath() {
-    this.onDeath.dispatch();
+    EventsManager.dispatch( 'playerDeath' );
   }
 }
