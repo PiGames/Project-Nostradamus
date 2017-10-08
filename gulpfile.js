@@ -39,13 +39,11 @@ function isProduction() {
  * Logs the current build mode on the console.
  */
 function logBuildMode() {
-
     if (isProduction()) {
         gutil.log(gutil.colors.green('Running production build...'));
     } else {
         gutil.log(gutil.colors.yellow('Running development build...'));
     }
-
 }
 
 /**
@@ -68,7 +66,13 @@ function cleanBuild() {
  */
 function copyStatic() {
     gulp.src('LICENSE.md')
-      .pipe(gulp.dest(BUILD_PATH));
+      .pipe(gulp.dest(BUILD_PATH))
+      .on('error', function(error) {
+        if (error.code !== 'ENOENT'){
+          gutil.log(gutil.colors.red('[Build Error]', error.message));
+          this.emit('end');
+        }
+      });
     return gulp.src(STATIC_PATH + '/**/*')
         .pipe(gulp.dest(BUILD_PATH));
 }
@@ -115,7 +119,7 @@ function build() {
             transform: [
                 [
                     babelify, {
-                        presets: ["es2015"]
+                        presets: ["es2015", "stage-2"]
                     }
                 ]
             ]
