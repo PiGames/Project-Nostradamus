@@ -19,7 +19,7 @@ const HtmlWebpackPluginConfig = {
 
 module.exports = {
   iP,
-  port: process.env.PORT || 9000,
+  port: process.env.PORT || 3000,
   config: {
     entry: [
       path.join( __rootdir, 'src/index.js' ),
