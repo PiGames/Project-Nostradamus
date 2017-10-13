@@ -3,7 +3,9 @@ const path = require( 'path' );
 const webpack = require( 'webpack' );
 const HtmlWebpackPlugin = require( 'html-webpack-plugin' );
 const FaviconsWebpackPlugin = require( 'favicons-webpack-plugin' );
+const BundleAnalyzerPlugin = require( 'webpack-bundle-analyzer' ).BundleAnalyzerPlugin;
 
+const analyseBundle = process.env.ANALYSE_BUNDLE || false;
 const isPhaser = context => ( context.indexOf( 'phaser' ) >= 0 || context.indexOf( 'p2' ) >= 0 || context.indexOf( 'pixi' ) >= 0 );
 
 const iP = process.env.NODE_ENV === 'production';
@@ -65,6 +67,9 @@ module.exports = {
     },
 
     plugins: [
+      ( analyseBundle ? new BundleAnalyzerPlugin( {
+        analyzerMode: 'static',
+      } ) : () => {} ),
       new webpack.optimize.CommonsChunkPlugin( {
         name: 'phaser',
         filename: 'scripts/phaser.[hash].js',

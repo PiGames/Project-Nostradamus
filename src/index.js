@@ -1,3 +1,4 @@
+import './phaser.js';
 import 'styles/main.css';
 
 import ProjectNostradamus from './ProjectNostradamus';
