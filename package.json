@@ -6,8 +6,8 @@
   "scripts": {
     "start": "webpack-dev-server --config ./build/webpack.dev.config.js",
     "build": "webpack --config ./build/webpack.prod.config.js -p --progress",
-    "deploy": "gulp deploy",
-    "deploy-for-testers": "gulp deploy-for-testers --ssh",
+    "deploy": "sh ./build/deploy.sh https://github.com/PiGames/Project-Nostradamus gh-pages",
+    "deploy-for-testers": "sh ./build/deploy.sh https://github.com/PiGames/PN-for-testers master",
     "document": "jsdoc -d docs src/ src/**"
   },
   "repository": {
