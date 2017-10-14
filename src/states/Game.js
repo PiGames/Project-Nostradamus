@@ -49,7 +49,7 @@ export default class Game extends Phaser.State {
     const createNewId = IdCreator();
 
     for ( let i = 0; i < this.map.paths.length; i++ ) {
-      const newZombie = new Zombie( this.game, 'zombie', createNewId() );
+      const newZombie = new Zombie( this.game, 'zombie', createNewId.next().value );
 
       newZombie.setTilePosition( this.map.paths[ i ][ 0 ] );
       newZombie.initializeChasingSystem( this.player, this.map.walls );
