@@ -1,5 +1,6 @@
 import { pixelsToTile } from '../utils/MapUtils.js';
 import { TILE_SIZE } from '../constants/TileMapConstants.js';
+import { getWallsPositions } from '../utils/MapUtils.js';
 
 export default class TileMap extends Phaser.Tilemap {
   constructor( game, key, tileWidth, tileHeight ) {
@@ -34,6 +35,10 @@ export default class TileMap extends Phaser.Tilemap {
     }
 
     this.createPathPoints();
+
+    this.wallsData = getWallsPositions( this.walls );
+
+    this.calculateWallsEndpoints();
   }
   collides( collisionGroup, callback ) {
     for ( const body of this.wallsBodiesArray ) {
@@ -100,5 +105,47 @@ export default class TileMap extends Phaser.Tilemap {
   }
   getPath( i ) {
     return this.paths[ i ];
+  }
+  calculateWallsEndpoints() {
+    const flattenWallsMap = this.walls.layer.data.reduce( ( flattenArr, column ) => {
+      flattenArr.push( ...column );
+      return flattenArr;
+    }, [] );
+
+    const wallsEndpoints = flattenWallsMap.reduce( ( endpoints, tile ) => {
+      endpoints.push( ...this.getTileEndpoints( tile ) );
+      return endpoints;
+    }, [] );
+
+    this.wallsEndpoints = wallsEndpoints;
+    console.log( 'wallsEndpoints', this.wallsEndpoints );
+  }
+  areWalls( ...tiles ) {
+    for ( const tile of tiles ) {
+      if ( this.wallsData[ tile.x ][ tile.y ] !== 1 ) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+  isTileCorner( x, y ) {
+    const m = this.wallsData;
+    return this.areWalls( { x: Math.max( 0, x - 1 ), y }, { x: Math.min( x + 1, m.length ), y } )
+    || this.areWalls( { x, y: Math.max( 0, y - 1 ) }, { x, y: Math.min( y + 1, m[ 0 ].length ) } );
+  }
+  getTileEndpoints( { x, y } ) {
+    if ( !this.isTileCorner( x, y ) ) {
+      return [];
+    }
+    return this.getCornerEndpoints( x, y );
+  }
+  getCornerEndpoints( x, y ) {
+    const m = this.wallsData;
+    const endpoints = [];
+    if ( this.areWalls({x: Math.max( 0, x - 1 ), y: Math.min( y + 1, m[ 0 ].length )}) ) {
+      endpoints.push({x: (x+1)*TILE_SIZE, y: (y-1)*TILE_SIZE )})
+      // TODO get neighbours
+    }
   }
 }

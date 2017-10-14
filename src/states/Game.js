@@ -12,7 +12,6 @@ import StatusLight from '../objects/LightsComponents/StatusLight';
 
 import { PLAYER_INITIAL_FRAME } from '../constants/PlayerConstants';
 import { TILE_SIZE } from '../constants/TileMapConstants';
-import { getWallsPositions } from '../utils/MapUtils';
 
 export default class Game extends Phaser.State {
   create() {
@@ -63,8 +62,7 @@ export default class Game extends Phaser.State {
     this.game.camera.follow( this.player );
   }
   initZombies() {
-    const wallsPositions = getWallsPositions( this.map.walls );
-    this.zombies = new BoidsManager( this.game, wallsPositions );
+    this.zombies = new BoidsManager( this.game, this.map.wallsData );
 
     for ( let i = 0; i < this.map.paths.length; i++ ) {
       const newZombie = new Zombie( this.game, 'zombie' );
@@ -72,7 +70,7 @@ export default class Game extends Phaser.State {
       newZombie.setTilePosition( this.map.paths[ i ][ 0 ] );
       newZombie.initializeChasingSystem( this.player, this.map.walls );
       newZombie.body.setCollisionGroup( this.zombiesCollisionGroup );
-      newZombie.initializePathSystem( this.map.getPath( i ), wallsPositions );
+      newZombie.initializePathSystem( this.map.getPath( i ), this.map.wallsData );
       newZombie.startPathSystem();
 
       this.player.onDeath.add( () => newZombie.onPlayerDeath() );

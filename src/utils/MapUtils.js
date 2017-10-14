@@ -16,25 +16,11 @@ export const pixelsToTile = ( coords ) => ( {
 } );
 
 export const getWallsPositions = ( layer ) => {
-  const { width: mapWidth, height: mapHeight } = layer.game.world;
-  const walls = layer.getTiles( 0, 0, mapWidth, mapHeight );
-
-  const mapHeightInTiles = Math.floor(mapHeight / TILE_SIZE);
-
-  const wallsData = walls.reduce( ( columns, tile ) => {
-    const lastColumn = columns[columns.length - 1];
-    const tileData = tile.index !== -1 ? 1 : 0;
-
-    if( lastColumn.length === mapHeightInTiles - 1 ) {
-      columns.push([tileData]);
-      return columns;
-    }
-
-    lastColumn.push(tileData);
-    return columns;
-  }, [[]]);
-
-  return wallsData;
+  return layer.layer.data.map( column =>
+    column.map(
+      tile => tile.index !== -1 ? 1 : 0
+    )
+  );
 };
 
 export function isTileBlocking( begin, end, walls ) {
