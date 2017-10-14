@@ -1,6 +1,6 @@
 
 # Created by https://www.gitignore.io/api/osx,macos,linux,node,windows
-build
+dist
 ### OSX ###
 *.DS_Store
 .AppleDouble
@@ -121,7 +121,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-build
 .publish
 .vscode
 
